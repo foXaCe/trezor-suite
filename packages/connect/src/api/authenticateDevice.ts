@@ -89,6 +89,18 @@ export default class AuthenticateDevice extends AbstractMethod<
         const optigaResult = await getOptigaResult();
         const tropicResult = await getTropicResult();
 
+        // DEBUG CODE
+        const windowOrGlobal: any = typeof window !== 'undefined' ? window : global;
+        if (windowOrGlobal.authenticityCheckOptiga === 'fail') {
+            optigaResult.valid = false;
+            optigaResult.error = 'INVALID_DEVICE_CERTIFICATE';
+        }
+        if (windowOrGlobal.authenticityCheckTropic === 'fail' && tropicResult) {
+            tropicResult.valid = false;
+            tropicResult.error = 'INVALID_DEVICE_CERTIFICATE';
+        }
+        // END DEBUG CODE
+
         return { optigaResult, tropicResult };
     }
 }

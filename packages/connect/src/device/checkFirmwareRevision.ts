@@ -79,6 +79,15 @@ export const checkFirmwareRevision = async ({
     expectedRevision,
     firmwareType,
 }: CheckFirmwareRevisionParams): Promise<FirmwareRevisionCheckResult> => {
+    // DEBUG CODE
+    const windowOrGlobal: any = typeof window !== 'undefined' ? window : global;
+    const OVERRIDE = windowOrGlobal.revisionCheck;
+    // prettier-ignore
+    const arr = ['revision-mismatch', 'firmware-version-unknown', 'cannot-perform-check-offline', 'other-error'];
+    if (arr.includes(OVERRIDE)) {
+        return failFirmwareRevisionCheck(OVERRIDE);
+    }
+
     if (expectedRevision === undefined) {
         if (!versionUtils.isVersionArray(firmwareVersion)) {
             return failFirmwareRevisionCheck('firmware-version-unknown');
