@@ -11,7 +11,7 @@ import {
     VStack,
     useDiscreetMode,
 } from '@suite-native/atoms';
-import { useBiometricsSettings, useIsBiometricsEnabled } from '@suite-native/biometrics';
+import { selectIsBiometricsEnabled, useBiometricsSettings } from '@suite-native/biometrics';
 import { Translation } from '@suite-native/intl';
 import { DynamicScreenHeader, Screen } from '@suite-native/navigation';
 import { useAnalytics } from '@suite-native/services';
@@ -90,12 +90,12 @@ const AnalyticsSwitchRow = () => {
 };
 
 const BiometricsSwitchRow = () => {
-    const { isBiometricsOptionEnabled } = useIsBiometricsEnabled();
+    const isBiometricsEnabled = useSelector(selectIsBiometricsEnabled);
     const { toggleBiometricsOption } = useBiometricsSettings();
 
     return (
         <TouchableSwitchRow
-            isChecked={isBiometricsOptionEnabled}
+            isChecked={isBiometricsEnabled}
             onChange={toggleBiometricsOption}
             accessibilityLabel="biometrics"
             text={<Translation id="moduleSettings.privacyAndSecurity.biometrics.title" />}

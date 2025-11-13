@@ -1,24 +1,27 @@
 import { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useAlert } from '@suite-native/alerts';
 import { events } from '@suite-native/analytics';
 import { useAnalytics } from '@suite-native/services';
 
 import {
-    useIsBiometricsEnabled,
-    useIsBiometricsOverlayVisible,
-    useIsUserAuthenticated,
-} from './biometricsAtoms';
+    authenticate,
+    selectIsBiometricsEnabled,
+    setIsBiometricsOverlayVisible,
+    setIsUserAuthenticated,
+    toggleEnableBiometrics,
+} from './biometricsSlice';
 import { getIsBiometricsFeatureAvailable } from './isBiometricsFeatureAvailable';
-import { authenticate } from './useBiometrics';
 
 export type BiometricsToggleResult = 'enabled' | 'disabled' | 'failed' | 'notAvailable';
 
 export const useBiometricsSettings = () => {
     const { showAlert } = useAlert();
-    const { setIsUserAuthenticated } = useIsUserAuthenticated();
-    const { isBiometricsOptionEnabled, setIsBiometricsOptionEnabled } = useIsBiometricsEnabled();
-    const { setIsBiometricsOverlayVisible } = useIsBiometricsOverlayVisible();
+
+    const dispatch = useDispatch();
+
+    const isBiometricsEnabled = useSelector(selectIsBiometricsEnabled);
     const analytics = useAnalytics();
     const toggleBiometricsOption = useCallback(async (): Promise<BiometricsToggleResult> => {
         const isBiometricsAvailable = await getIsBiometricsFeatureAvailable();
@@ -38,17 +41,17 @@ export const useBiometricsSettings = () => {
             return 'notAvailable';
         }
 
-        const authResult = await authenticate();
+        const authResult = await dispatch(authenticate()).unwrap();
 
         if (!authResult?.success) {
             return 'failed';
         }
 
-        setIsBiometricsOverlayVisible(false);
+        dispatch(setIsBiometricsOverlayVisible(false));
 
-        if (isBiometricsOptionEnabled) {
-            setIsBiometricsOptionEnabled(false);
-            setIsUserAuthenticated(false);
+        if (isBiometricsEnabled) {
+            dispatch(toggleEnableBiometrics(false));
+            dispatch(setIsUserAuthenticated(false));
             analytics.report({
                 type: events.biometricsChangeEvent.name,
                 payload: { enabled: false, origin: 'settingsToggle' },
@@ -58,7 +61,7 @@ export const useBiometricsSettings = () => {
         }
 
         setIsUserAuthenticated(true);
-        setIsBiometricsOptionEnabled(true);
+        dispatch(toggleEnableBiometrics(true));
         analytics.report({
             type: events.biometricsChangeEvent.name,
             payload: { enabled: true, origin: 'settingsToggle' },
@@ -67,11 +70,12 @@ export const useBiometricsSettings = () => {
         return 'enabled';
     }, [
         analytics,
-        isBiometricsOptionEnabled,
         setIsBiometricsOptionEnabled,
         setIsBiometricsOverlayVisible,
         setIsUserAuthenticated,
         showAlert,
+        dispatch,
+        isBiometricsEnabled
     ]);
 
     return { toggleBiometricsOption };
