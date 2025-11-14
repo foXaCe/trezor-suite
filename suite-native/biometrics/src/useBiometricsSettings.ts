@@ -32,8 +32,6 @@ export const useBiometricsSettings = () => {
             }
         }
 
-        if (!authResult.payload) return 'failed';
-
         return authResult.payload;
     }, [dispatch, showAlert]);
 
