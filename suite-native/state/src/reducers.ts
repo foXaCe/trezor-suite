@@ -344,8 +344,6 @@ export const prepareRootReducers = (deps: PrepareRootReducersDeps) => {
             app: appReducer,
             appSettings: appSettingsPersistedReducer,
             biometrics: biometricsPersistedReducer,
-            wallet: walletPersistedReducer,
-            featureFlags: featureFlagsPersistedReducer,
             bannerFlags: bannerFlagsPersistedReducer,
             bluetooth: bluetoothPersistedReducer,
             connectPopup: connectPopupPersistedReducer,
