@@ -93,11 +93,16 @@ export class EvoluClient {
     }
 
     @step()
-    async debugReadAllTablesAndThrow() {
+    async readAllTables() {
         const allTables = Object.keys(Schema) as TableName[];
         const allDataPromise = allTables.map(async table => await this.readFrom(table));
+        return Promise.all(allDataPromise);
+    }
+
+    @step()
+    async debugReadAllTablesAndThrow() {
         await expect(async () => {
-            const allData = await Promise.all(allDataPromise);
+            const allData = await this.readAllTables();
             // test if any tables are empty
             if (allData.some(item => item.length === 0)) {
                 // we want to throw even partial results so we can debug

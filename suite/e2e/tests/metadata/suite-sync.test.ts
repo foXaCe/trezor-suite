@@ -7,6 +7,8 @@ import { asAccountDescriptor, asWalletDescriptor } from '@suite-common/wallet-ty
 import { isWebProject, skipFixture } from '../../support/common';
 import { AccountLabelId } from '../../support/enums/accountLabelId';
 import { expect, test } from '../../support/fixtures';
+import { dash } from '@trezor/utxo-lib/src/networks';
+import { DevicePrompt } from '../../support/pageObjects/devicePrompt';
 
 test.use({ exceptionLogger: skipFixture });
 test.describe(
@@ -104,7 +106,7 @@ const addressSeed = {
 
 test.describe(
     'Suite Sync - Labelling',
-    { tag: ['@webOnly', '@specificFirmware', '@T3W1', '@T3T1'] },
+    { tag: ['@specificFirmware', '@smoke', '@T3W1', '@T3T1'] },
     () => {
         test.use({
             firmwareVersion: '2-main',
@@ -120,18 +122,29 @@ test.describe(
                 evoluClient.writeTo('wallet', walletSeed);
                 evoluClient.writeTo('account', accountSeed);
                 evoluClient.writeTo('address', addressSeed);
+                console.error(
+                    'RIGHT AFTER INSERT - Evolu seeded with data:',
+                    JSON.stringify(await evoluClient.readAllTables(), null, 2),
+                );
+                await new Promise(resolve => setTimeout(resolve, 5_000));
+                console.error(
+                    'AFTER DELAY AFTER INSERT - Evolu seeded with data:',
+                    JSON.stringify(await evoluClient.readAllTables(), null, 2),
+                );
             });
         });
 
         test('Sync labels from server', async ({
+            page,
             target,
             device,
             dashboardPage,
             walletPage,
             metadataPage,
+            evoluClient,
         }) => {
             await test.step('Enable Suite Sync', async () => {
-                await metadataPage.setupQuotaManager();
+                // await metadataPage.setupQuotaManager();
                 await metadataPage.initiateSuiteSyncSetup();
                 if (isWebProject(target)) {
                     // eslint-disable-next-line playwright/no-conditional-expect
@@ -191,6 +204,45 @@ test.describe(
                     .soft(metadataPage.address.label(addressSeed.address))
                     .toHaveText(addressSeed.label);
             });
+
+            console.error(
+                'AFTER VERIFICATION - Evolu seeded with data:',
+                JSON.stringify(await evoluClient.readAllTables(), null, 2),
+            );
+
+            // ---- tady konci test --- //
+            await dashboardPage.openDeviceSwitcher();
+            await dashboardPage.addHiddenWalletButton.click();
+            await dashboardPage.addNewHiddenWalletButton.click();
+            await device.debugThrowJSONFromDisplay();
+            await dashboardPage.openUnusedWalletButton2.click();
+            await page.getByTestId('@switch-device/close-button').click();
+
+            const newLabel = 'my synced btc account label';
+            await test.step('Change BTC account label in first session', async () => {
+                await walletPage
+                    .accountLabel({ symbol: 'btc', type: 'normal', atIndex: 0 })
+                    .click();
+                await metadataPage.account.clickEditLabelButton(AccountLabelId.BitcoinDefault1);
+                await metadataPage.account.metadataInput.fill(newLabel);
+                await page.keyboard.press('Enter');
+                await expect(
+                    walletPage.accountLabel({ symbol: 'btc', type: 'normal', atIndex: 0 }),
+                ).toHaveText(newLabel);
+
+                await page.waitForTimeout(5_000); // wait for sync to complete
+            });
+
+            console.error(
+                'AFTER LABEL CHANGE - Evolu seeded with data:',
+                JSON.stringify(await evoluClient.readAllTables(), null, 2),
+            );
+            await page.waitForTimeout(5_000); // wait for sync to complete
+
+            console.error(
+                'FINAL STATE - Evolu seeded with data:',
+                JSON.stringify(await evoluClient.readAllTables(), null, 2),
+            );
         });
     },
 );
