@@ -68,7 +68,7 @@ jobs:
 
       - name: Build a Detox test app
         working-directory: ./suite-native/app
-        run: npx detox build --configuration ios.sim.release
+        run: npx detox build --configuration ios.sim.debug
 
       - name: Store build artifact
         uses: actions/upload-artifact@v4
@@ -146,7 +146,7 @@ jobs:
           GITHUB_ACTION: true
         run: |
           npx detox clean-framework-cache && npx detox build-framework-cache
-          yarn test:e2e ios.sim.release --headless
+          yarn test:e2e ios.sim.debug --headless
 
       - name: Upload results to Currents.dev
         if: ${{ ! cancelled() }}
