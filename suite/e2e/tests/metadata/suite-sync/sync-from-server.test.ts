@@ -30,7 +30,7 @@ const addressSeed = {
 
 test.describe(
     'Suite Sync - Labelling',
-    { tag: ['@webOnly', '@specificFirmware', '@T3W1', '@T3T1'] },
+    { tag: ['@webOnly', '@T3W1', '@T3T1'] },
     () => {
         test.use({
             deviceSetup: { passphrase_protection: true },
@@ -38,7 +38,7 @@ test.describe(
 
         test.beforeEach(async ({ evoluClient, onboardingPage }) => {
             await test.step('Seed Evolu relay server', async () => {
-                evoluClient.wipeAndRestartServer();
+                //evoluClient.wipeAndRestartServer();
                 await evoluClient.init({ ownerSecret });
                 evoluClient.writeTo('wallet', walletSeed);
                 evoluClient.writeTo('account', accountSeed);

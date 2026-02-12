@@ -48,14 +48,14 @@ const expectedOutput = {
 
 test.describe(
     'Suite Sync - Labelling',
-    { tag: ['@webOnly', '@specificFirmware', '@T3W1', '@T3T1'] },
+    { tag: ['@webOnly', '@T3W1', '@T3T1'] },
     () => {
         test.use({
             deviceSetup: { passphrase_protection: true },
         });
 
         test.beforeEach(async ({ evoluClient, onboardingPage, metadataPage }) => {
-            evoluClient.wipeAndRestartServer();
+            //evoluClient.wipeAndRestartServer();
             await onboardingPage.completeOnboarding({ keepDebugModeEnabled: true });
             await metadataPage.setupQuotaManager();
             await metadataPage.enableSuiteSync();
