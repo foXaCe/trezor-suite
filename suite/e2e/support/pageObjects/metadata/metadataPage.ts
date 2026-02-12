@@ -55,7 +55,9 @@ export class MetadataPage {
     }
 
     @step()
-    async initiateSuiteSyncSetup() {
+    async initiateSuiteSyncSetup(
+        URL = 'http://127.0.0.1:4000',
+    ) {
         // Enable Suite Sync in Experimental Features
         await this.settingsPage.navigateTo('application');
         await this.settingsPage.experimentalFeaturesSwitch.click();
@@ -63,7 +65,7 @@ export class MetadataPage {
 
         // Configure Suite Sync relay URL in Debug settings
         await this.settingsPage.navigateTo('debug');
-        await this.settingsPage.debugTab.suiteSyncUrlInput.fill('http://127.0.0.1:4000');
+        await this.settingsPage.debugTab.suiteSyncUrlInput.fill(URL);
         await this.settingsPage.debugTab.suiteSyncUrlSaveButton.click();
 
         // Select Suite Sync as the labeling method
@@ -83,16 +85,20 @@ export class MetadataPage {
     }
 
     @step()
-    async enableSuiteSync() {
-        await this.initiateSuiteSyncSetup();
+    async enableSuiteSync(
+        URL?: string
+    ) {
+        await this.initiateSuiteSyncSetup(URL);
         await this.confirmSuiteSyncSetup();
     }
 
     @step()
-    async setupQuotaManager() {
+    async setupQuotaManager(
+        URL = 'http://127.0.0.1:4001',
+    ) {
         await this.settingsPage.navigateTo('debug');
         await this.settingsPage.debugTab.quotaManagerCheckbox.click();
-        await this.settingsPage.debugTab.quotaManagerUrlInput.fill('http://127.0.0.1:4001');
+        await this.settingsPage.debugTab.quotaManagerUrlInput.fill(URL);
         await this.settingsPage.debugTab.quotaManagerUrlSaveButton.click();
     }
 }
