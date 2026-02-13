@@ -7,7 +7,7 @@ import { Translation } from '@suite-native/intl';
 import { prepareNativeStyle, useNativeStyles } from '@trezor/styles';
 
 import { BiometricsIcon } from './BiometricsIcon';
-import { selectShouldUserBeAuthenticated } from '../biometricsSlice';
+import { selectShouldUserBeAuthenticated } from '../biometricsSelectors';
 import { authenticateUserThunk } from '../biometricsThunks';
 
 const overlayWrapperStyle = prepareNativeStyle(utils => ({

@@ -8,11 +8,13 @@ import { createThunk } from '@suite-common/redux-utils';
 import { asTypedNativeAnalytics, events } from '@suite-native/analytics';
 
 import {
-    changeGoneToBackgroundAtTimestamp,
     selectGoneToBackgroundAtTimestamp,
     selectIsBiometricsEnabled,
     selectIsTogglingBiometrics,
     selectShouldUserBeAuthenticated,
+} from './biometricsSelectors';
+import {
+    changeGoneToBackgroundAtTimestamp,
     setIsUserAuthenticated,
     toggleEnableBiometrics,
 } from './biometricsSlice';

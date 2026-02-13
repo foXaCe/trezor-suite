@@ -7,7 +7,7 @@ import {
     selectBiometricsError,
     selectIsBiometricsEnabled,
     selectShouldUserBeAuthenticated,
-} from '../biometricsSlice';
+} from '../biometricsSelectors';
 import { handleBiometricsAppStateChangeThunk } from '../biometricsThunks';
 
 export const BiometricsModalRenderer = () => {
