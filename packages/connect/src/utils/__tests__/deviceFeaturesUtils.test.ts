@@ -216,8 +216,6 @@ describe('utils/deviceFeaturesUtils', () => {
                 tbtg: 'no-support',
                 dash: 'no-support',
                 tdash: 'no-support',
-                dcr: 'no-support',
-                tdcr: 'no-support',
                 dgb: 'no-support',
                 maid: 'no-capability',
                 nmc: 'no-support',
