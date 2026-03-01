@@ -161,7 +161,6 @@ describe('utils/deviceFeaturesUtils', () => {
                 xrp: 'no-support',
                 xtz: 'no-support',
                 xvg: 'update-required',
-                zcr: 'update-required',
                 chunkify: 'no-support',
                 evmApproval: 'no-support',
                 evolu: 'no-support',
