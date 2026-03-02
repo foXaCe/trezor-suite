@@ -139,40 +139,15 @@ const parseBitcoinNetworksJson = (json: any) => {
 
         bitcoinNetworks.push({
             type: 'bitcoin',
-            // address_type in Network
-            // address_type_p2sh in Network
-            // bech32_prefix in Network
-            // consensus_branch_id in Network
-            // bip115: not used
-            // bitcore: not used,
-            // blockbook: not used,
             blockchainLink: coin.blockchain_link,
-            cashAddrPrefix: coin.cashaddr_prefix,
             label: coin.coin_label,
             name: coin.coin_name,
             shortcut,
-            // cooldown not used
-            curveName: coin.curve_name,
-            forceBip143: coin.force_bip143,
-            // forkid in Network
-            // github not used
-            hashGenesisBlock: coin.hash_genesis_block,
-            // key not used
-            // maintainer not used
-            maxAddressLength: coin.max_address_length,
             maxFeeSatoshiKb: coin.maxfee_kb,
-            minAddressLength: coin.min_address_length,
             minFeeSatoshiKb: coin.minfee_kb,
-            // name: same as coin_label
             segwit: coin.segwit,
-            // signed_message_header in Network
             slip44: coin.slip44,
             support: coin.support,
-            // uri_prefix not used
-            // version_group_id not used
-            // website not used
-            // xprv_magic in Network
-            xPubMagic: coin.xpub_magic,
             xPubMagicSegwitNative: coin.xpub_magic_segwit_native,
             xPubMagicSegwit: coin.xpub_magic_segwit_p2sh,
             taproot: coin.taproot,

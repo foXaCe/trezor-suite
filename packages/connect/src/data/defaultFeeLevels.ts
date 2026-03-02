@@ -45,9 +45,10 @@ const getEvmChainGweiGasPrice = (chain: string) =>
         minPriorityFee: 0,
     };
 
-// partial data from coins.jon
+// partial data from coins.json
 interface CoinsJsonData {
-    shortcut: string; // uppercase shortcut
+    coin_shortcut: string; // uppercase shortcut (bitcoin entries)
+    shortcut: string; // uppercase shortcut (misc/eth entries)
     blocktime_seconds: number;
     // data below are defined and relevant only for bitcoin-like networks
     default_fee_b: Record<'High' | 'Normal' | 'Economy' | 'Low', number>;
@@ -64,7 +65,7 @@ export const getBitcoinFeeLevels = (coin: CoinsJsonData): FeeInfoWithLevels => {
     // sort fee levels from coinInfo
     // and transform in to FeeLevel object
     const defaultFees = coin.default_fee_b;
-    const shortcut = coin.shortcut.toLowerCase();
+    const shortcut = (coin.coin_shortcut || coin.shortcut).toLowerCase();
     const keys = typedObjectKeys(defaultFees);
     const levels = keys
         .sort((levelA, levelB) => defaultFees[levelB] - defaultFees[levelA])
@@ -80,7 +81,9 @@ export const getBitcoinFeeLevels = (coin: CoinsJsonData): FeeInfoWithLevels => {
 
     // BTC supports lower fees (min 0.1 sat/vb), so do not round for it
     const minFee =
-        coin.shortcut === 'BTC' ? coin.minfee_kb / 1000 : Math.round(coin.minfee_kb / 1000);
+        (coin.coin_shortcut || coin.shortcut) === 'BTC'
+            ? coin.minfee_kb / 1000
+            : Math.round(coin.minfee_kb / 1000);
 
     return {
         blockTime: Math.max(1, Math.round(coin.blocktime_seconds / 60)),
