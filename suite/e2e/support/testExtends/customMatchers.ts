@@ -249,7 +249,7 @@ export const expect = baseExpect.extend({
 
     async toHaveTranslation(
         locator: Locator,
-        translationKey: TranslationKey,
+        translationKey: TranslationKey | TranslationKey[],
         // Use ICU values for placeholders (e.g., { amount, symbol, days })
         options?: {
             isValueElement?: boolean;
@@ -257,24 +257,31 @@ export const expect = baseExpect.extend({
             timeout?: number;
         },
     ) {
-        const template = messages[translationKey].defaultMessage;
-        const values = options?.values;
-        const expectedTranslation =
-            values && Object.keys(values).length > 0
-                ? String(
-                      intlEn.formatMessage(
-                          { id: translationKey, defaultMessage: template },
-                          options.values,
-                      ),
-                  )
+        // Helper to resolve a translation key into its formatted string
+        const translate = (key: TranslationKey) => {
+            const template = messages[key].defaultMessage;
+            const values = options?.values;
+
+            return values && Object.keys(values).length > 0
+                ? String(intlEn.formatMessage({ id: key, defaultMessage: template }, values))
                 : template;
+        };
+
+        /*
+         * Resolve all keys into translated strings.
+         * If an array is provided, 'expected' will be an array of strings,
+         * enabling the locator to match multiple elements simultaneously.
+         */
+        const expected = Array.isArray(translationKey)
+            ? translationKey.map(translate)
+            : translate(translationKey);
 
         if (options?.isValueElement) {
-            await baseExpect(locator).toHaveValue(expectedTranslation, {
+            await baseExpect(locator).toHaveValue(expected as string, {
                 timeout: options?.timeout,
             });
         } else {
-            await baseExpect(locator).toHaveText(expectedTranslation, {
+            await baseExpect(locator).toHaveText(expected as string | string[], {
                 timeout: options?.timeout,
             });
         }
