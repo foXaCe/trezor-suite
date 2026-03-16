@@ -13965,8 +13965,8 @@ __metadata:
     "@testing-library/react-native": "npm:13.3.3"
     "@trezor/styles": "workspace:*"
     "@trezor/theme": "workspace:*"
-    react: "npm:19.1.0"
-    react-native: "npm:0.81.5"
+    react: "npm:19.2.4"
+    react-native: "npm:0.83.2"
     react-native-safe-area-context: "npm:5.6.2"
     react-redux: "npm:9.2.0"
   languageName: unknown
