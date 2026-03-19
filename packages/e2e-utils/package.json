@@ -8,6 +8,7 @@
     "scripts": {
         "depcheck": "yarn g:depcheck",
         "type-check": "yarn g:tsc --build",
+        "test:unit": "yarn g:jest --verbose",
         "test-health": "tsx ./src/quarantineBot/index.ts",
         "seed-tests": "CURRENTS_PROJECT_ID=iBEsWE yarn pwc --config ./src/quarantineBot/seed/playwright.config.ts",
         "lint:js": "yarn g:eslint '**/*.{ts,tsx,js}'"
