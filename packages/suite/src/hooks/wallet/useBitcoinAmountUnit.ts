@@ -19,6 +19,7 @@ export const useBitcoinAmountUnit = (symbol?: NetworkSymbol) => {
     };
 
     const areSatsDisplayed = bitcoinAmountUnit === PROTO.AmountUnit.SATOSHI;
+    const isBtcSatsAmountUnit = areSatsDisplayed && symbol === 'btc';
 
     const areUnitsSupportedByDevice = !unavailableCapabilities?.amountUnit;
 
@@ -27,8 +28,9 @@ export const useBitcoinAmountUnit = (symbol?: NetworkSymbol) => {
     return {
         bitcoinAmountUnit,
         areSatsDisplayed,
+        isBtcSatsAmountUnit,
         shouldSendInSats:
-            areSatsDisplayed && areUnitsSupportedByNetwork && areUnitsSupportedByDevice,
+            isBtcSatsAmountUnit && areUnitsSupportedByNetwork && areUnitsSupportedByDevice,
         toggleBitcoinAmountUnits: toggleBitcoinAmountUnitsAction,
         setBitcoinAmountUnits: setBitcoinAmountUnitsAction,
         areUnitsSupportedByNetwork,

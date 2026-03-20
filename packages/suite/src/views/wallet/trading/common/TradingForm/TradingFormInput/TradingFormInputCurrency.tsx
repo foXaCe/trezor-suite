@@ -14,7 +14,7 @@ import {
     isTradingFiatCurrencyOption,
 } from '@suite-common/trading';
 import { buildCurrencyOptions, buildCurrencyShortOption } from '@suite-common/wallet-utils';
-import { isBaseCurrencyCode } from '@trezor/blockchain-link-types';
+import { isFiatBaseCurrencyCode } from '@trezor/blockchain-link-types';
 
 import { useTradingFormContext } from 'src/hooks/wallet/trading/form/useTradingCommonForm';
 import {
@@ -29,8 +29,6 @@ import {
     isTradingSellContext,
 } from 'src/utils/wallet/trading/tradingTypingUtils';
 
-import { useBitcoinAmountUnit } from '../../../../../../hooks/wallet/useBitcoinAmountUnit';
-
 export const TradingFormInputCurrency = ({
     width,
     isClean = false,
@@ -43,18 +41,24 @@ export const TradingFormInputCurrency = ({
     const currentCurrency = getSelectedTradingCurrency(context);
     const fiatCurrencies = getFiatCurrenciesProps(context);
     const currencies = fiatCurrencies?.supportedFiatCurrencies ?? null;
-    const { areSatsDisplayed } = useBitcoinAmountUnit(context.network.symbol);
+    const selectedBaseCurrencyValue = isFiatBaseCurrencyCode(currentCurrency.value)
+        ? currentCurrency.value
+        : '';
+
     const selectedBaseCurrency = buildCurrencyShortOption({
-        currency: isBaseCurrencyCode(currentCurrency.value) ? currentCurrency.value : '',
-        areSatsDisplayed,
+        currency: selectedBaseCurrencyValue,
+        areSatsDisplayed: false,
     });
 
     const options = useMemo(
         () =>
             currencies
                 ? [...currencies].map(currency => buildTradingFiatOption(currency))
-                : buildCurrencyOptions({ selected: selectedBaseCurrency, areSatsDisplayed }),
-        [currencies, selectedBaseCurrency, areSatsDisplayed],
+                : buildCurrencyOptions({
+                      selected: selectedBaseCurrency,
+                      areSatsDisplayed: false,
+                  }).filter(option => isFiatBaseCurrencyCode(option.value)),
+        [currencies, selectedBaseCurrency],
     );
 
     const onChangeAdditional = (option: TradingFiatCurrencyOption) => {
