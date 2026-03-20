@@ -1,5 +1,5 @@
 import { type Network, type NetworkSymbol } from '@suite-common/wallet-config';
-import { Paragraph } from '@trezor/components';
+import { Column, H4 } from '@trezor/components';
 
 import { CoinList } from 'src/components/suite/CoinList/CoinList';
 
@@ -21,20 +21,15 @@ export const SelectNetwork = ({
     }
 
     return (
-        <div>
-            <Paragraph
-                intent="neutral"
-                priority="secondary"
-                margin={{ bottom: 12 }}
-                typographyStyle="body-sm"
-            >
+        <Column gap={12}>
+            <H4 intent="neutral" priority="secondary" typographyStyle="body-sm">
                 {heading}
-            </Paragraph>
+            </H4>
             <CoinList
-                onToggle={handleNetworkSelection}
+                onClick={handleNetworkSelection}
                 networks={networks}
                 enabledNetworks={selectedNetworks}
             />
-        </div>
+        </Column>
     );
 };

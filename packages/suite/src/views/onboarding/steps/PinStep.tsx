@@ -22,7 +22,7 @@ export const PinStep = () => {
     const modal = useSelector(state => state.modal);
     const dispatch = useDispatch();
 
-    const { goToNextStep, showPinMatrix, updateAnalytics } = useOnboarding();
+    const { goToSuite, showPinMatrix, updateAnalytics } = useOnboarding();
 
     const setPinAndSkipSuccessToast = () => dispatch(changePin({}, true));
     const onTryAgain = () => {
@@ -62,10 +62,10 @@ export const PinStep = () => {
 
             if (device && device.features.pin_protection) {
                 setStatus('success');
-                goToNextStep();
+                goToSuite();
             }
         }
-    }, [device, goToNextStep]);
+    }, [device, goToSuite]);
 
     if (!device || !device.features) {
         return null;

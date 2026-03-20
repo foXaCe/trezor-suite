@@ -22,7 +22,6 @@ export class OnboardingPage {
     readonly tutorial: TutorialSection;
 
     readonly welcomeBody: Locator;
-    readonly completeOnboardingButton: Locator;
     readonly connectDevicePrompt: Locator;
     readonly authenticityStartButton: Locator;
     readonly authenticityContinueButton: Locator;
@@ -55,7 +54,6 @@ export class OnboardingPage {
         this.pin = new PinSection(page);
 
         this.welcomeBody = this.page.getByTestId('@welcome-layout/body');
-        this.completeOnboardingButton = this.page.getByTestId('@onboarding/complete-onboarding');
         this.connectDevicePrompt = this.page.getByTestId('@connect-device-prompt');
         this.authenticityStartButton = this.page.getByTestId('@authenticity-check/start-button');
         this.authenticityContinueButton = this.page.getByTestId(
@@ -115,6 +113,24 @@ export class OnboardingPage {
         }
     }
     @step()
+    async skipPinIfVisible() {
+        const visibleState = await Promise.any([
+            this.pin.skipButton
+                .waitFor({ state: 'visible', timeout: 30_000 })
+                .then(() => 'pin' as const),
+            this.suiteLoadedIndicator
+                .waitFor({ state: 'visible', timeout: 60_000 })
+                .then(() => 'suite' as const),
+        ]);
+
+        if (visibleState === 'pin') {
+            await this.pin.skip();
+        }
+
+        await this.suiteLoadedIndicator.waitFor({ state: 'visible', timeout: 60_000 });
+    }
+
+    @step()
     async completeOnboarding(options?: { keepDebugModeEnabled?: boolean }) {
         await this.disableNecessaryFirmwareChecks();
         await this.disableDisconnectPrompt();
@@ -123,10 +139,12 @@ export class OnboardingPage {
 
         await this.pairTHP();
 
-        await this.completeOnboardingButton.click();
         if (this.device.hasSecureElement && this.device.model !== Model.T3W1) {
             await this.passThroughAuthenticityCheck();
         }
+
+        await this.skipPinIfVisible();
+
         // Enabled debug mode is needed for passing firmware checks but it also enables several hidden features
         // that differs from production version, so we disable it again after onboarding is done
         if (!options?.keepDebugModeEnabled) {

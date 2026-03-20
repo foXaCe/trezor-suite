@@ -1,7 +1,6 @@
 import React, { type ReactNode } from 'react';
 
 import { Card, Column, type IconName, InfoItem, Tooltip } from '@trezor/components';
-import { spacings } from '@trezor/theme';
 
 import { useLayoutSize } from 'src/hooks/suite';
 
@@ -11,9 +10,16 @@ type SettingsSectionProps = {
     className?: string;
     children?: ReactNode;
     tooltipText?: ReactNode;
+    hasContainer?: boolean;
 };
 
-export const SettingsSection = ({ title, icon, children, tooltipText }: SettingsSectionProps) => {
+export const SettingsSection = ({
+    title,
+    icon,
+    children,
+    tooltipText,
+    hasContainer = true,
+}: SettingsSectionProps) => {
     const { isBelowLaptop } = useLayoutSize();
     const width = isBelowLaptop ? '100%' : 250;
 
@@ -33,11 +39,17 @@ export const SettingsSection = ({ title, icon, children, tooltipText }: Settings
             typographyStyle="headline-sm"
             verticalAlignment="start"
         >
-            <Card>
-                <Column gap={spacings.xxl} hasDivider>
+            {hasContainer ? (
+                <Card>
+                    <Column gap={32} hasDivider>
+                        {children}
+                    </Column>
+                </Card>
+            ) : (
+                <Column gap={32} width="100%">
                     {children}
                 </Column>
-            </Card>
+            )}
         </InfoItem>
     );
 };

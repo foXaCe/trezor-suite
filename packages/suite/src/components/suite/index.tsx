@@ -40,7 +40,6 @@ import { HomescreenGallery } from './HomescreenGallery';
 import { DeviceMatrixExplanation } from './DeviceMatrixExplanation';
 import { TroubleshootingTips } from './troubleshooting/TroubleshootingTips';
 import { getMessageId } from './getMessageId';
-import { CoinGroup } from './CoinGroup/CoinGroup';
 import { CoinList } from './CoinList/CoinList';
 import { StatusLight } from './StatusLight';
 import { AmountUnitSwitchWrapper } from './AmountUnitSwitchWrapper';
@@ -90,7 +89,6 @@ export {
     HomescreenGallery,
     DeviceMatrixExplanation,
     TroubleshootingTips,
-    CoinGroup,
     CoinList,
     StatusLight,
     AmountUnitSwitchWrapper,

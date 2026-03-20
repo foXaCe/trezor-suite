@@ -80,16 +80,16 @@ test.describe('Onboarding - create wallet', { tag: ['@firmware-ready', '@T1B1'] 
                 await trezorInput.enterPinOnBlindMatrix(pin);
             });
 
+            await test.step('Finish wallet creation', async () => {
+                await expect(onboardingPage.suiteLoadedIndicator).toBeVisible();
+                await expect(dashboardPage.walletReady).toBeVisible();
+            });
+
             await test.step('Activate assets', async () => {
+                await settingsPage.navigateTo('coins');
                 await expect(settingsPage.coinsTab.networkButton('btc')).toBeEnabledCoin();
                 await expect(settingsPage.coinsTab.networkButton('eth')).toBeDisabledCoin();
                 await settingsPage.coinsTab.enableNetwork('eth');
-            });
-
-            await test.step('Finish wallet creation', async () => {
-                await onboardingPage.completeOnboardingButton.click();
-                await expect(onboardingPage.suiteLoadedIndicator).toBeVisible();
-                await expect(dashboardPage.walletReady).toBeVisible();
             });
         },
     );

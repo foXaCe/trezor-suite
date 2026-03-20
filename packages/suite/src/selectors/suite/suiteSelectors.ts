@@ -88,6 +88,8 @@ export const selectIsFirmwareRevisionCheckEnabled = (state: SuiteRootState) =>
     state.suite.settings.enabledSecurityChecks.firmwareRevision;
 export const selectAreDeviceMetaChecksEnabled = (state: SuiteRootState) =>
     state.suite.settings.enabledSecurityChecks.deviceMeta;
+export const selectIsUnlockedBootloaderAllowed = (state: SuiteRootState) =>
+    state.suite.settings.debug.isUnlockedBootloaderAllowed;
 
 // TODO use selectDeviceByDeviceRef from wallet-core; currently WIP in https://github.com/trezor/trezor-suite/pull/20955
 export const selectRecentlyConnectedDevice = (state: AppState): TrezorDevice | undefined =>

@@ -1,34 +1,33 @@
 import { Translation } from '@suite/intl';
 import { getCoinUnavailabilityMessage } from '@suite-common/suite-utils';
 import { type Network, type NetworkSymbol } from '@suite-common/wallet-config';
-import { Row, Tooltip } from '@trezor/components';
+import { selectBlockchainState } from '@suite-common/wallet-core';
+import { Column, Tooltip } from '@trezor/components';
 import { getFirmwareVersion, isDeviceInBootloaderMode } from '@trezor/device-utils';
-import { spacings } from '@trezor/theme';
 import { versionUtils } from '@trezor/utils';
 
 import { useDevice, useDiscovery, useSelector } from 'src/hooks/suite';
 import { getCoinLabel } from 'src/utils/suite/getCoinLabel';
 
-import { Coin } from './Coin';
+import { CoinCard } from './CoinCard';
 
 export type CoinListProps = {
     networks: Network[];
     enabledNetworks?: NetworkSymbol[];
-    settingsMode?: boolean;
+    onClick: (symbol: NetworkSymbol, isEnabled?: boolean) => void;
+    onToggle?: (symbol: NetworkSymbol, isEnabled?: boolean) => void;
     onSettings?: (symbol: NetworkSymbol) => void;
-    onToggle: (symbol: NetworkSymbol, toggled: boolean) => void;
 };
 
 export const CoinList = ({
     networks,
     enabledNetworks,
-    settingsMode = false,
-    onSettings,
+    onClick,
     onToggle,
+    onSettings,
 }: CoinListProps) => {
     const { device, isLocked } = useDevice();
-
-    const blockchain = useSelector(state => state.wallet.blockchain);
+    const blockchain = useSelector(selectBlockchainState);
     const isDeviceLocked = !!device && isLocked(true);
     const { isDiscoveryRunning } = useDiscovery();
     const lockedTooltip = isDeviceLocked ? 'TR_DISABLED_SWITCH_TOOLTIP' : null;
@@ -41,7 +40,7 @@ export const CoinList = ({
     const deviceDisplayName = device?.name;
 
     return (
-        <Row rowGap={spacings.md} columnGap={spacings.sm} flexWrap="wrap">
+        <Column gap={12} width="100%">
             {networks.map(network => {
                 const { symbol, name, support, features, testnet: isTestnet } = network;
                 const hasCustomBackend = !!blockchain[symbol].backends.selected;
@@ -59,8 +58,8 @@ export const CoinList = ({
 
                 const isEnabled = !!enabledNetworks?.includes(symbol);
 
-                const disabled =
-                    (!settingsMode && !!unavailableReason && !isBootloaderMode) ||
+                const isDisabled =
+                    (!!unavailableReason && !isBootloaderMode) ||
                     isDeviceLocked ||
                     !isSupportedByApp;
                 const unavailabilityTooltip =
@@ -75,6 +74,7 @@ export const CoinList = ({
                     <Tooltip
                         key={symbol}
                         placement="top"
+                        isActive={!!tooltipString}
                         content={
                             tooltipString && (
                                 <Translation
@@ -86,21 +86,19 @@ export const CoinList = ({
                             )
                         }
                     >
-                        <Coin
+                        <CoinCard
                             symbol={symbol}
                             name={name}
                             label={label}
-                            toggled={isEnabled}
-                            disabled={disabled || (settingsMode && !isEnabled)}
-                            forceHover={settingsMode}
-                            onToggle={disabled ? undefined : () => onToggle(symbol, !isEnabled)}
-                            onSettings={
-                                disabled || !onSettings ? undefined : () => onSettings(symbol)
-                            }
+                            isDisabled={isDisabled}
+                            isEnabled={isEnabled}
+                            onClick={onClick}
+                            onToggle={onToggle}
+                            onSettings={onSettings}
                         />
                     </Tooltip>
                 );
             })}
-        </Row>
+        </Column>
     );
 };

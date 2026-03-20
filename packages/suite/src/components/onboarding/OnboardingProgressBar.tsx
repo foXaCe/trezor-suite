@@ -4,22 +4,23 @@ import { Translation, type TranslationKey } from '@suite/intl';
 import { BulletList, type BulletListItemState, Text } from '@trezor/components';
 
 import { useDevice, useOnboarding, useSelector } from 'src/hooks/suite';
-import { selectIsDeviceAuthenticityCheckEnabled } from 'src/selectors/suite/suiteSelectors';
+import {
+    selectIsDeviceAuthenticityCheckEnabled,
+    selectIsUnlockedBootloaderAllowed,
+} from 'src/selectors/suite/suiteSelectors';
 
 import { stepCategories } from '../../config/onboarding/steps';
 import { isStepCategoryUsed } from '../../utils/onboarding/steps';
 
 /**
  * Returns stepCategories that have at least one currently relevant step
- * (for example Coin selection `step` is alone in its category, so the category is hidden for BTC-only onboarding)
+ * so categories with no currently relevant steps are hidden from the progress bar.
  * */
 const useOnboardingStepCategoriesInPath = () => {
     const { device } = useDevice();
     const { path: onboardingPath } = useOnboarding();
     const isDeviceAuthenticityCheckEnabled = useSelector(selectIsDeviceAuthenticityCheckEnabled);
-    const isUnlockedBootloaderAllowed = useSelector(
-        state => state.suite.settings.debug.isUnlockedBootloaderAllowed,
-    );
+    const isUnlockedBootloaderAllowed = useSelector(selectIsUnlockedBootloaderAllowed);
 
     return useMemo(
         () =>

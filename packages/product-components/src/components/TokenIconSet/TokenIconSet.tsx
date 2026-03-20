@@ -9,14 +9,13 @@ import { type SpacingValuesNew, borders } from '@trezor/theme';
 import { mapSizeToTypographyStyle } from './utils';
 import { AssetLogo, type AssetLogoSize } from '../AssetLogo/AssetLogo';
 
-const MAX_VISIBLE_TOKENS = 3;
-
 export type TokenIconSetProps = {
     symbol: NetworkSymbol;
     tokens: { contract: string; symbol?: string }[]; // tokens represented by their contract addresses and symbols
     size: AssetLogoSize;
     gap: SpacingValuesNew;
     isCountVisible?: boolean;
+    maxVisibleTokens?: number;
     isCentered?: boolean;
     /**
      * If true, visible tokens will be displayed from the last token to the first.
@@ -30,13 +29,15 @@ const Container = styled.div<{
     $gap: SpacingValuesNew;
     $isCountVisible: boolean;
     $isCentered: boolean;
+    $maxVisibleTokens: number;
 }>`
     justify-content: center;
     display: flex;
     align-items: center;
 
-    ${({ $isCentered, $size, $gap, $length, $isCountVisible }) => {
-        const visibleCount = $length > 3 ? 3 + Number($isCountVisible) : $length;
+    ${({ $isCentered, $size, $gap, $length, $isCountVisible, $maxVisibleTokens }) => {
+        const visibleCount =
+            $length > $maxVisibleTokens ? $maxVisibleTokens + Number($isCountVisible) : $length;
 
         return $isCentered
             ? css`
@@ -47,12 +48,14 @@ const Container = styled.div<{
               `;
     }}
 
-    ${({ $length, $gap, $isCountVisible }) =>
+    ${({ $length, $gap, $isCountVisible, $maxVisibleTokens }) =>
         $length > 1 &&
         css`
             display: grid;
             grid-template-columns: repeat(
-                ${$length > 3 ? 3 + Number($isCountVisible) : $length},
+                ${$length > $maxVisibleTokens
+                    ? $maxVisibleTokens + Number($isCountVisible)
+                    : $length},
                 ${$gap}px
             );
             justify-items: center;
@@ -68,8 +71,8 @@ const IconWrapper = styled.div<{ $size: number; $gap: number; $length: number }>
             &:not(:last-child) {
                 mask: radial-gradient(
                     circle at calc(50% + ${$gap}px) 50%,
-                    transparent ${$size / 2 + 1}px,
-                    black ${$size / 2 + 1}px
+                    transparent ${$size / 2 + 2}px,
+                    black ${$size / 2 + 2}px
                 );
             }
         `}
@@ -95,13 +98,14 @@ export const TokenIconSet = ({
     size,
     gap,
     isCountVisible = false,
+    maxVisibleTokens = 3,
     isCentered = false,
     reverseVisibleTokens = true,
 }: TokenIconSetProps) => {
     const { length } = tokens;
 
     const visibleTokensContent = useMemo(() => {
-        const visibleTokens = tokens.slice(0, MAX_VISIBLE_TOKENS);
+        const visibleTokens = tokens.slice(0, maxVisibleTokens);
         const orderedTokens = reverseVisibleTokens ? visibleTokens.reverse() : visibleTokens;
         const coingeckoId = getCoingeckoId(symbol);
 
@@ -117,7 +121,7 @@ export const TokenIconSet = ({
                 />
             </IconWrapper>
         ));
-    }, [tokens, reverseVisibleTokens, symbol, size, gap, length]);
+    }, [tokens, reverseVisibleTokens, symbol, size, gap, length, maxVisibleTokens]);
 
     if (length === 0) {
         return null;
@@ -128,14 +132,15 @@ export const TokenIconSet = ({
             $length={length}
             $size={size}
             $gap={gap}
+            $maxVisibleTokens={maxVisibleTokens}
             $isCountVisible={isCountVisible}
             $isCentered={isCentered}
         >
             {visibleTokensContent}
-            {length > 3 && isCountVisible && (
+            {length > maxVisibleTokens && isCountVisible && (
                 <CountContainer $size={size}>
                     <Text typographyStyle={mapSizeToTypographyStyle(size)} intent="neutral">
-                        +{length - MAX_VISIBLE_TOKENS}
+                        +{length - maxVisibleTokens}
                     </Text>
                 </CountContainer>
             )}

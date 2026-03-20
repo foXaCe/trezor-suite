@@ -38,14 +38,14 @@ test.describe('Suite initial run', { tag: ['@T3W1', '@T3T1'] }, () => {
             await onboardingPage.enterTHPPairingCode();
         }
 
-        await expect(page.getByTestId('@onboarding/complete-onboarding')).toBeVisible();
+        await expect(onboardingPage.pin.skipButton).toBeVisible();
 
         await page.reload();
 
         await onboardingPage.verifySuiteIsLoaded();
         optionallyDismissFwHashCheckError(page);
         await expect(analyticsSection.toggleSwitch).toBeHidden();
-        await expect(onboardingPage.completeOnboardingButton).toBeVisible();
+        await expect(onboardingPage.pin.skipButton).toBeVisible();
     });
 
     test('Once user passed trough, skips initial run and shows connect-device modal', async ({
