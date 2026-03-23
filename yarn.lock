@@ -8696,14 +8696,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/base@npm:1.2.6, @scure/base@npm:^1.1.3, @scure/base@npm:~1.2.5":
+"@scure/base@npm:1.2.6, @scure/base@npm:^1.1.3, @scure/base@npm:^1.2.6, @scure/base@npm:~1.2.5":
   version: 1.2.6
   resolution: "@scure/base@npm:1.2.6"
   checksum: 10/c1a7bd5e0b0c8f94c36fbc220f4a67cc832b00e2d2065c7d8a404ed81ab1c94c5443def6d361a70fc382db3496e9487fb9941728f0584782b274c18a4bed4187
   languageName: node
   linkType: hard
 
-"@scure/base@npm:2.0.0":
+"@scure/base@npm:2.0.0, @scure/base@npm:^2.0.0":
   version: 2.0.0
   resolution: "@scure/base@npm:2.0.0"
   checksum: 10/8fb86024f22e9c532d513b8df8a672252e58bd5695920ce646162287f0accd38e89cab58722a738b3d247b5dcf7760362ae2d82d502be7e62a555f5d98f8a110
@@ -11435,6 +11435,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@suite-common/wallet-utils@workspace:suite-common/wallet-utils"
   dependencies:
+    "@scure/base": "npm:^2.0.0"
     "@suite-common/earn-staking-api": "workspace:*"
     "@suite-common/fiat-services": "workspace:*"
     "@suite-common/staking-solana-types": "workspace:*"
@@ -11453,7 +11454,6 @@ __metadata:
     "@trezor/type-utils": "workspace:*"
     "@trezor/urls": "workspace:*"
     "@trezor/utils": "workspace:*"
-    bech32: "npm:^2.0.0"
     date-fns: "npm:^4.1.0"
     react: "npm:19.2.4"
     react-hook-form: "npm:^7.71.2"
@@ -11468,6 +11468,7 @@ __metadata:
   dependencies:
     "@reduxjs/toolkit": "npm:2.11.2"
     "@reown/walletkit": "npm:^1.2.8"
+    "@scure/base": "npm:^2.0.0"
     "@stellar/stellar-sdk": "npm:14.5.0"
     "@suite-common/analytics": "workspace:*"
     "@suite-common/connect-popup": "workspace:*"
@@ -11490,7 +11491,6 @@ __metadata:
     "@walletconnect/core": "npm:^2.21.5"
     "@walletconnect/types": "npm:2.21.4"
     "@walletconnect/utils": "npm:^2.21.5"
-    bs58: "npm:^6.0.0"
   languageName: unknown
   linkType: soft
 
@@ -13778,6 +13778,7 @@ __metadata:
   dependencies:
     "@mobily/ts-belt": "npm:^3.13.1"
     "@reduxjs/toolkit": "npm:2.11.2"
+    "@scure/base": "npm:^2.0.0"
     "@sentry/react-native": "npm:8.5.0"
     "@suite-common/device": "workspace:*"
     "@suite-common/firmware-authenticity": "workspace:*"
@@ -13791,7 +13792,6 @@ __metadata:
     "@trezor/connect": "workspace:*"
     "@trezor/transport-native-bluetooth": "workspace:*"
     "@trezor/type-utils": "workspace:*"
-    bs58: "npm:^6.0.0"
     expo-crypto: "npm:~55.0.8"
     expo-secure-store: "npm:~55.0.8"
     expo-splash-screen: "npm:~55.0.10"
@@ -14383,7 +14383,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@suite/metadata@workspace:suite/metadata"
   dependencies:
+    "@noble/hashes": "npm:^2.0.1"
     "@reduxjs/toolkit": "npm:2.11.2"
+    "@scure/base": "npm:^2.0.0"
     "@suite-common/device": "workspace:*"
     "@suite-common/metadata-types": "workspace:*"
     "@suite-common/redux-utils": "workspace:*"
@@ -14407,7 +14409,6 @@ __metadata:
     "@trezor/theme": "workspace:*"
     "@trezor/type-utils": "workspace:*"
     "@trezor/utils": "workspace:*"
-    bs58check: "npm:^4.0.0"
     dropbox: "npm:^10.34.0"
     immer: "npm:11.0.0"
     react: "npm:19.2.4"
@@ -14824,9 +14825,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@trezor/address-validator@workspace:packages/address-validator"
   dependencies:
+    "@scure/base": "npm:^1.2.6"
     "@trezor/eslint": "workspace:*"
     base-x: "npm:^5.0.1"
-    bech32: "npm:^2.0.0"
     browserify-bignum: "npm:^1.3.0-2"
     cbor: "npm:^10.0.10"
     chai: "npm:^5.2.0"
@@ -15280,6 +15281,7 @@ __metadata:
     "@ethereumjs/tx": "npm:^10.1.1"
     "@fivebinaries/coin-selection": "npm:3.0.0"
     "@noble/hashes": "npm:^2.0.1"
+    "@scure/base": "npm:^1.2.6"
     "@scure/bip39": "npm:^1.5.1"
     "@solana-program/compute-budget": "npm:^0.8.0"
     "@solana-program/system": "npm:^0.7.0"
@@ -15308,9 +15310,6 @@ __metadata:
     "@types/node-fetch": "npm:^2.6.12"
     "@types/w3c-web-usb": "npm:^1.0.10"
     "@vitest/browser-playwright": "npm:^4.1.0"
-    blakejs: "npm:^1.2.1"
-    bs58: "npm:^6.0.0"
-    bs58check: "npm:^4.0.0"
     cbor: "npm:^10.0.10"
     cross-fetch: "npm:^4.1.0"
     crypto-browserify: "npm:3.12.0"
@@ -15791,7 +15790,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@trezor/suite-desktop@workspace:packages/suite-desktop"
   dependencies:
-    blake-hash: "npm:^2.0.0"
     electron: "npm:41.0.4"
     electron-builder: "npm:26.8.1"
     openpgp: "npm:^6.3.0"
@@ -16213,21 +16211,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@trezor/utxo-lib@workspace:packages/utxo-lib"
   dependencies:
+    "@noble/curves": "npm:^2.0.1"
+    "@noble/hashes": "npm:^2.0.1"
+    "@scure/base": "npm:^1.2.6"
     "@sinclair/typebox": "npm:^0.33.12"
     "@trezor/eslint": "workspace:*"
     "@trezor/utils": "workspace:*"
     "@types/bn.js": "npm:^5.2.0"
-    "@types/create-hmac": "npm:^1.1.3"
-    bech32: "npm:^2.0.0"
     bip66: "npm:^2.0.0"
     bitcoin-ops: "npm:^1.4.1"
-    blake-hash: "npm:^2.0.0"
-    blakejs: "npm:^1.2.1"
     bn.js: "npm:5.2.3"
-    bs58: "npm:^6.0.0"
-    bs58check: "npm:^4.0.0"
     cashaddrjs: "npm:0.4.4"
-    create-hmac: "npm:^1.1.7"
     int64-buffer: "npm:^1.1.0"
     minimaldata: "npm:^1.0.2"
     pushdata-bitcoin: "npm:^1.0.1"
@@ -16519,15 +16513,6 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10/9545cc532c9218754443f48a0c98c1a9ba4af1fe54a3425c95de75ff3158147bb39e666cb7c6bf98cc56a9c6dc7b4ce5b2cbdae6b55d5942e50c81b76ed6b825
-  languageName: node
-  linkType: hard
-
-"@types/create-hmac@npm:^1.1.3":
-  version: 1.1.3
-  resolution: "@types/create-hmac@npm:1.1.3"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10/7549574506c0b7007a1e98c2364e4d8b8285a32e1bb043378d33cd9fe7d123670192251d43baf90c15709ba7a2a33f8155825fd311754a9dd9bb72d73d304059
   languageName: node
   linkType: hard
 
@@ -20040,13 +20025,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bech32@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "bech32@npm:2.0.0"
-  checksum: 10/fa15acb270b59aa496734a01f9155677b478987b773bf701f465858bf1606c6a970085babd43d71ce61895f1baa594cb41a2cd1394bd2c6698f03cc2d811300e
-  languageName: node
-  linkType: hard
-
 "before-after-hook@npm:^3.0.2":
   version: 3.0.2
   resolution: "before-after-hook@npm:3.0.2"
@@ -20143,19 +20121,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"blake-hash@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "blake-hash@npm:2.0.0"
-  dependencies:
-    node-addon-api: "npm:^3.0.0"
-    node-gyp: "npm:latest"
-    node-gyp-build: "npm:^4.2.2"
-    readable-stream: "npm:^3.6.0"
-  checksum: 10/91cb584c2c98bfeb94f2fe01ab1663577fd8a69c330b03ea071ce53eda8e3e28293da891e3eacd78a95ad1275325cf7055e39294535c0474f297ada373083fd2
-  languageName: node
-  linkType: hard
-
-"blakejs@npm:1.2.1, blakejs@npm:^1.2.1":
+"blakejs@npm:1.2.1":
   version: 1.2.1
   resolution: "blakejs@npm:1.2.1"
   checksum: 10/0638b1bd058b21892633929c43005aa6a4cc4b2ac5b338a146c3c076622f1b360795bd7a4d1f077c9b01863ed2df0c1504a81c5b520d164179120434847e6cd7
@@ -35222,7 +35188,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.13.2, nan@npm:^2.14.0, nan@npm:^2.22.2":
+"nan@npm:^2.13.2":
+  version: 2.26.2
+  resolution: "nan@npm:2.26.2"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10/d978ab0f1c959688289163678fd3dee640c63060ff27dbc73dc507f883508a7cb887f247212aabea9846d413f1016e5496ff9b80720e737a05bed8a5df8cc836
+  languageName: node
+  linkType: hard
+
+"nan@npm:^2.14.0, nan@npm:^2.22.2":
   version: 2.25.0
   resolution: "nan@npm:2.25.0"
   dependencies:
@@ -35666,7 +35641,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-gyp-build@npm:^4.2.2, node-gyp-build@npm:^4.5.0":
+"node-gyp-build@npm:^4.5.0":
   version: 4.8.1
   resolution: "node-gyp-build@npm:4.8.1"
   bin:
