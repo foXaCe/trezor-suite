@@ -237,12 +237,16 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
         if (this.discovery && this.discovery.completed) {
             const { discovery } = this;
             context.sendCoreMessage(
-                createUiMessage(UI_REQUEST.SELECT_ACCOUNT, {
-                    type: 'end',
-                    coinInfo,
-                    accountTypes: discovery.types.map(t => t.type),
-                    accounts: discovery.accounts,
-                }),
+                createUiMessage(
+                    UI_REQUEST.SELECT_ACCOUNT,
+                    {
+                        type: 'end',
+                        coinInfo,
+                        accountTypes: discovery.types.map(t => t.type),
+                        accounts: discovery.accounts,
+                    },
+                    dfd.requestId,
+                ),
             );
             const uiResp = await dfd.promise;
             const account = discovery.accounts[uiResp.payload];
@@ -266,20 +270,28 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
 
         discovery.on('progress', accounts => {
             context.sendCoreMessage(
-                createUiMessage(UI_REQUEST.SELECT_ACCOUNT, {
-                    type: 'progress',
-                    // preventEmpty: true,
-                    coinInfo,
-                    accounts,
-                }),
+                createUiMessage(
+                    UI_REQUEST.SELECT_ACCOUNT,
+                    {
+                        type: 'progress',
+                        // preventEmpty: true,
+                        coinInfo,
+                        accounts,
+                    },
+                    dfd.requestId,
+                ),
             );
         });
         discovery.on('complete', () => {
             context.sendCoreMessage(
-                createUiMessage(UI_REQUEST.SELECT_ACCOUNT, {
-                    type: 'end',
-                    coinInfo,
-                }),
+                createUiMessage(
+                    UI_REQUEST.SELECT_ACCOUNT,
+                    {
+                        type: 'end',
+                        coinInfo,
+                    },
+                    dfd.requestId,
+                ),
             );
         });
 
@@ -292,11 +304,15 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
         // set select account view
         // this view will be updated from discovery events
         context.sendCoreMessage(
-            createUiMessage(UI_REQUEST.SELECT_ACCOUNT, {
-                type: 'start',
-                accountTypes: discovery.types.map(t => t.type),
-                coinInfo,
-            }),
+            createUiMessage(
+                UI_REQUEST.SELECT_ACCOUNT,
+                {
+                    type: 'start',
+                    accountTypes: discovery.types.map(t => t.type),
+                    coinInfo,
+                },
+                dfd.requestId,
+            ),
         );
 
         // wait for user action
@@ -373,10 +389,14 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
                 // recompose custom fee level with requested value
                 composer.composeCustomFee(resp.payload.value);
                 context.sendCoreMessage(
-                    createUiMessage(UI_REQUEST.UPDATE_CUSTOM_FEE, {
-                        feeLevels: composer.getFeeLevelList(),
-                        coinInfo: this.params.coinInfo,
-                    }),
+                    createUiMessage(
+                        UI_REQUEST.UPDATE_CUSTOM_FEE,
+                        {
+                            feeLevels: composer.getFeeLevelList(),
+                            coinInfo: this.params.coinInfo,
+                        },
+                        resp.requestId,
+                    ),
                 );
 
                 // wait for user action

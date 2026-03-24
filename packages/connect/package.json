@@ -150,7 +150,8 @@
         "bs58check": "^4.0.0",
         "cbor": "^10.0.10",
         "cross-fetch": "^4.1.0",
-        "jws": "^4.0.1"
+        "jws": "^4.0.1",
+        "uuid": "^13.0.0"
     },
     "devDependencies": {
         "@babel/preset-typescript": "^7.28.5",
