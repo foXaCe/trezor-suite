@@ -14707,6 +14707,34 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@suite/metadata-migration@workspace:*, @suite/metadata-migration@workspace:suite/metadata-migration":
+  version: 0.0.0-use.local
+  resolution: "@suite/metadata-migration@workspace:suite/metadata-migration"
+  dependencies:
+    "@suite-common/dependency-injection": "workspace:*"
+    "@suite-common/device": "workspace:*"
+    "@suite-common/metadata-types": "workspace:*"
+    "@suite-common/redux-utils": "workspace:*"
+    "@suite-common/suite-sync": "workspace:*"
+    "@suite-common/suite-sync-storage": "workspace:*"
+    "@suite-common/suite-sync-types": "workspace:*"
+    "@suite-common/suite-types": "workspace:*"
+    "@suite-common/wallet-config": "workspace:*"
+    "@suite-common/wallet-types": "workspace:*"
+    "@suite-common/wallet-utils": "workspace:*"
+    "@suite/intl": "workspace:*"
+    "@suite/metadata": "workspace:*"
+    "@trezor/components": "workspace:*"
+    "@trezor/connect": "workspace:*"
+    "@trezor/product-components": "workspace:*"
+    "@trezor/type-utils": "workspace:*"
+    "@trezor/utils": "workspace:*"
+    react: "npm:19.2.4"
+    react-redux: "npm:9.2.0"
+    redux-thunk: "npm:^3.1.0"
+  languageName: unknown
+  linkType: soft
+
 "@suite/metadata@workspace:*, @suite/metadata@workspace:suite/metadata":
   version: 0.0.0-use.local
   resolution: "@suite/metadata@workspace:suite/metadata"
@@ -14877,6 +14905,7 @@ __metadata:
     "@suite-common/platform-encryption": "workspace:*"
     "@suite-common/suite-sync": "workspace:*"
     "@suite-common/suite-sync-evolu": "workspace:*"
+    "@suite-common/suite-sync-storage": "workspace:*"
     "@suite-common/suite-sync-types": "workspace:*"
     "@suite-common/suite-types": "workspace:*"
     "@suite-common/wallet-utils": "workspace:*"
@@ -14886,6 +14915,7 @@ __metadata:
     "@trezor/connect": "workspace:*"
     "@trezor/product-components": "workspace:*"
     "@trezor/theme": "workspace:*"
+    "@trezor/type-utils": "workspace:*"
     react: "npm:19.2.4"
     react-hook-form: "npm:^7.71.2"
     react-redux: "npm:9.2.0"
@@ -16303,6 +16333,7 @@ __metadata:
     "@suite/intl": "workspace:*"
     "@suite/locks": "workspace:*"
     "@suite/metadata": "workspace:*"
+    "@suite/metadata-migration": "workspace:*"
     "@suite/modal": "workspace:*"
     "@suite/onboarding-components": "workspace:*"
     "@suite/platform-encryption-electron": "workspace:*"
