@@ -2,17 +2,12 @@ import { FreeFocusInside } from 'react-focus-lock';
 
 import styled from 'styled-components';
 
-import { Icon, useElevation } from '@trezor/components';
-import {
-    type Elevation,
-    mapElevationToBackground,
-    mapElevationToBorder,
-    zIndices,
-} from '@trezor/theme';
+import { Icon } from '@trezor/components';
+import { zIndices } from '@trezor/theme';
 
 import { useGuide } from 'src/hooks/guide';
 
-const Wrapper = styled.button<{ $isGuideOpen: boolean; $elevation: Elevation }>`
+const Wrapper = styled.button<{ $isGuideOpen: boolean }>`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,13 +19,15 @@ const Wrapper = styled.button<{ $isGuideOpen: boolean; $elevation: Elevation }>`
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    border: solid 1px ${mapElevationToBorder};
-    background: ${mapElevationToBackground};
-    box-shadow: ${({ theme, $elevation }) => ($elevation === 1 ? theme.boxShadowBase : undefined)};
+    border: solid 1px ${({ theme }) => theme.borderElevation0};
+    background: ${({ theme }) => theme.backgroundTertiaryDefaultOnElevation0};
     transition: opacity 0.3s ease 0.3s;
     opacity: ${({ $isGuideOpen }) => ($isGuideOpen ? 0 : 1)};
+    box-shadow: 0 2px 4px 0 rgb(134 64 64 / 4%);
 
-    &:focus {
+    &:focus,
+    &:hover {
+        background: ${({ theme }) => theme.backgroundTertiaryPressedOnElevation0};
         transition: opacity 0.1s ease; /* hide button faster on guide open to prevent overlap */
     }
 
@@ -41,7 +38,6 @@ const Wrapper = styled.button<{ $isGuideOpen: boolean; $elevation: Elevation }>`
 
 export const GuideButton = () => {
     const { openGuide, isGuideOpen } = useGuide();
-    const { elevation } = useElevation();
 
     return (
         <FreeFocusInside>
@@ -49,9 +45,8 @@ export const GuideButton = () => {
                 data-testid="@guide/button-open"
                 onClick={openGuide}
                 $isGuideOpen={isGuideOpen}
-                $elevation={elevation}
             >
-                <Icon size={18} name="lightbulb" />
+                <Icon size={24} name="lifebuoy" />
             </Wrapper>
         </FreeFocusInside>
     );
