@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 
 import { Translation } from '@suite/intl';
+import { shouldDisplayExportBip329Labels } from '@suite-common/bip329';
 import { type Bip329Label, bip329LabelSchema } from '@suite-common/bip329-types';
 import { selectIsSuiteSyncEnabled } from '@suite-common/suite-sync';
 import { notificationsActions } from '@suite-common/toast-notifications';
@@ -43,10 +44,13 @@ export const Bip329Labels = ({ account, isLoading }: Bip329LabelsProps) => {
 
     const canImportBip329Labels = isSuiteSyncEnabled;
 
-    const shouldDisplayBip329Labels =
-        account.networkType === 'bitcoin' && (isMetadataEnabled || canImportBip329Labels);
+    const shouldDisplayExport = shouldDisplayExportBip329Labels({
+        account,
+        isSuiteSyncEnabled,
+        isMetadataEnabled,
+    });
 
-    if (!shouldDisplayBip329Labels) {
+    if (!shouldDisplayExport) {
         return null;
     }
 

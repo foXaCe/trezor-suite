@@ -1927,6 +1927,16 @@ export const messages = {
             },
         },
     },
+    moduleLabeling: {
+        exportBip329BottomSheet: {
+            title: 'Export labels',
+            button: 'Export labels',
+            description: 'Export address and output labels form this account in BIP 329 format.',
+        },
+        exportSuccessfulToast: 'Labels exported.',
+        exportFailedToast: 'Failed to export labels.',
+        fileSavingNotSupported: 'File saving is not supported on this platform.',
+    },
     moduleAccounts: {
         accountNotFound: 'Account {accountKey} not found.',
         tokens: {
@@ -1952,6 +1962,12 @@ export const messages = {
             title: 'To add new coin or account, reconnect your Trezor device.',
             description:
                 'We’re unable to add any new coins or accounts to your device when it’s disconnected.',
+        },
+        accountSettingsExportBip329Button: {
+            title: 'Export labels',
+            button: 'Export',
+            description:
+                'Export your transaction labels for this account to a .jsonl file. You can import this file into other wallet apps that support label import.',
         },
     },
     transactions: {

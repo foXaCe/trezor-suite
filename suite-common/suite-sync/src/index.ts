@@ -62,7 +62,10 @@ export {
     selectSuiteSyncOutputLabel,
     selectSuiteSyncOutputLabels,
 } from './data/output/suiteSyncOutputSelectors';
-export { selectAllLabelsForAccount } from './data/labeling/selectAllLabelsForAccount';
+export {
+    type AllLabelsForAccount,
+    selectAllLabelsForAccount,
+} from './data/labeling/selectAllLabelsForAccount';
 export {
     fromSuiteSyncToSearchAccountLabels,
     fromSuiteSyncToSearchOutputLabels,

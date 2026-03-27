@@ -12608,7 +12608,10 @@ __metadata:
     "@suite-native/test-utils": "workspace:*"
     "@suite-native/toasts": "workspace:*"
     "@trezor/connect": "workspace:*"
+    "@trezor/styles-native": "workspace:*"
     "@trezor/type-utils": "workspace:*"
+    expo-file-system: "npm:^55.0.10"
+    expo-sharing: "npm:^55.0.11"
     react: "npm:19.2.4"
     react-native: "npm:0.83.2"
     react-redux: "npm:9.2.0"
@@ -26218,7 +26221,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-file-system@npm:~55.0.10":
+"expo-file-system@npm:^55.0.10, expo-file-system@npm:~55.0.10":
   version: 55.0.10
   resolution: "expo-file-system@npm:55.0.10"
   peerDependencies:
@@ -26425,7 +26428,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-sharing@npm:~55.0.11":
+"expo-sharing@npm:^55.0.11, expo-sharing@npm:~55.0.11":
   version: 55.0.11
   resolution: "expo-sharing@npm:55.0.11"
   dependencies:
