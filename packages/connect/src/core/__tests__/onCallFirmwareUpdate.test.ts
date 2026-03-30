@@ -1,5 +1,4 @@
 import { DeviceModelInternal, FirmwareType } from '@trezor/device-utils';
-import { parseConfigure } from '@trezor/protobuf';
 import { v1 as protocolV1 } from '@trezor/protocol';
 import { buildMessage } from '@trezor/transport/src/utils/send';
 import { Log } from '@trezor/utils';
@@ -8,6 +7,7 @@ import * as mockFwHash from '../../api/firmware/calculateFirmwareHash';
 import { DataManager } from '../../data/DataManager';
 import { parseConnectSettings } from '../../data/connectSettings';
 import { getBundledRelease, initializeFirmwareConfig } from '../../data/firmwareInfo';
+import { loadProtobufModules } from '../../data/protobufLoader';
 import { DeviceList } from '../../device/DeviceList';
 // mocks
 import * as mockAssets from '../../utils/assets';
@@ -97,7 +97,7 @@ const transportApiMock = (fixtures: ResponseFixture[]) => {
 
 // build protobuf message.
 // default: recent release Features
-const buildProtobufMessage = (messages: any, override: any = {}) => {
+const buildProtobufMessage = (override: any = {}) => {
     const major_version = override.data?.major_version || 2;
     const model = major_version === 1 ? 1 : 2;
     const internal_model = major_version === 1 ? 'T1B1' : 'T2T1';
@@ -120,7 +120,6 @@ const buildProtobufMessage = (messages: any, override: any = {}) => {
     }
 
     return buildMessage({
-        messages,
         name: override.name || 'Features',
         data: override.name
             ? override.data
@@ -170,10 +169,9 @@ const calculateFirmwareHashMock = (hash?: string) => ({
 
 // common setup for all tests
 const setupTest = () => {
-    const messages = parseConfigure(DataManager.getProtobufMessages());
     const deviceList = new DeviceList({
         ...DataManager.getSettings(),
-        messages,
+        messages: {},
         // debug: true,
     });
 
@@ -209,7 +207,7 @@ const setupTest = () => {
 
     const buildFixture = (id: string, data: any = {}, name?: string) => ({
         id,
-        data: buildProtobufMessage(messages, { data, name }),
+        data: buildProtobufMessage({ data, name }),
     });
 
     const context = {
@@ -232,6 +230,7 @@ const setupTest = () => {
 
 describe('onCallFirmwareUpdate', () => {
     beforeAll(async () => {
+        await loadProtobufModules();
         await DataManager.load(parseConnectSettings({}), true, true, initializeFirmwareConfig);
     });
     beforeEach(() => {

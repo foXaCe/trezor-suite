@@ -48,15 +48,14 @@
     },
     "dependencies": {
         "@bufbuild/protobuf": "^2.11.0",
-        "@trezor/schema-utils": "workspace:*",
-        "long": "5.2.5",
-        "protobufjs": "7.4.0"
+        "@trezor/schema-utils": "workspace:*"
     },
     "devDependencies": {
         "@bufbuild/buf": "^1.62.1",
         "@bufbuild/protoc-gen-es": "2.11.0",
         "@bufbuild/protoplugin": "2.11.0",
         "@trezor/eslint": "workspace:*",
+        "protobufjs": "7.4.0",
         "protobufjs-cli": "^1.1.3",
         "tsx": "^4.21.0"
     },

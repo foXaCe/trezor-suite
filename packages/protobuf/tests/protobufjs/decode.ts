@@ -1,7 +1,7 @@
 import type * as protobuf from 'protobufjs/light';
 
-import type { MessageResponse } from './messages';
 import { createMessageFromType, isPrimitiveField } from './utils';
+import type { MessageResponse } from '../../src/messages';
 
 type Field = protobuf.Field;
 type MessageType<T extends object> = protobuf.Message<T>;

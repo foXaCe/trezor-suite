@@ -52,7 +52,6 @@ intersection-observer
 json5
 jssha
 lodash
-long
 match-sorter
 next
 next-seo

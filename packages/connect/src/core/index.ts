@@ -12,6 +12,7 @@ import { dispose as disposeBackend } from '../backend/BlockchainLink';
 import { DataManager } from '../data/DataManager';
 import { parseLocalFirmwares } from '../data/connectSettings';
 import { initializeFirmwareConfig } from '../data/firmwareInfo';
+import { loadProtobufModules } from '../data/protobufLoader';
 import type { Device, DeviceEvents } from '../device/Device';
 import type { IDeviceList } from '../device/DeviceList';
 import { DeviceList, assertDeviceListConnected } from '../device/DeviceList';
@@ -882,14 +883,14 @@ export class Core extends EventEmitter {
             if (localFirmwares) {
                 DataManager.setLocalFirmwares(localFirmwares);
             }
+            await loadProtobufModules();
             const { debug, priority, manifest } = DataManager.getSettings();
-            const messages = DataManager.getProtobufMessages();
 
             enableLog(debug);
 
             this._deviceList = new DeviceList({
                 debug,
-                messages,
+                messages: {},
                 priority,
                 manifest,
             });

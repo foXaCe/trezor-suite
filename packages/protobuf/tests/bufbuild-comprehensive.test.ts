@@ -10,8 +10,8 @@ import * as ProtoBuf from 'protobufjs/light';
 
 import * as messagesJson from '../messages.json';
 import { RULE_PATCH } from '../scripts/protobuf-patches';
-import { decode as decodeProtobufJs } from '../src/decode';
-import { encode as encodeProtobufJs } from '../src/encode';
+import { decode as decodeProtobufJs } from './protobufjs/decode';
+import { encode as encodeProtobufJs } from './protobufjs/encode';
 import { ProtobufManager } from '../src/manager';
 
 type JsonFieldDefinition = {

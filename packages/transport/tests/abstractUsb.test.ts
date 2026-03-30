@@ -1,9 +1,14 @@
-import * as messages from '@trezor/protobuf/messages.json';
+import { protobufManager } from '@trezor/protobuf';
+import * as bitcoinProto from '@trezor/protobuf/src/definitions/messages-bitcoin_pb';
+import * as commonProto from '@trezor/protobuf/src/definitions/messages-common_pb';
+import * as messagesProto from '@trezor/protobuf/src/definitions/messages_pb';
 import { v1 as v1Protocol } from '@trezor/protocol';
 
 import { UsbApi } from '../src/api/usb';
 import { AbstractApiTransport } from '../src/transports/abstractApi';
 import { PathPublic, Session } from '../src/types';
+
+protobufManager.load([commonProto, messagesProto, bitcoinProto]);
 
 // create devices otherwise returned from navigator.usb.getDevices
 const createMockedDevice = (optional = {}) => ({
@@ -51,7 +56,7 @@ const initTest = async () => {
     });
     const transport = new TestUsbTransport({
         api: testUsbApi,
-        messages,
+        messages: {},
         id: 'test',
     });
 
@@ -229,7 +234,8 @@ describe('Usb', () => {
             expect(res2).toEqual({
                 success: false,
                 error: 'unexpected error',
-                message: 'no such type: Foo-bar message',
+                // message: 'no such type: Foo-bar message',
+                message: 'Schema Foo-bar message not found',
             });
         });
 

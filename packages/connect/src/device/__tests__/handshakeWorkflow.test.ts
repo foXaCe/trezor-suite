@@ -1,6 +1,7 @@
 import { DataManager } from '../../data/DataManager';
 import { parseConnectSettings } from '../../data/connectSettings';
 import { initializeFirmwareConfig } from '../../data/firmwareInfo';
+import { loadProtobufModules } from '../../data/protobufLoader';
 import { Device } from '../Device';
 import { handshakeCancel } from '../workflow/handshake';
 
@@ -22,7 +23,6 @@ const getAcquiredDevice = async (apiMethods: any = {}) => {
         },
         ...apiMethods,
     });
-    transport.updateMessages(DataManager.getProtobufMessages());
 
     await transport.init();
     await transport.enumerate();
@@ -53,6 +53,7 @@ describe('workflow/handshake', () => {
             true,
             initializeFirmwareConfig,
         );
+        await loadProtobufModules();
     });
 
     afterEach(() => {

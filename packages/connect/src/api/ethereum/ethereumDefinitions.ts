@@ -1,12 +1,11 @@
 import fetch from 'cross-fetch';
 
 import type { MessagesSchema } from '@trezor/protobuf';
-import { decodeMessage, parseConfigure } from '@trezor/protobuf';
+import { protobufManager } from '@trezor/protobuf';
 import { trzd } from '@trezor/protocol';
 import type { Static } from '@trezor/schema-utils';
 import { Assert, Type } from '@trezor/schema-utils';
 
-import { DataManager } from '../../data/DataManager';
 import { ethereumNetworkInfoBase } from '../../data/coinInfo';
 import type { EthereumNetworkInfoDefinitionValues } from '../../types';
 
@@ -106,9 +105,6 @@ export const decodeEthereumDefinition = (
         token: undefined,
     };
 
-    const messages = DataManager.getProtobufMessages();
-    const proto = parseConfigure(messages);
-
     (['encoded_token', 'encoded_network'] as const).forEach(key => {
         const encodedPayload = encodedDefinition[key];
 
@@ -118,8 +114,7 @@ export const decodeEthereumDefinition = (
         }
 
         const { definitionType, protobufPayload } = trzd.decode(encodedPayload);
-        const { message: decodedDefinition } = decodeMessage(
-            proto,
+        const { message: decodedDefinition } = protobufManager.decode(
             definitionType === 0 ? 'EthereumNetworkInfo' : 'EthereumTokenInfo',
             protobufPayload,
         );

@@ -1,7 +1,7 @@
 import * as ProtoBuf from 'protobufjs/light';
 
-import { decode } from '../src/decode';
-import { encode } from '../src/encode';
+import { decode } from './protobufjs/decode';
+import { encode } from './protobufjs/encode';
 
 const messages = {
     nested: {

@@ -1,4 +1,3 @@
-import { loadDefinitions, parseConfigure } from '@trezor/protobuf';
 import { type PROTOCOL_MALFORMED, type ThpState, type TransportProtocol } from '@trezor/protocol';
 import {
     type ScheduleActionParams,
@@ -93,6 +92,8 @@ export type TransportDeviceEvent =
     | { type: typeof TRANSPORT.DEVICE_REQUEST_RELEASE }
     | { type: typeof TRANSPORT.DEVICE_SESSION_CHANGED; descriptor: Descriptor };
 
+const parseConfigure = (..._args: any[]) => {};
+
 export abstract class AbstractTransport extends TypedEmitter<TransportEvents> {
     public abstract readonly name:
         | 'BridgeTransport'
@@ -119,7 +120,7 @@ export abstract class AbstractTransport extends TypedEmitter<TransportEvents> {
      * once transport is listening, it will be emitting TRANSPORT.UPDATE events
      */
     protected listening = false;
-    protected messages: protobuf.Root;
+    protected messages: any; // protobuf.Root;
     /**
      * minimal data to track device on transport layer
      */
@@ -373,8 +374,9 @@ export abstract class AbstractTransport extends TypedEmitter<TransportEvents> {
      * Check if protobuf message is present in protobuf.Root
      * default: GetFeatures - this message should be always present.
      */
-    public getMessage(message = 'GetFeatures') {
-        return !!this.messages.get(message);
+    public getMessage(_message = 'GetFeatures') {
+        // return !!this.messages.get(message);
+        return true;
     }
 
     public getMessages() {
@@ -385,8 +387,8 @@ export abstract class AbstractTransport extends TypedEmitter<TransportEvents> {
         this.messages = parseConfigure(messages);
     }
 
-    public loadMessages(packageName: string, packageLoader: Parameters<typeof loadDefinitions>[2]) {
-        return loadDefinitions(this.messages, packageName, packageLoader);
+    public loadMessages(..._args: any[]) {
+        // return loadDefinitions(this.messages, packageName, packageLoader);
     }
 
     protected success<T>(payload: T): Success<T> {
@@ -435,9 +437,15 @@ export abstract class AbstractTransport extends TypedEmitter<TransportEvents> {
             ...params,
             signal,
         })
-            .catch(err =>
-                unknownError(err, [ERRORS.ABORTED_BY_TIMEOUT, ERRORS.ABORTED_BY_SIGNAL, ...errors]),
-            )
+            .catch(err => {
+                console.error(err);
+
+                return unknownError(err, [
+                    ERRORS.ABORTED_BY_TIMEOUT,
+                    ERRORS.ABORTED_BY_SIGNAL,
+                    ...errors,
+                ]);
+            })
             .finally(clear);
     };
 }

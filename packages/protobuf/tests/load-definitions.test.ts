@@ -1,6 +1,6 @@
 import * as ProtoBuf from 'protobufjs/light';
 
-import { loadDefinitions } from '../src/load-definitions';
+import { loadDefinitions } from './protobufjs/load-definitions';
 
 describe('loadDefinitions', () => {
     const createProtobufRoot = () =>

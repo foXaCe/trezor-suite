@@ -13743,7 +13743,6 @@ __metadata:
     "@suite-native/trading-state": "workspace:*"
     "@suite-native/transaction-management": "workspace:*"
     "@trezor/connect": "workspace:*"
-    "@trezor/protobuf": "workspace:^"
     "@trezor/transport": "workspace:^"
     "@trezor/transport-native-bluetooth": "workspace:*"
     "@trezor/transport-native-usb": "workspace:*"
@@ -15026,7 +15025,6 @@ __metadata:
   resolution: "@trezor/connect-cli@workspace:packages/connect-cli"
   dependencies:
     "@trezor/connect": "workspace:*"
-    "@trezor/protobuf": "workspace:*"
     "@trezor/transport": "workspace:*"
     "@trezor/transport-bluetooth": "workspace:*"
     tsx: "npm:^4.21.0"
@@ -15458,7 +15456,6 @@ __metadata:
     "@bufbuild/protoplugin": "npm:2.11.0"
     "@trezor/eslint": "workspace:*"
     "@trezor/schema-utils": "workspace:*"
-    long: "npm:5.2.5"
     protobufjs: "npm:7.4.0"
     protobufjs-cli: "npm:^1.1.3"
     tsx: "npm:^4.21.0"
@@ -32313,13 +32310,6 @@ __metadata:
   version: 4.0.1
   resolution: "loglevelnext@npm:4.0.1"
   checksum: 10/0711e1c5ebf8242aedbaa802142dbaf1c0e268afaed4bf942271e2087036e5d82ecdeba2dc7d112fb90e29bb678f40e120d83566010bcc5e9e9913d0b709bb49
-  languageName: node
-  linkType: hard
-
-"long@npm:5.2.5":
-  version: 5.2.5
-  resolution: "long@npm:5.2.5"
-  checksum: 10/972589d04a564ef4c066069d5ed06db14cd63de2a08d4f6c989512fa414bc2239479564e3a85de3efd42eb533ce142cdcaa28f12f4ecd051670015d36cbbb10b
   languageName: node
   linkType: hard
 

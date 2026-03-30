@@ -25,14 +25,13 @@ import type { EnsureEncryptionKeyDep, MMKVStorageDep } from '@suite-native/stora
 import { createSuiteSyncNativeCompositionRoot } from '@suite-native/suite-sync';
 import { selectTradingEnvironment } from '@suite-native/trading-state';
 import TrezorConnect from '@trezor/connect';
-import messages from '@trezor/protobuf/messages.json';
 import { BridgeTransport } from '@trezor/transport';
 import { NativeBluetoothTransport } from '@trezor/transport-native-bluetooth';
 import { NativeUsbTransport } from '@trezor/transport-native-usb';
 
 const deviceType = Device.isDevice ? 'device' : 'emulator';
 
-const bridgeTransport = new BridgeTransport({ messages, port: 21328, id: 'bridge' });
+const bridgeTransport = new BridgeTransport({ messages: {}, port: 21328, id: 'bridge' });
 
 const transportsPerDeviceType = {
     device: Platform.select({

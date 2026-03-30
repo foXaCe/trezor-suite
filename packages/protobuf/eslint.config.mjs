@@ -9,7 +9,8 @@ export default [
                 {
                     devDependencies: [
                         ...globalNoExtraneousDependenciesDevDependencies,
-                        '**/scripts/**',
+                        '**/scripts/**', // @bufbuild/protoplugin + protobufjs
+                        '**/tests/**', // protobufjs
                     ],
                 },
             ],

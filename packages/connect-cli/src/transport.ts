@@ -1,5 +1,4 @@
 import { type ConnectSettingsTransport, type UiRequestThpPairing } from '@trezor/connect';
-import * as protobufDefinitions from '@trezor/protobuf/messages.json';
 import { NodeUsbTransport, UdpTransport } from '@trezor/transport';
 import { BluetoothTransport, TrezorBluetooth } from '@trezor/transport-bluetooth';
 
@@ -23,8 +22,8 @@ export const isDebugLinkInteraction = (type: string) =>
 
 const debugTransport =
     getCurrentTransport() === 'udp'
-        ? new UdpTransport({ id: 'udp', messages: protobufDefinitions, debugLink: true })
-        : new NodeUsbTransport({ id: 'usb', messages: protobufDefinitions, debugLink: true });
+        ? new UdpTransport({ id: 'udp', messages: {}, debugLink: true })
+        : new NodeUsbTransport({ id: 'usb', messages: {}, debugLink: true });
 
 export const initDebugLink = async () => {
     if (args['interactive']) return;
@@ -136,7 +135,7 @@ export const getTransport = async (): Promise<ConnectSettingsTransport> => {
 
         return new BluetoothTransport({
             url: 'ws://127.0.0.1:21327',
-            messages: protobufDefinitions,
+            messages: {},
             id: 'ble',
         });
     } else if (transportName === 'bridge') {

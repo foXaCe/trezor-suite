@@ -1,6 +1,7 @@
 import { DataManager } from '../../data/DataManager';
 import { parseConnectSettings } from '../../data/connectSettings';
 import { initializeFirmwareConfig } from '../../data/firmwareInfo';
+import { loadProtobufModules } from '../../data/protobufLoader';
 import { DeviceList } from '../DeviceList';
 
 const { createTestTransport, createTestTransportClass } = global.JestMocks;
@@ -31,6 +32,7 @@ describe('DeviceList', () => {
             true,
             initializeFirmwareConfig,
         );
+        await loadProtobufModules();
     });
 
     let list: DeviceList;
@@ -40,7 +42,7 @@ describe('DeviceList', () => {
         list = new DeviceList({
             ...parseConnectSettings({}),
             priority: 0,
-            messages: DataManager.getProtobufMessages(),
+            messages: {},
         });
         eventsSpy = jest.fn();
         list.on('transport-start', ({ apiType }) => eventsSpy('transport-start', apiType));
