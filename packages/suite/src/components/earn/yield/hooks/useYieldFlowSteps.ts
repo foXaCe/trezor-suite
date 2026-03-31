@@ -7,7 +7,6 @@ import { YIELD_FLOW_STEPS, type YieldFlowStepId } from '../common/types';
 export type UseYieldFlowStepsResult = {
     currentStep: YieldFlowStepId;
     stepStates: Record<YieldFlowStepId, BulletListItemState>;
-    goToNextStep: () => void;
     goToStep: (step: YieldFlowStepId) => void;
 };
 
@@ -32,20 +31,16 @@ export const useYieldFlowSteps = (): UseYieldFlowStepsResult => {
         [currentStepIndex],
     );
 
-    const goToNextStep = useCallback(() => {
-        setCurrentStep(
-            current => YIELD_FLOW_STEPS[YIELD_FLOW_STEPS.indexOf(current) + 1] ?? current,
-        );
-    }, []);
-
     const goToStep = useCallback((step: YieldFlowStepId) => {
         setCurrentStep(step);
     }, []);
 
-    return {
-        currentStep,
-        stepStates,
-        goToNextStep,
-        goToStep,
-    };
+    return useMemo(
+        () => ({
+            currentStep,
+            stepStates,
+            goToStep,
+        }),
+        [currentStep, stepStates, goToStep],
+    );
 };

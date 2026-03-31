@@ -1,10 +1,15 @@
+import type { ReactNode } from 'react';
+
 import { Translation } from '@suite/intl';
 import type { YieldFlowType } from '@suite-common/suite-types';
+import { tokenSupportsIncreasingAllowance } from '@suite-common/trading';
 import { Button, Column } from '@trezor/components';
+import { BigNumber } from '@trezor/utils';
 
 import { YieldAmountCard } from './YieldAmountCard';
 import { YieldApprovedAmountCard } from './YieldApprovedAmountCard';
-import type { YieldFlowDisplayToken } from './types';
+import { YieldPendingTransaction } from './YieldPendingTransaction';
+import type { YieldFlowDisplayToken, YieldPendingTransactionState } from './types';
 
 const approveStepTranslationMap = {
     supply: {
@@ -23,13 +28,18 @@ export type YieldApproveStepProps = {
     variant: 'active' | 'done';
     amount: string;
     summaryValue: string;
-    switchCurrencyLabel?: string;
-    isSwitchDisabled?: boolean;
+    isDisabled?: boolean;
     approvedAmount?: string;
+    isModifyMode?: boolean;
+    previousApprovedAmount?: string;
+    revokeRequired?: boolean;
+    warning?: ReactNode;
+    pendingApproveTransaction?: YieldPendingTransactionState;
     onAmountSelect: (amount: string) => void;
     onMaxClick?: () => void;
-    onSwitchCurrency?: () => void;
-    onApprove?: () => void;
+    onApprove?: () => void | Promise<void>;
+    onRevokeApproval?: () => void | Promise<void>;
+    onPendingTxClick?: (txid: string) => void;
 };
 
 export const YieldApproveStep = ({
@@ -38,41 +48,102 @@ export const YieldApproveStep = ({
     variant,
     amount,
     summaryValue,
-    switchCurrencyLabel,
-    isSwitchDisabled = false,
+    isDisabled = false,
     approvedAmount,
+    isModifyMode = false,
+    previousApprovedAmount,
+    revokeRequired = false,
+    warning,
+    pendingApproveTransaction,
     onAmountSelect,
     onMaxClick,
-    onSwitchCurrency,
     onApprove,
+    onRevokeApproval,
+    onPendingTxClick,
 }: YieldApproveStepProps) => {
     const { amountLabelTranslationId, balanceLabelTranslationId } =
         approveStepTranslationMap[flowType];
+    const normalizedPreviousApprovedAmount = previousApprovedAmount || '0';
+
+    const hasPreviousApprovedAmount =
+        !!previousApprovedAmount && !new BigNumber(normalizedPreviousApprovedAmount).isZero();
+    const isAmountChanged =
+        isModifyMode &&
+        hasPreviousApprovedAmount &&
+        !new BigNumber(amount || '0').eq(normalizedPreviousApprovedAmount);
+    const isIncreasing =
+        isModifyMode &&
+        hasPreviousApprovedAmount &&
+        new BigNumber(amount || '0').gt(normalizedPreviousApprovedAmount);
+    const needsZeroApprovalReset =
+        !!token.contractAddress && !tokenSupportsIncreasingAllowance(token.contractAddress);
+    const shouldRevokeApproval =
+        isModifyMode && (revokeRequired || (isAmountChanged && needsZeroApprovalReset));
+    let approveButtonId:
+        | 'TR_EARN_YIELD_REVOKE_APPROVAL'
+        | 'TR_EARN_YIELD_INCREASE_APPROVAL'
+        | 'TR_APPROVE_DATA_TITLE';
+
+    if (shouldRevokeApproval) {
+        approveButtonId = 'TR_EARN_YIELD_REVOKE_APPROVAL';
+    } else if (isModifyMode && isIncreasing) {
+        approveButtonId = 'TR_EARN_YIELD_INCREASE_APPROVAL';
+    } else {
+        approveButtonId = 'TR_APPROVE_DATA_TITLE';
+    }
+    const onApproveButtonClick = shouldRevokeApproval ? onRevokeApproval : onApprove;
 
     return (
         <>
             {variant === 'active' && (
                 <Column gap={16}>
+                    {previousApprovedAmount && (
+                        <YieldApprovedAmountCard
+                            token={token}
+                            amount={previousApprovedAmount}
+                            onRevoke={onRevokeApproval}
+                        />
+                    )}
+
                     <YieldAmountCard
                         amount={amount}
                         tokenSymbol={token.symbol}
                         summary={{
                             labelTranslationId: balanceLabelTranslationId,
                             value: summaryValue,
-                            onMaxClick,
+                            onMaxClick: pendingApproveTransaction ? undefined : onMaxClick,
                         }}
                         heading={{
                             amountLabelTranslationId,
-                            switchCurrencyLabel,
-                            isSwitchDisabled,
-                            onSwitchCurrency,
                         }}
+                        warning={warning}
+                        isDisabled={!!pendingApproveTransaction}
                         onAmountChange={onAmountSelect}
                     />
 
-                    <Button size="large" width="100%" onClick={onApprove}>
-                        <Translation id="TR_APPROVE_DATA_TITLE" />
+                    <Button
+                        size="large"
+                        width="100%"
+                        onClick={
+                            onApproveButtonClick
+                                ? () => {
+                                      void onApproveButtonClick();
+                                  }
+                                : undefined
+                        }
+                        isDisabled={
+                            isDisabled || !!pendingApproveTransaction || !onApproveButtonClick
+                        }
+                    >
+                        <Translation id={approveButtonId} />
                     </Button>
+
+                    {pendingApproveTransaction && (
+                        <YieldPendingTransaction
+                            pendingTransaction={pendingApproveTransaction}
+                            onTxClick={onPendingTxClick}
+                        />
+                    )}
                 </Column>
             )}
 

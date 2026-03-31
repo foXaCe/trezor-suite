@@ -72,7 +72,10 @@ const fetchAccountTokens = async (account: Account, payloadTokens: AccountInfo['
 // as we usually want to update all accounts for a single coin at once
 export const fetchAndUpdateAccountThunk = createThunk(
     `${ACCOUNTS_MODULE_PREFIX}/fetchAndUpdateAccountThunk`,
-    async ({ accountKey }: { accountKey: AccountKey }, { dispatch, getState }) => {
+    async (
+        { accountKey, forceUpdate = false }: { accountKey: AccountKey; forceUpdate?: boolean },
+        { dispatch, getState },
+    ) => {
         const account = selectAccountByKey(getState(), accountKey);
 
         if (!account || account.failed || account.accountType === 'placeholder') return;
@@ -102,7 +105,7 @@ export const fetchAndUpdateAccountThunk = createThunk(
 
         // stop here if account is not outdated and there are no pending transactions
 
-        if (!accountOutdated && !accountTxs.find(isPending)) {
+        if (!forceUpdate && !accountOutdated && !accountTxs.find(isPending)) {
             dispatch(accountsActions.updateAccountRefreshTimestamp(account));
 
             return;

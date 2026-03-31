@@ -1,115 +1,192 @@
 import { Translation } from '@suite/intl';
-import { BulletList, Button, Column, Row, Text } from '@trezor/components';
+import { Banner, BulletList, Button, Column, Row, Text } from '@trezor/components';
 
 import { useYieldWithdrawContext } from './useYieldWithdrawContext';
 import { YieldActionStep } from '../common/YieldActionStep';
+import { YieldActionStepWarning } from '../common/YieldActionStepWarning';
+import { YieldApproveModal } from '../common/YieldApproveModal';
 import { YieldApproveStep } from '../common/YieldApproveStep';
 import { YieldFlowComplete } from '../common/YieldFlowComplete';
 
 export const YieldWithdrawForm = () => {
     const {
+        account,
         token,
         receiptToken,
         maxAmount,
         approveAmount,
         withdrawAmount,
         completedAmount,
+        completedReceiptAmount,
+        errorMessage,
+        approveModalState,
+        pendingTransaction,
+        isModifyMode,
+        lastApprovedAmount,
+        revokeRequired,
+        isApproveAmountTooHigh,
+        isWithdrawAmountTooHigh,
+        isApprovalInsufficient,
+        isSubmittingApprove,
+        isSubmittingWithdraw,
         setApproveAmount,
         setApproveMaxAmount,
         setWithdrawAmount,
         setWithdrawMaxAmount,
+        submitApprove,
+        submitWithdraw,
+        submitRevoke,
+        enterModifyApproval,
+        handleApproveModalCancel,
+        handleApproveSuccessTxid,
+        openPendingTransaction,
         flow,
     } = useYieldWithdrawContext();
+
     const {
         approve: approveStepState,
         action: actionStepState,
         complete: completeStepState,
     } = flow.stepStates;
 
+    const isApprovalPending =
+        pendingTransaction?.type === 'approve' ||
+        pendingTransaction?.type === 'revoke' ||
+        pendingTransaction?.type === 'revoke-only';
+    const isWithdrawPending = pendingTransaction?.type === 'withdraw';
+    const approvalPendingTransaction = isApprovalPending ? pendingTransaction : undefined;
+    const withdrawPendingTransaction = isWithdrawPending ? pendingTransaction : undefined;
+
     return (
-        <Column width="100%" alignItems="center">
-            <Column gap={24} width="100%" maxWidth={500}>
-                {flow.currentStep === 'complete' ? (
-                    <YieldFlowComplete
-                        flowType="withdraw"
-                        input={{
-                            token: receiptToken,
-                            value: `${completedAmount} ${receiptToken.symbol}`,
-                        }}
-                        output={{
-                            token,
-                            value: `${completedAmount} ${token.symbol}`,
-                        }}
-                    />
-                ) : (
-                    <>
-                        <Text typographyStyle="headline-md">
-                            <Translation id="TR_EARN_YIELD_WITHDRAW" />
-                        </Text>
+        <>
+            <Column width="100%" alignItems="center">
+                <Column gap={24} width="100%" maxWidth={500}>
+                    {flow.currentStep === 'complete' ? (
+                        <YieldFlowComplete
+                            flowType="withdraw"
+                            input={{
+                                token: receiptToken,
+                                amount: completedReceiptAmount,
+                            }}
+                            output={{
+                                token,
+                                amount: completedAmount,
+                            }}
+                        />
+                    ) : (
+                        <>
+                            <Text typographyStyle="headline-md">
+                                <Translation id="TR_EARN_YIELD_WITHDRAW" />
+                            </Text>
 
-                        <BulletList bulletSize="small" bulletGap={12} gap={24} titleGap={16}>
-                            <BulletList.Item
-                                state={approveStepState}
-                                title={
-                                    <Row
-                                        justifyContent="space-between"
-                                        alignItems="center"
-                                        width="100%"
-                                    >
-                                        <Translation id="TR_EARN_YIELD_SELECT_AMOUNT_AND_APPROVE" />
-                                        {approveStepState === 'done' && (
-                                            <Button
-                                                size="small"
-                                                intent="neutral"
-                                                priority="secondary"
-                                                onClick={() => flow.goToStep('approve')}
-                                            >
-                                                <Translation id="TR_MODIFY" />
-                                            </Button>
-                                        )}
-                                    </Row>
-                                }
-                            >
-                                <YieldApproveStep
-                                    flowType="withdraw"
-                                    token={token}
-                                    variant={approveStepState === 'done' ? 'done' : 'active'}
-                                    amount={approveAmount}
-                                    summaryValue={`${maxAmount} ${token.symbol}`}
-                                    approvedAmount={approveAmount}
-                                    switchCurrencyLabel={receiptToken.symbol}
-                                    isSwitchDisabled
-                                    onAmountSelect={setApproveAmount}
-                                    onMaxClick={setApproveMaxAmount}
-                                    onApprove={flow.goToNextStep}
+                            {errorMessage && (
+                                <Banner
+                                    intent="warning"
+                                    description={<Translation id={errorMessage} />}
                                 />
-                            </BulletList.Item>
+                            )}
 
-                            <BulletList.Item
-                                state={actionStepState}
-                                title={<Translation id="TR_EARN_YIELD_WITHDRAW" />}
-                            >
-                                {actionStepState === 'active' && (
-                                    <YieldActionStep
+                            <BulletList bulletSize="small" bulletGap={12} gap={24} titleGap={16}>
+                                <BulletList.Item
+                                    state={approveStepState}
+                                    title={
+                                        <Row
+                                            justifyContent="space-between"
+                                            alignItems="center"
+                                            width="100%"
+                                        >
+                                            <Translation id="TR_EARN_YIELD_SELECT_AMOUNT_AND_APPROVE" />
+                                            {approveStepState === 'done' && (
+                                                <Button
+                                                    size="small"
+                                                    intent="neutral"
+                                                    priority="secondary"
+                                                    onClick={enterModifyApproval}
+                                                >
+                                                    <Translation id="TR_MODIFY" />
+                                                </Button>
+                                            )}
+                                        </Row>
+                                    }
+                                >
+                                    <YieldApproveStep
                                         flowType="withdraw"
                                         token={token}
-                                        amount={withdrawAmount}
+                                        variant={approveStepState === 'done' ? 'done' : 'active'}
+                                        amount={approveAmount}
                                         summaryValue={`${maxAmount} ${token.symbol}`}
-                                        onAmountSelect={setWithdrawAmount}
-                                        onMaxClick={setWithdrawMaxAmount}
-                                        onSubmit={flow.goToNextStep}
+                                        approvedAmount={approveAmount}
+                                        isModifyMode={isModifyMode}
+                                        previousApprovedAmount={lastApprovedAmount || undefined}
+                                        revokeRequired={revokeRequired}
+                                        warning={
+                                            isApproveAmountTooHigh ? (
+                                                <YieldActionStepWarning isInsufficientFunds />
+                                            ) : undefined
+                                        }
+                                        isDisabled={
+                                            !approveAmount ||
+                                            isApproveAmountTooHigh ||
+                                            isSubmittingApprove
+                                        }
+                                        pendingApproveTransaction={approvalPendingTransaction}
+                                        onAmountSelect={setApproveAmount}
+                                        onMaxClick={setApproveMaxAmount}
+                                        onApprove={submitApprove}
+                                        onRevokeApproval={submitRevoke}
+                                        onPendingTxClick={openPendingTransaction}
                                     />
-                                )}
-                            </BulletList.Item>
+                                </BulletList.Item>
 
-                            <BulletList.Item
-                                state={completeStepState}
-                                title={<Translation id="TR_EARN_YIELD_WITHDRAW_COMPLETE" />}
-                            />
-                        </BulletList>
-                    </>
-                )}
+                                <BulletList.Item
+                                    state={actionStepState}
+                                    title={<Translation id="TR_EARN_YIELD_WITHDRAW" />}
+                                >
+                                    {actionStepState === 'active' && (
+                                        <YieldActionStep
+                                            flowType="withdraw"
+                                            token={token}
+                                            amount={withdrawAmount}
+                                            summaryValue={`${maxAmount} ${token.symbol}`}
+                                            warning={
+                                                <YieldActionStepWarning
+                                                    isInsufficientFunds={isWithdrawAmountTooHigh}
+                                                    isApprovalInsufficient={isApprovalInsufficient}
+                                                    onModifyApproval={enterModifyApproval}
+                                                />
+                                            }
+                                            isDisabled={
+                                                isWithdrawAmountTooHigh ||
+                                                isApprovalInsufficient ||
+                                                isSubmittingWithdraw
+                                            }
+                                            pendingTransaction={withdrawPendingTransaction}
+                                            onAmountSelect={setWithdrawAmount}
+                                            onMaxClick={setWithdrawMaxAmount}
+                                            onSubmit={submitWithdraw}
+                                            onPendingTxClick={openPendingTransaction}
+                                        />
+                                    )}
+                                </BulletList.Item>
+
+                                <BulletList.Item
+                                    state={completeStepState}
+                                    title={<Translation id="TR_EARN_YIELD_WITHDRAW_COMPLETE" />}
+                                />
+                            </BulletList>
+                        </>
+                    )}
+                </Column>
             </Column>
-        </Column>
+
+            {approveModalState && (
+                <YieldApproveModal
+                    {...approveModalState}
+                    account={account}
+                    onCancel={handleApproveModalCancel}
+                    onSuccessTxid={handleApproveSuccessTxid}
+                />
+            )}
+        </>
     );
 };

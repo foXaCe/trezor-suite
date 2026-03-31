@@ -22,9 +22,7 @@ const getProviderLogoSource = (logo?: string) => {
         return null;
     }
 
-    return logo.startsWith('http://') || logo.startsWith('https://')
-        ? logo
-        : invityAPI.getProviderLogoUrl(logo);
+    return logo.startsWith('https://') ? logo : invityAPI.getProviderLogoUrl(logo);
 };
 
 export const AllowanceModalProviderInfo = ({
