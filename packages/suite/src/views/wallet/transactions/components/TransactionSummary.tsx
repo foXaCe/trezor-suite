@@ -1,27 +1,32 @@
+import { useEffect, useState } from 'react';
+
 import { getUnixTime } from 'date-fns';
 import styled from 'styled-components';
 
 import { Translation } from '@suite/intl';
-import { calcTicks, calcTicksFromData } from '@suite-common/suite-utils';
+import { getCoingeckoId, getNetworkFeatures } from '@suite-common/wallet-config';
 import { selectBaseCurrency } from '@suite-common/wallet-core';
-import { Button, Card, Column, Row } from '@trezor/components';
+import { Button, Card, Column, Icon, Paragraph, Row } from '@trezor/components';
 import { typography } from '@trezor/theme';
-import { BigNumber } from '@trezor/utils';
 
 import { updateGraphData } from 'src/actions/wallet/graphActions';
-import { GraphRangeSelector, HiddenPlaceholder, TransactionsGraph } from 'src/components/suite';
+import { GraphRangeSelector, HiddenPlaceholder } from 'src/components/suite';
 import { useDispatch, useSelector } from 'src/hooks/suite';
-import { useIsContentBelowBreakpoint } from 'src/support/suite/ContentFlex';
+import { type AppState } from 'src/types/suite';
 import { type Account } from 'src/types/wallet';
+import { type GraphRange } from 'src/types/wallet/graph';
 import {
     aggregateBalanceHistory,
     getGraphDataForInterval,
-    getMinMaxValueFromData,
     isNetworkWithGraphFeature,
 } from 'src/utils/wallet/graph';
+import {
+    LiveFiatGraph,
+    hasCoinbaseLiveSupport,
+} from 'src/views/dashboard/PortfolioCard/LiveFiatGraph';
+import { UnsupportedAssetsMessage } from 'src/views/dashboard/PortfolioCard/UnsupportedAssetsMessage';
 
 import { SummaryCards } from './SummaryCards';
-import { TransactionSummaryDropdown } from './TransactionSummaryDropdown';
 
 const ErrorMessage = styled.div`
     display: flex;
@@ -40,12 +45,17 @@ interface TransactionSummaryProps {
     account: Account;
 }
 
+const selectSelectedRange = (state: AppState) => state.wallet.graph.selectedRange;
+const selectGraph = (state: AppState) => state.wallet.graph;
+
 export const TransactionSummary = ({ account }: TransactionSummaryProps) => {
-    const selectedRange = useSelector(state => state.wallet.graph.selectedRange);
-    const graph = useSelector(state => state.wallet.graph);
+    const selectedRange = useSelector(selectSelectedRange);
+    const graph = useSelector(selectGraph);
 
     const baseCurrencyCode = useSelector(selectBaseCurrency);
     const dispatch = useDispatch();
+
+    const [isLive, setIsLive] = useState(false);
 
     const intervalGraphData = getGraphDataForInterval({ account, graph });
     const data = intervalGraphData[0]?.data
@@ -53,21 +63,8 @@ export const TransactionSummary = ({ account }: TransactionSummaryProps) => {
         : [];
 
     const error = intervalGraphData[0]?.error ?? false;
-    const isLoading = intervalGraphData[0]?.isLoading ?? false;
-
-    // aggregate values from shown graph data
-    const minMaxValues = getMinMaxValueFromData(
-        data,
-        'account',
-        d => new BigNumber(d.sent),
-        d => new BigNumber(d.received),
-        d => new BigNumber(d.balance),
-    );
-
-    const xTicks =
-        selectedRange.label === 'all'
-            ? calcTicksFromData(data).map(getUnixTime)
-            : calcTicks(selectedRange.startDate, selectedRange.endDate).map(getUnixTime);
+    const isGraphLoading = intervalGraphData[0]?.isLoading ?? false;
+    const isLoading = isGraphLoading && data.length === 0;
 
     // Interval shown in InfoCard below the graph
     // For 'all' range pick first and last datapoint's timestamps
@@ -87,71 +84,92 @@ export const TransactionSummary = ({ account }: TransactionSummaryProps) => {
                 abortSignal: abortController?.signal,
             }),
         ).unwrap();
-    const onSelectedRange = () =>
-        dispatch(
-            updateGraphData({
-                accounts: [account],
-            }),
-        );
-
     const isGraphSupported = isNetworkWithGraphFeature(account.symbol, account.backendType);
-    const isContentBelowBreakpoint = useIsContentBelowBreakpoint();
+    const hasCoingeckoPrice = !!getCoingeckoId(account.symbol);
+    const showGraph = hasCoingeckoPrice && isGraphSupported;
+    const hasLiveSupport = hasCoinbaseLiveSupport(account.symbol);
+    const hasTokens = getNetworkFeatures(account.symbol).includes('tokens');
+
+    useEffect(() => {
+        if (!hasLiveSupport && isLive) {
+            setIsLive(false);
+        }
+    }, [hasLiveSupport, isLive]);
+
+    const onSelectedRange = isGraphSupported
+        ? (range: GraphRange) =>
+              dispatch(
+                  updateGraphData({
+                      accounts: [account],
+                      selectedRange: range,
+                  }),
+              )
+        : undefined;
+
+    const graphCardControls = (
+        <Row justifyContent="space-between" alignItems="center" gap={24}>
+            <GraphRangeSelector
+                onSelectedRange={onSelectedRange}
+                isLive={isLive}
+                isLoading={isGraphLoading}
+                onLiveChange={setIsLive}
+                showLiveOption={hasLiveSupport}
+            />
+            {hasTokens && (
+                <Row gap={12}>
+                    <Paragraph
+                        typographyStyle="body-xs"
+                        intent="neutral"
+                        priority="secondary"
+                        align="end"
+                        textWrap="balance"
+                        maxWidth={400}
+                    >
+                        <UnsupportedAssetsMessage affectedNetworks={[]} hasTokens />
+                    </Paragraph>
+                    <Icon name="info" size={24} intent="neutral" priority="secondary" />
+                </Row>
+            )}
+        </Row>
+    );
 
     return (
         <Column alignItems="stretch" gap={20}>
-            {isGraphSupported && (
+            {showGraph && (
                 <>
-                    <Row justifyContent="space-between" alignItems="center">
-                        <GraphRangeSelector
-                            onSelectedRange={onSelectedRange}
-                            placement={{ position: 'bottom', alignment: 'end' }}
-                        />
-                        <TransactionSummaryDropdown />
-                    </Row>
-
                     <Column alignItems="stretch">
                         {error ? (
-                            <Card>
-                                <Row height={320} overflow="visible" alignItems="stretch">
-                                    <ErrorMessage>
-                                        <Translation id="TR_COULD_NOT_RETRIEVE_DATA" />
-                                        <Button
-                                            onClick={() => onRefresh()}
-                                            iconLeft="repeat"
-                                            intent="neutral"
-                                            priority="secondary"
-                                        >
-                                            <Translation id="TR_RETRY" />
-                                        </Button>
-                                    </ErrorMessage>
-                                </Row>
+                            <Card paddingType="none">
+                                <Column alignItems="stretch" padding={24} gap={24}>
+                                    <Row height={320} overflow="visible" alignItems="stretch">
+                                        <ErrorMessage>
+                                            <Translation id="TR_COULD_NOT_RETRIEVE_DATA" />
+                                            <Button
+                                                onClick={() => onRefresh()}
+                                                iconLeft="repeat"
+                                                intent="neutral"
+                                                priority="secondary"
+                                            >
+                                                <Translation id="TR_RETRY" />
+                                            </Button>
+                                        </ErrorMessage>
+                                    </Row>
+                                    {graphCardControls}
+                                </Column>
                             </Card>
                         ) : (
                             <HiddenPlaceholder enforceIntensity={8}>
-                                <Card
-                                    overflow="visible"
-                                    paddingType={isContentBelowBreakpoint ? 'none' : 'normal'}
-                                >
-                                    <Row height={320} overflow="visible" alignItems="stretch">
-                                        <TransactionsGraph
-                                            hideToolbar
-                                            variant="one-asset"
-                                            xTicks={xTicks}
-                                            account={account}
-                                            isLoading={isLoading}
-                                            data={data}
-                                            minMaxValues={[
-                                                minMaxValues[0].toNumber(),
-                                                minMaxValues[1].toNumber(),
-                                            ]}
-                                            localCurrency={baseCurrencyCode}
-                                            onRefresh={onRefresh}
-                                            selectedRange={selectedRange}
-                                            receivedValueFn={data => data.received}
-                                            sentValueFn={data => data.sent}
-                                            balanceValueFn={data => data.balance}
-                                        />
-                                    </Row>
+                                <Card overflow="visible" paddingType="none">
+                                    <Column alignItems="stretch" padding={24} gap={40}>
+                                        <Row height={320} overflow="visible" alignItems="stretch">
+                                            <LiveFiatGraph
+                                                account={account}
+                                                isLive={isLive}
+                                                isGraphLoading={isGraphLoading}
+                                            />
+                                        </Row>
+                                        {graphCardControls}
+                                    </Column>
                                 </Card>
                             </HiddenPlaceholder>
                         )}

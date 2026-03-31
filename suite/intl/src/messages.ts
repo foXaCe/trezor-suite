@@ -7312,6 +7312,10 @@ export const messages = defineMessages({
         id: 'TR_SHOW_GRAPH',
         defaultMessage: 'Show graph',
     },
+    TR_HIDE_GRAPH: {
+        id: 'TR_HIDE_GRAPH',
+        defaultMessage: 'Hide graph',
+    },
     TR_DATE_DAY_LONG: {
         id: 'TR_DATE_DAY_LONG',
         defaultMessage: '1 day',

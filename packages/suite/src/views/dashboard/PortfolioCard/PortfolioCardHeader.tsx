@@ -1,58 +1,27 @@
-import { useCallback } from 'react';
+import { type ReactNode } from 'react';
 
-import { selectAllAccountsToList } from '@suite-common/wallet-core';
 import { SkeletonRectangle } from '@trezor/components';
 
-import { updateGraphData } from 'src/actions/wallet/graphActions';
-import { GraphRangeSelector } from 'src/components/suite';
 import { FiatHeader } from 'src/components/wallet/FiatHeader';
-import { useSelector } from 'src/hooks/suite';
 import { ContentFlex, useIsContentBelowBreakpoint } from 'src/support/suite/ContentFlex';
 import { type Discovery } from 'src/types/wallet';
-import { type GraphRange } from 'src/types/wallet/graph';
 
 export type PortfolioCardHeaderProps = {
     discovery?: Discovery;
     fiatAmount: string;
     localCurrency: string;
-    isWalletLoading: boolean;
-    isWalletError: boolean;
     isDiscoveryRunning?: boolean;
-    showGraphControls: boolean;
-    passphraseEntryCanceled: boolean;
+    rightContent?: ReactNode;
 };
 
 export const PortfolioCardHeader = ({
     discovery,
     fiatAmount,
     localCurrency,
-    isWalletLoading,
-    isWalletError,
     isDiscoveryRunning,
-    showGraphControls,
-    passphraseEntryCanceled,
+    rightContent,
 }: PortfolioCardHeaderProps) => {
-    const accounts = useSelector(selectAllAccountsToList);
     const isContentBelowBreakpoint = useIsContentBelowBreakpoint();
-
-    const onSelectedRange = useCallback(
-        (_range: GraphRange) => {
-            updateGraphData({ accounts });
-        },
-        [accounts],
-    );
-
-    let actions = null;
-    if (!isWalletLoading && !isWalletError && !passphraseEntryCanceled) {
-        if (showGraphControls) {
-            actions = (
-                <GraphRangeSelector
-                    onSelectedRange={onSelectedRange}
-                    placement={{ position: 'bottom', alignment: 'start' }}
-                />
-            );
-        }
-    }
 
     const valueLoading = isDiscoveryRunning || (!discovery && isNaN(Number(fiatAmount)));
 
@@ -73,7 +42,7 @@ export const PortfolioCardHeader = ({
                     localCurrency={localCurrency}
                 />
             )}
-            {actions}
+            {rightContent}
         </ContentFlex>
     );
 };

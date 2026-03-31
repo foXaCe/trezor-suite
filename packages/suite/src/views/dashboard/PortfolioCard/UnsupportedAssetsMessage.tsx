@@ -1,6 +1,11 @@
 import { Translation } from '@suite/intl';
 import { type TrezorDevice } from '@suite-common/suite-types';
-import { type NetworkSymbol, getNetwork, getNetworkFeatures } from '@suite-common/wallet-config';
+import {
+    type NetworkSymbol,
+    getCoingeckoId,
+    getNetwork,
+    getNetworkFeatures,
+} from '@suite-common/wallet-config';
 import { type Account } from '@suite-common/wallet-types';
 import { hasBitcoinOnlyFirmware } from '@trezor/device-utils';
 import { union } from '@trezor/utils';
@@ -27,7 +32,8 @@ export const useUnsupportedNetworkMessage = ({
                   .filter(
                       account =>
                           account.history &&
-                          !isNetworkWithGraphFeature(account.symbol, account.backendType),
+                          (!getCoingeckoId(account.symbol) ||
+                              !isNetworkWithGraphFeature(account.symbol, account.backendType)),
                   )
                   .map(({ symbol }) => symbol)
             : [];

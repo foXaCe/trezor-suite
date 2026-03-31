@@ -1,4 +1,5 @@
 import { type TokenTransfer, type Transaction } from '@trezor/blockchain-link-types/src';
+import { BigNumber } from '@trezor/utils';
 
 import {
     type ApiTokenAccount,
@@ -35,6 +36,62 @@ describe('solana/utils', () => {
                     input.address,
                 );
                 expect(result).toEqual(expectedOutput);
+            });
+        });
+
+        it('matches descriptor against account keys via string normalization', () => {
+            const result = extractAccountBalanceDiff(
+                {
+                    transaction: {
+                        message: {
+                            accountKeys: [
+                                {
+                                    pubkey: {
+                                        toString: () => 'descriptor-address',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    meta: {
+                        preBalances: [1000n],
+                        postBalances: [2500n],
+                    },
+                } as unknown as ParsedTransactionWithMeta,
+                'descriptor-address',
+            );
+
+            expect(result).toEqual({
+                preBalance: new BigNumber(1000),
+                postBalance: new BigNumber(2500),
+            });
+        });
+
+        it('matches descriptor against wrapped pubkey objects', () => {
+            const result = extractAccountBalanceDiff(
+                {
+                    transaction: {
+                        message: {
+                            accountKeys: [
+                                {
+                                    pubkey: {
+                                        address: 'wrapped-descriptor-address',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    meta: {
+                        preBalances: [11n],
+                        postBalances: [22n],
+                    },
+                } as unknown as ParsedTransactionWithMeta,
+                'wrapped-descriptor-address',
+            );
+
+            expect(result).toEqual({
+                preBalance: new BigNumber(11),
+                postBalance: new BigNumber(22),
             });
         });
     });

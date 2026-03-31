@@ -309,7 +309,7 @@ export const networks = {
         bip43Path: "m/44'/501'/i'/0'", // phantom - bip44Change
         decimals: 9,
         testnet: false,
-        features: ['tokens', 'coin-definitions', 'staking'],
+        features: ['tokens', 'coin-definitions', 'staking', 'graph'],
         explorer: getExplorerUrls('https://solscan.io', 'solana'),
         support: {
             [DeviceModelInternal.T2T1]: '2.6.4',
@@ -373,7 +373,7 @@ export const networks = {
         bip43Path: "m/1852'/1815'/i'",
         decimals: 6,
         testnet: false,
-        features: ['tokens', 'staking', 'coin-definitions', 'sign-verify'],
+        features: ['tokens', 'staking', 'coin-definitions', 'sign-verify', 'graph'],
         explorer: getExplorerUrls('https://cexplorer.io', 'cardano'),
         support: {
             [DeviceModelInternal.T2T1]: '2.4.3',
@@ -427,7 +427,7 @@ export const networks = {
         decimals: 6,
         testnet: false,
         explorer: getExplorerUrls('https://xrpscan.com', 'ripple'),
-        features: [],
+        features: ['graph'],
         backendTypes: ['ripple'],
         accountTypes: {},
         coingeckoId: 'ripple',
@@ -443,7 +443,7 @@ export const networks = {
         decimals: 7,
         testnet: false,
         explorer: getExplorerUrls('https://stellar.expert/explorer/public', 'stellar'),
-        features: ['tokens', 'coin-definitions'],
+        features: ['tokens', 'coin-definitions', 'graph'],
         backendTypes: ['stellar'],
         accountTypes: {},
         coingeckoId: 'stellar',

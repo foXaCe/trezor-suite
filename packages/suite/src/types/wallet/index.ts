@@ -20,6 +20,7 @@ import {
 import { type CoinjoinAccountAction } from 'src/actions/wallet/coinjoinAccountActions';
 import { type CoinjoinClientAction } from 'src/actions/wallet/coinjoinClientActions';
 import { type GraphAction } from 'src/actions/wallet/graphActions';
+import { type GraphFiatAction } from 'src/actions/wallet/graphFiatActions';
 import { type ReceiveAction } from 'src/actions/wallet/receiveActions';
 import { type SignVerifyAction } from 'src/actions/wallet/signVerifyActions';
 import { type accountSearchActions } from 'src/reducers/wallet/accountSearchReducer';
@@ -81,6 +82,7 @@ export type WalletAction =
     | ReceiveAction
     | SignVerifyAction
     | GraphAction
+    | GraphFiatAction
     | DiscoveryAction
     | TradingAction
     | TradingBuyAction

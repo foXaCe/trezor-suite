@@ -29,6 +29,7 @@ import {
     selectActiveBackendType,
     selectIsElectrumBackendSelected,
 } from '../blockchain/blockchainSelectors';
+import { selectBaseCurrency } from '../settings/walletSettingsReducer';
 import { selectTransactionsWithMissingRates } from '../transactions/transactionsSelectors';
 
 type UpdateTxsFiatRatesThunkPayload = {
@@ -41,6 +42,10 @@ type UpdateTxsFiatRatesThunkPayload = {
 export const updateTxsFiatRatesThunk = createThunk(
     `${FIAT_RATES_MODULE_PREFIX}/updateTxsRates`,
     async ({ accountKey, txs, baseCurrencyCode }: UpdateTxsFiatRatesThunkPayload, { getState }) => {
+        if (selectBaseCurrency(getState()) !== baseCurrencyCode) {
+            return { account: undefined, rates: [] };
+        }
+
         const account = selectAccountByKey(getState(), accountKey);
         if (!account || txs?.length === 0 || isTestnet(account.symbol))
             return { account, rates: [] };
@@ -64,6 +69,10 @@ export const updateTxsFiatRatesThunk = createThunk(
         const groupedTokensTxs = groupTokensTransactionsByContractAddress(txs);
 
         for (const token of typedObjectKeys(groupedTokensTxs)) {
+            if (selectBaseCurrency(getState()) !== baseCurrencyCode) {
+                return { account, rates };
+            }
+
             const hasCoinDefinitions = getNetworkFeatures(account.symbol).includes(
                 'coin-definitions',
             );
@@ -120,6 +129,10 @@ export const updateFiatRatesThunk = createThunk<
         { getState },
     ) => {
         const fetchRate = async (ticker: TickerId) => {
+            if (selectBaseCurrency(getState()) !== baseCurrencyCode) {
+                throw new Error(`Stale base currency request: ${baseCurrencyCode}`);
+            }
+
             if (isTestnet(ticker.symbol)) {
                 throw new Error('Testnet');
             }
@@ -190,6 +203,10 @@ export const updateMissingTxFiatRatesThunk = createThunk(
         { localCurrency, accountKey }: { localCurrency: BaseCurrencyCode; accountKey?: AccountKey },
         { dispatch, getState },
     ) => {
+        if (selectBaseCurrency(getState()) !== localCurrency) {
+            return;
+        }
+
         const transactionsWithMissingRates = selectTransactionsWithMissingRates(
             getState(),
             localCurrency,
@@ -197,6 +214,10 @@ export const updateMissingTxFiatRatesThunk = createThunk(
         );
 
         transactionsWithMissingRates.forEach(({ account, txs }) => {
+            if (selectBaseCurrency(getState()) !== localCurrency) {
+                return;
+            }
+
             dispatch(
                 updateTxsFiatRatesThunk({
                     accountKey: account.key,
@@ -243,16 +264,20 @@ export const fetchFiatRatesThunk = createThunk(
 
         tickerChunks.reduce<Promise<any>>(
             (chain, chunk) =>
-                chain.then(() =>
-                    dispatch(
+                chain.then(() => {
+                    if (selectBaseCurrency(getState()) !== localCurrency) {
+                        return;
+                    }
+
+                    return dispatch(
                         updateFiatRatesThunk({
                             tickers: chunk,
                             baseCurrencyCode: localCurrency,
                             rateType,
                             fetchAttemptTimestamp: asTimestamp(Date.now()),
                         }),
-                    ),
-                ),
+                    );
+                }),
             Promise.resolve(),
         );
 

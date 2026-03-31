@@ -36,6 +36,7 @@ export default class BlockchainGetAccountBalanceHistory extends AbstractMethod<
             { name: 'to', type: 'number' },
             { name: 'groupBy', type: 'number' },
             { name: 'currencies', type: 'array' },
+            { name: 'requestId', type: 'string' },
         ]);
 
         const coinInfo = getCoinInfo(payload.coin);
@@ -54,6 +55,7 @@ export default class BlockchainGetAccountBalanceHistory extends AbstractMethod<
                 to: payload.to,
                 groupBy: payload.groupBy,
                 currencies: payload.currencies,
+                requestId: payload.requestId,
             },
         };
 

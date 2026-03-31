@@ -247,6 +247,8 @@ export interface Transaction {
     solanaSpecific?: {
         status: 'confirmed';
         stakeOperation?: { type: StakeType; amount: string };
+        /** Native SOL balance after this transaction (in lamports). */
+        postBalance?: string;
     };
     details: TransactionDetail;
     vsize?: number;

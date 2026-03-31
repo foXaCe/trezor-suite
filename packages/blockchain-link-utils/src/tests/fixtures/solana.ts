@@ -901,6 +901,7 @@ export const fixtures = {
                 solanaSpecific: {
                     status: 'confirmed',
                     stakeOperation: undefined,
+                    postBalance: '180',
                 },
                 targets: [
                     {

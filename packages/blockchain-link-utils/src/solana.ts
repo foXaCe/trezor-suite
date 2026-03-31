@@ -92,6 +92,48 @@ export const getTokenNameAndSymbol = (mint: string, tokenDetailByMint: TokenDeta
 const isTokenProgramName = (programName: string): programName is TokenProgramName =>
     tokenProgramNames.some(name => name === programName);
 
+const normalizeAddress = (
+    address:
+        | string
+        | Address
+        | {
+              address?: string | Address;
+              pubkey?: string | Address;
+              toBase58?: () => string;
+              toString?: () => string;
+          }
+        | undefined,
+): string | undefined => {
+    if (address === undefined) {
+        return undefined;
+    }
+
+    if (typeof address === 'string') {
+        return address;
+    }
+
+    if (typeof address === 'object') {
+        if ('address' in address && address.address !== undefined) {
+            return normalizeAddress(address.address);
+        }
+
+        if ('pubkey' in address && address.pubkey !== undefined) {
+            return normalizeAddress(address.pubkey);
+        }
+
+        if ('toBase58' in address && typeof address.toBase58 === 'function') {
+            return address.toBase58();
+        }
+    }
+
+    const normalized = address.toString();
+
+    return normalized === '[object Object]' ? undefined : normalized;
+};
+
+const isSameAddress = (left: string | Address | undefined, right: string | Address | undefined) =>
+    normalizeAddress(left) !== undefined && normalizeAddress(left) === normalizeAddress(right);
+
 export const tokenStandardToTokenProgramName = (standard: TokenStandard): TokenProgramName => {
     const tokenProgram = Object.entries(tokenProgramsInfo).find(
         ([_, programInfo]) => programInfo.tokenStandard === standard,
@@ -198,7 +240,7 @@ export const extractAccountBalanceDiff = (
     postBalance: BigNumber;
 } | null => {
     const pubKeyIndex = transaction.transaction.message.accountKeys.findIndex(
-        ak => ak.pubkey === address,
+        ak => normalizeAddress(ak.pubkey) === address,
     );
 
     if (pubKeyIndex === -1) {
@@ -239,7 +281,7 @@ const isWSolTransfer = (ixs: readonly (ParsedInstruction | PartiallyDecodedInstr
     );
 
 type TransactionEffect = {
-    address: Address;
+    address: string;
     amount: BigNumber;
 };
 
@@ -250,7 +292,7 @@ export function getNativeEffects(transaction: ParsedTransactionWithMeta): Transa
 
     return transaction.transaction.message.accountKeys
         .map(ak => {
-            const targetAddress = ak.pubkey;
+            const targetAddress = normalizeAddress(ak.pubkey)!;
             const balanceDiff = extractAccountBalanceDiff(transaction, targetAddress);
 
             // WSOL Transfers are counted as SOL transfers in the transaction effects, leading to duplicate
@@ -259,10 +301,13 @@ export function getNativeEffects(transaction: ParsedTransactionWithMeta): Transa
                 if (
                     (!!wSolTransferInstruction.parsed.info &&
                         'destination' in wSolTransferInstruction.parsed.info &&
-                        wSolTransferInstruction.parsed.info.destination === targetAddress) ||
+                        isSameAddress(
+                            wSolTransferInstruction.parsed.info.destination,
+                            targetAddress,
+                        )) ||
                     (!!wSolTransferInstruction.parsed.info &&
                         'source' in wSolTransferInstruction.parsed.info &&
-                        wSolTransferInstruction.parsed.info.source === targetAddress)
+                        isSameAddress(wSolTransferInstruction.parsed.info.source, targetAddress))
                 ) {
                     return null;
                 }
@@ -299,7 +344,7 @@ export const getTargets = (
 
             // Exclude effects on foreign addresses for tx types other than sent, otherwise it
             // leads to the foreign address being displayed next to user's own address which might lead to confusion.
-            if (txType !== 'sent' && effect.address !== accountAddress) {
+            if (txType !== 'sent' && !isSameAddress(effect.address, accountAddress)) {
                 return false;
             }
 
@@ -312,7 +357,7 @@ export const getTargets = (
                 addresses: [effect.address],
                 isAddress: true,
                 amount: effect.amount.abs().toString(),
-                isAccountTarget: effect.address === accountAddress && txType !== 'sent',
+                isAccountTarget: isSameAddress(effect.address, accountAddress) && txType !== 'sent',
             };
 
             return target;
@@ -341,7 +386,7 @@ const getNativeTransferTxType = (
 ) => {
     if (
         effects.length === 1 &&
-        effects[0]?.address === accountAddress &&
+        isSameAddress(effects[0]?.address, accountAddress) &&
         effects[0]?.amount.abs().isEqualTo(new BigNumber(transaction.meta?.fee.toString() || 0))
     ) {
         return 'self';
@@ -349,11 +394,11 @@ const getNativeTransferTxType = (
 
     const [senders, receivers] = arrayPartition(effects, ({ amount }) => amount.isNegative());
 
-    if (senders.some(({ address }) => address === accountAddress)) {
+    if (senders.some(({ address }) => isSameAddress(address, accountAddress))) {
         return 'sent';
     }
 
-    if (receivers.some(({ address }) => address === accountAddress)) {
+    if (receivers.some(({ address }) => isSameAddress(address, accountAddress))) {
         return 'recv';
     }
 
@@ -432,15 +477,16 @@ export const getDetails = (
     const receivers = effects
         .filter(
             ({ amount, address }) =>
-                amount.isPositive() && (txType !== 'sent' ? address === accountAddress : true),
+                amount.isPositive() &&
+                (txType !== 'sent' ? isSameAddress(address, accountAddress) : true),
         )
-        .filter(({ address }) => !(txType === 'self' && address === accountAddress));
+        .filter(({ address }) => !(txType === 'self' && isSameAddress(address, accountAddress)));
 
     const getVin = ({ address, amount }: { address: string; amount?: BigNumber }, i: number) => ({
         txid: transaction.transaction.signatures[0].toString(),
         version: transaction.version?.toString(),
         isAddress: true,
-        isAccountOwned: address === accountAddress,
+        isAccountOwned: isSameAddress(address, accountAddress),
         n: i,
         value: amount?.abs().toString(),
         addresses: [address],
@@ -672,7 +718,7 @@ const getUnstakeAmount = (tx: SolanaValidParsedTxWithMeta): string => {
             ) {
                 const stakeAccount = instruction.parsed.info?.stakeAccount;
 
-                return accountKeys.findIndex(key => key.pubkey === stakeAccount);
+                return accountKeys.findIndex(key => isSameAddress(key.pubkey, stakeAccount));
             }
 
             return -1;
@@ -730,7 +776,7 @@ export const transformTransaction = (
     const amount = isUnstakeTx
         ? '0' // amount for unstake transactions should be hidden
         : getAmount(
-              nativeEffects.find(({ address }) => address === accountAddress),
+              nativeEffects.find(({ address }) => isSameAddress(address, accountAddress)),
               type,
           );
 
@@ -758,6 +804,7 @@ export const transformTransaction = (
                       amount: stakeAmount,
                   }
                 : undefined,
+            postBalance: extractAccountBalanceDiff(tx, accountAddress)?.postBalance.toFixed(0),
         },
     };
 };
