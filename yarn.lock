@@ -6329,7 +6329,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:^2.0.1":
+"@noble/curves@npm:^2.0.1, @noble/curves@npm:~2.0.0":
   version: 2.0.1
   resolution: "@noble/curves@npm:2.0.1"
   dependencies:
@@ -6359,10 +6359,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:2.0.1, @noble/hashes@npm:^2.0.1":
+"@noble/hashes@npm:2.0.1, @noble/hashes@npm:^2.0.1, @noble/hashes@npm:~2.0.0":
   version: 2.0.1
   resolution: "@noble/hashes@npm:2.0.1"
   checksum: 10/f4d00e7564eb4ff4e6d16be151dd0e404aede35f91e4372b0a8a6ec888379c1dd1e02c721b480af8e7853bea9637185b5cb9533970c5b77d60c254ead0cfd8f7
+  languageName: node
+  linkType: hard
+
+"@noble/post-quantum@npm:^0.5.4":
+  version: 0.5.4
+  resolution: "@noble/post-quantum@npm:0.5.4"
+  dependencies:
+    "@noble/curves": "npm:~2.0.0"
+    "@noble/hashes": "npm:~2.0.0"
+  checksum: 10/9849fbc36c05fde8b1786d4ff94314c39cdeb3c4313945d86f3f0fdc3aa71447c0bf406106d2479afffc137cbc2e1aeebe4af8eb37aaf81625d7f6c22c3a6356
   languageName: node
   linkType: hard
 
@@ -15425,6 +15435,7 @@ __metadata:
   resolution: "@trezor/device-authenticity@workspace:packages/device-authenticity"
   dependencies:
     "@noble/curves": "npm:^2.0.1"
+    "@noble/post-quantum": "npm:^0.5.4"
     "@trezor/crypto-utils": "workspace:*"
     "@trezor/protobuf": "workspace:*"
     "@trezor/schema-utils": "workspace:*"

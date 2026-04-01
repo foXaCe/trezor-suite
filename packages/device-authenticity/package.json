@@ -42,6 +42,7 @@
     },
     "dependencies": {
         "@noble/curves": "^2.0.1",
+        "@noble/post-quantum": "^0.5.4",
         "@trezor/crypto-utils": "workspace:*",
         "@trezor/protobuf": "workspace:*",
         "@trezor/schema-utils": "workspace:*",

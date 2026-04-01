@@ -16,6 +16,7 @@
 @evolu/react-native
 @evolu/web
 @noble/curves
+@noble/post-quantum
 @pmmmwh/react-refresh-webpack-plugin
 @sentry/browser
 @sentry/core
