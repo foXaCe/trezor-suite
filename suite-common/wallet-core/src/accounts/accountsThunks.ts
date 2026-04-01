@@ -122,6 +122,7 @@ export const fetchAndUpdateAccountThunk = createThunk(
             page: 1, // useful for every network except ripple and stellar
             pageSize,
             suppressBackupWarning: true,
+            includeErc4626: account.networkType === 'ethereum' ? true : undefined,
         });
 
         if (response.success) {

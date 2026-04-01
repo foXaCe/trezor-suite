@@ -1758,6 +1758,15 @@ export const messages = defineMessages({
         defaultMessage: 'Hidden',
         id: 'TR_HIDDEN',
     },
+    TR_DEFI: {
+        defaultMessage: 'DeFi',
+        id: 'TR_DEFI',
+    },
+    TR_DEFI_BANNER_TEXT: {
+        id: 'TR_DEFI_BANNER_TEXT',
+        defaultMessage:
+            'These tokens represent your position. Sending or swapping them will also remove your positions.',
+    },
     TR_CONFIRM: {
         defaultMessage: 'Confirm',
         id: 'TR_CONFIRM',

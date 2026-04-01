@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Translation } from '@suite/intl';
+import { type YieldDto } from '@suite-common/earn-api';
 import {
     type EnhancedTokenInfo,
     type TokenManagementAction,
@@ -37,6 +38,7 @@ interface TokensTableProps {
     hideRates?: boolean;
     searchQuery?: string;
     isUnverifiedTable?: boolean;
+    yieldOpportunities?: YieldDto[];
 }
 
 export const TokensTable = ({
@@ -48,6 +50,7 @@ export const TokensTable = ({
     hideRates,
     searchQuery,
     isUnverifiedTable,
+    yieldOpportunities,
 }: TokensTableProps) => {
     const dispatch = useDispatch();
     const [isZeroBalanceOpen, setIsZeroBalanceOpen] = useState(false);
@@ -99,6 +102,7 @@ export const TokensTable = ({
                                 tokenStatusType={tokenStatusType}
                                 isUnverifiedTable={isUnverifiedTable}
                                 hideRates={hideRates}
+                                yieldOpportunities={yieldOpportunities}
                             />
                         ))}
                         {tokensWithoutBalance.length !== 0 && (
@@ -125,6 +129,7 @@ export const TokensTable = ({
                                         isUnverifiedTable={isUnverifiedTable}
                                         hideRates={hideRates}
                                         isCollapsed={!isZeroBalanceOpen}
+                                        yieldOpportunities={yieldOpportunities}
                                     />
                                 ))}
                             </>

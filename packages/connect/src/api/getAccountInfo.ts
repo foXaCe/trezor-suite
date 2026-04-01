@@ -62,6 +62,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                 { name: 'contractFilter', type: 'string' },
                 { name: 'gap', type: 'number' },
                 { name: 'marker', type: 'object' },
+                { name: 'includeErc4626', type: 'boolean' },
                 { name: 'defaultAccountType', type: 'string' },
                 { name: 'derivationType', type: 'number' },
                 { name: 'suppressBackupWarning', type: 'boolean' },
@@ -272,6 +273,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                     gap: request.gap,
                     marker: request.marker,
                     tokenAccountsPubKeys: request.tokenAccountsPubKeys,
+                    includeErc4626: request.includeErc4626,
                 });
 
                 if (this.disposed) break;
@@ -382,6 +384,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
             contractFilter: request.contractFilter,
             gap: request.gap,
             marker: request.marker,
+            includeErc4626: request.includeErc4626,
         });
 
         let utxo: AccountUtxo[] | undefined;
