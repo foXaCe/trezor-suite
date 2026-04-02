@@ -3,7 +3,10 @@ import { type DeviceCancelledErrType, type DeviceErrorType } from '@suite-common
 import { type StaticSessionId } from '@trezor/connect';
 import { type Result } from '@trezor/type-utils';
 
-import { type WriteModeRequiredForAllocationErrType } from '../quotaManager/quotaManagerTypes';
+import {
+    type QuotaManagerCommunicationFailedErrType,
+    type WriteModeRequiredForAllocationErrType,
+} from '../quotaManager/quotaManagerTypes';
 import { type SuiteSyncUnavailableOnDeviceErrorType } from '../refreshSuiteSyncKeys';
 
 export type SuiteSyncFirmwareUpgradeNeededDeviceErrorType = {
@@ -25,7 +28,8 @@ export type EnsureWalletSuiteSyncOnErrors =
     | SuiteSyncFirmwareUpgradeNeededDeviceErrorType
     | DeviceErrorType
     | DeviceCancelledErrType
-    | WriteModeRequiredForAllocationErrType;
+    | WriteModeRequiredForAllocationErrType
+    | QuotaManagerCommunicationFailedErrType;
 
 export type EnsureWalletSuiteSyncOn = (
     params: EnsureWalletSuiteSyncOnParams,

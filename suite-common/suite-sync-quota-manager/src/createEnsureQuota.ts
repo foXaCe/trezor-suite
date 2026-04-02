@@ -2,7 +2,10 @@ import { type Dispatch } from '@reduxjs/toolkit';
 
 import { isTrezorDeviceWithState } from '@suite-common/device';
 import { type SuiteSyncOwner } from '@suite-common/suite-sync-storage';
-import { type WriteModeRequiredForAllocationErrType } from '@suite-common/suite-sync-types';
+import {
+    type QuotaManagerCommunicationFailedErrType,
+    type WriteModeRequiredForAllocationErrType,
+} from '@suite-common/suite-sync-types';
 import { type DelegatedIdentityKey } from '@suite-common/suite-types';
 import { parseDeviceStaticSessionId } from '@suite-common/wallet-utils';
 import { type StaticSessionId } from '@trezor/connect';
@@ -31,7 +34,9 @@ export type EnsureQuotaParams = {
 
 export type EnsureQuota = (
     params: EnsureQuotaParams,
-) => Promise<Result<void, WriteModeRequiredForAllocationErrType>>;
+) => Promise<
+    Result<void, WriteModeRequiredForAllocationErrType | QuotaManagerCommunicationFailedErrType>
+>;
 
 export type EnsureQuotaDep = {
     ensureQuota: EnsureQuota;
@@ -75,6 +80,10 @@ export const createEnsureQuota =
             allocatedQuota.error.type === 'WriteModeRequiredForAllocation'
         ) {
             return err(WriteModeRequiredForAllocation());
+        }
+
+        if (!allocatedQuota.success) {
+            return err({ type: 'QuotaManagerCommunicationFailed', caused: allocatedQuota.error });
         }
 
         return ok();

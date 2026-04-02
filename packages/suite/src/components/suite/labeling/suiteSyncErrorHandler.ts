@@ -32,6 +32,7 @@ export const suiteSyncErrorHandler = ({
         case 'DeviceCancelled':
         case 'DeviceError':
         case 'SuiteSyncUpdateError':
+        case 'QuotaManagerCommunicationFailed':
             dispatch(
                 notificationsActions.addToast({
                     type: 'error',
