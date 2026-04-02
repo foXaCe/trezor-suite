@@ -3,7 +3,10 @@ import { type DelegatedIdentityKey } from '@suite-common/suite-types';
 import { type StaticSessionId } from '@trezor/connect';
 import { type Result } from '@trezor/type-utils';
 
-import { type WriteModeRequiredForAllocationErrType } from './quotaManagerTypes';
+import {
+    type QuotaManagerCommunicationFailedErrType,
+    type WriteModeRequiredForAllocationErrType,
+} from './quotaManagerTypes';
 
 export type HttpErrType = { type: 'HttpError' };
 
@@ -26,9 +29,7 @@ export type EnsureOwnerHasAllocatedQuota = (
     Result<
         void,
         | WriteModeRequiredForAllocationErrType
-        | HttpErrType
-        | ChallengeFailedErrType
-        | ProofOfDelegatedIdentityFailedErrType
         | NoQuotaLeftToAllocateErrType
+        | QuotaManagerCommunicationFailedErrType
     >
 >;

@@ -2,15 +2,16 @@ import type { Dispatch } from '@reduxjs/toolkit';
 
 import { type SuiteSyncOwnerId } from '@suite-common/suite-sync-storage';
 import { type WalletDescriptor } from '@suite-common/wallet-types';
-import { err, ok } from '@trezor/type-utils';
+import { type Result, ok } from '@trezor/type-utils';
 
 import {
     quotaManagerDeviceUnspentStorageFetched,
-    quotaManagerFetchError,
     quotaManagerOwnerFetched,
 } from '../quotaManagerActions';
-import { quotaManagerFetch } from '../quotaManagerFetch';
-import { selectQuotaManagerBaseUrl } from '../quotaManagerSelectors';
+import {
+    type QuotaManagerFetchCommunicationError,
+    type QuotaManagerFetchDep,
+} from '../quotaManagerFetch';
 
 type TransferStorageBody = {
     publicKey: string;
@@ -26,33 +27,44 @@ type TransferStorageResponse = {
     ownerTotalSpace: number | null;
 };
 
-type TransferStorageThunkParams = {
+export type TransferStorageParams = {
     params: TransferStorageBody;
     walletDescriptor: WalletDescriptor;
     deviceId?: string;
 };
 
-export const transferStorageThunk =
-    ({ params, walletDescriptor, deviceId }: TransferStorageThunkParams) =>
-    async (dispatch: Dispatch, getState: () => any) => {
-        const baseUrl = selectQuotaManagerBaseUrl(getState());
+export type TransferStorage = (
+    params: TransferStorageParams,
+) => Promise<Result<TransferStorageResponse, QuotaManagerFetchCommunicationError>>;
 
-        const result = await quotaManagerFetch({
-            baseUrl,
+type GetQuotaManagerBaseUrl = () => string | null;
+
+export type TransferStorageDeps = {
+    dispatch: Dispatch;
+    getQuotaManagerBaseUrl: GetQuotaManagerBaseUrl;
+} & QuotaManagerFetchDep;
+
+export type TransferStorageDep = {
+    transferStorage: TransferStorage;
+};
+
+export const createTransferStorage =
+    (deps: TransferStorageDeps): TransferStorage =>
+    async ({ params, walletDescriptor, deviceId }) => {
+        const result = await deps.quotaManagerFetch({
+            baseUrl: deps.getQuotaManagerBaseUrl(),
             path: '/storage/add',
             method: 'POST',
             body: params,
         });
 
         if (!result.success) {
-            dispatch(quotaManagerFetchError({ error: result.error.message }));
-
-            return err(result.error);
+            return result;
         }
 
         const response = result.payload as TransferStorageResponse;
 
-        dispatch(
+        deps.dispatch(
             quotaManagerOwnerFetched({
                 walletDescriptor,
                 totalSpace: response.ownerTotalSpace ?? 0,
@@ -60,7 +72,7 @@ export const transferStorageThunk =
         );
 
         if (deviceId !== undefined && response.publicKeyUnspentSpace !== null) {
-            dispatch(
+            deps.dispatch(
                 quotaManagerDeviceUnspentStorageFetched({
                     deviceId,
                     unspentStorageSize: response.publicKeyUnspentSpace,

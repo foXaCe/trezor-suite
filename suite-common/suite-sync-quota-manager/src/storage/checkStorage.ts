@@ -1,6 +1,9 @@
-import { err, ok } from '@trezor/type-utils';
+import { type Result, err, ok } from '@trezor/type-utils';
 
-import { quotaManagerFetch } from '../quotaManagerFetch';
+import {
+    type QuotaManagerFetchCommunicationError,
+    type QuotaManagerFetchDep,
+} from '../quotaManagerFetch';
 
 type AskForStorageResponse = {
     totalSpace: number;
@@ -20,42 +23,59 @@ export type CheckStorageByOwnerIdParams = {
     ownerId: string;
 };
 
+export type CheckStorageByPublicKey = (
+    params: CheckStorageByPublicKeyParams,
+) => Promise<Result<AskForStoragePublicKeyResponse, QuotaManagerFetchCommunicationError>>;
+
+export type CheckStorageByOwnerId = (
+    params: CheckStorageByOwnerIdParams,
+) => Promise<Result<AskForStorageResponse, QuotaManagerFetchCommunicationError>>;
+
+export type CheckStorageByPublicKeyDep = {
+    checkStorageByPublicKey: CheckStorageByPublicKey;
+};
+
+export type CheckStorageByOwnerIdDep = {
+    checkStorageByOwnerId: CheckStorageByOwnerId;
+};
+
 /**
  * Ask quota manager for storage allowance by public key.
  * Returns also unspent space left.
  */
-export const checkStorageByPublicKey = async ({
-    baseUrl,
-    publicKey,
-}: CheckStorageByPublicKeyParams) => {
-    const result = await quotaManagerFetch({
-        baseUrl,
-        path: '/storage/ask',
-        method: 'POST',
-        body: { publicKey },
-    });
+export const createCheckStorageByPublicKey =
+    (deps: QuotaManagerFetchDep): CheckStorageByPublicKey =>
+    async ({ baseUrl, publicKey }) => {
+        const result = await deps.quotaManagerFetch({
+            baseUrl,
+            path: '/storage/ask',
+            method: 'POST',
+            body: { publicKey },
+        });
 
-    if (!result.success) {
-        return err(result.error);
-    }
+        if (!result.success) {
+            return err(result.error);
+        }
 
-    return ok(result.payload as AskForStoragePublicKeyResponse);
-};
+        return ok(result.payload as AskForStoragePublicKeyResponse);
+    };
 
 /**
  * Ask quota manager for storage allowance by owner ID.
  */
-export const checkStorageByOwnerId = async ({ baseUrl, ownerId }: CheckStorageByOwnerIdParams) => {
-    const result = await quotaManagerFetch({
-        baseUrl,
-        path: '/storage/ask',
-        method: 'POST',
-        body: { ownerId },
-    });
+export const createCheckStorageByOwnerId =
+    (deps: QuotaManagerFetchDep): CheckStorageByOwnerId =>
+    async ({ baseUrl, ownerId }) => {
+        const result = await deps.quotaManagerFetch({
+            baseUrl,
+            path: '/storage/ask',
+            method: 'POST',
+            body: { ownerId },
+        });
 
-    if (!result.success) {
-        return err(result.error);
-    }
+        if (!result.success) {
+            return err(result.error);
+        }
 
-    return ok(result.payload as AskForStorageResponse);
-};
+        return ok(result.payload as AskForStorageResponse);
+    };

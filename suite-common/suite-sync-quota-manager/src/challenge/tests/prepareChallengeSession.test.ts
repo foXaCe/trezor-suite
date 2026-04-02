@@ -1,29 +1,32 @@
 import { ok } from '@trezor/type-utils';
 
-import * as sessionUtil from '../../util/generateSessionId';
-import { prepareChallengeSession } from '../prepareChallengeSession';
+import { createPrepareChallengeSession } from '../prepareChallengeSession';
 
-// mocking generateSessionId to return predictable session IDs
-jest.spyOn(sessionUtil, 'generateSessionId')
-    .mockReturnValueOnce('mocked-session-id')
-    .mockReturnValueOnce('mocked-session-id-2');
-
-jest.spyOn(global, 'fetch')
-    .mockResolvedValueOnce(
-        new Response(
-            '{"challenge": "b4bc999327b7d2685890530b2814b56bba8549459aebdd551f33a1de2c5a2a8d"}',
-            { status: 200 },
-        ),
-    )
-    .mockResolvedValueOnce(
-        new Response(
-            '{"challenge": "b4bc999327b7d2685890530b2814b56bba8549459aebdd551f33a1de2c5a2a8dSecond"}',
-            { status: 200 },
-        ),
-    );
-
-describe(prepareChallengeSession.name, () => {
+describe(createPrepareChallengeSession.name, () => {
     it('should prepare challenge unique for each session', async () => {
+        const generateSessionId = jest
+            .fn()
+            .mockReturnValueOnce('mocked-session-id')
+            .mockReturnValueOnce('mocked-session-id-2');
+
+        const quotaManagerFetch = jest
+            .fn()
+            .mockResolvedValueOnce(
+                ok({
+                    challenge: 'b4bc999327b7d2685890530b2814b56bba8549459aebdd551f33a1de2c5a2a8d',
+                }),
+            )
+            .mockResolvedValueOnce(
+                ok({
+                    challenge:
+                        'b4bc999327b7d2685890530b2814b56bba8549459aebdd551f33a1de2c5a2a8dSecond',
+                }),
+            );
+        const prepareChallengeSession = createPrepareChallengeSession({
+            generateSessionId,
+            quotaManagerFetch,
+        });
+
         const challengeSession = await prepareChallengeSession({
             baseUrl: 'https://example.com',
         });
@@ -45,5 +48,21 @@ describe(prepareChallengeSession.name, () => {
                 challenge: 'b4bc999327b7d2685890530b2814b56bba8549459aebdd551f33a1de2c5a2a8dSecond',
             }),
         );
+
+        expect(quotaManagerFetch).toHaveBeenNthCalledWith(1, {
+            baseUrl: 'https://example.com',
+            path: '/challenge',
+            method: 'POST',
+            body: { sessionId: 'mocked-session-id' },
+        });
+
+        expect(quotaManagerFetch).toHaveBeenNthCalledWith(2, {
+            baseUrl: 'https://example.com',
+            path: '/challenge',
+            method: 'POST',
+            body: { sessionId: 'mocked-session-id-2' },
+        });
+
+        expect(generateSessionId).toHaveBeenCalledTimes(2);
     });
 });

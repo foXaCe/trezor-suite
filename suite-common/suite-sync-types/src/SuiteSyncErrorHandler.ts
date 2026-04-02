@@ -2,8 +2,11 @@ import { type Dispatch } from '@reduxjs/toolkit';
 
 import { type SuiteSyncOwnerId } from '@suite-common/suite-sync-storage';
 
+export type IncreaseOwnerQuota = (params: { ownerId: SuiteSyncOwnerId }) => Promise<unknown>;
+
 export type CreateSuiteSyncErrorHandlerDep = {
-    dispatch: Dispatch;
+    dispatch?: Dispatch;
+    increaseOwnerQuota: IncreaseOwnerQuota;
 };
 
 export type RelayQuotaExceededError = { type: 'RelayQuotaExceeded'; ownerId: SuiteSyncOwnerId };

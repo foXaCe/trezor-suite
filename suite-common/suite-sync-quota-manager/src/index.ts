@@ -1,16 +1,24 @@
 /**
- * QuotaManager API thunks / functions.
+ * QuotaManager API services / functions.
  */
-export { checkStorageByOwnerId, checkStorageByPublicKey } from './storage/checkStorage';
-export { registerStorageThunk } from './storage/registerStorageThunk';
-export { transferStorageThunk } from './storage/transferStorageThunk';
-export { prepareChallengeSession } from './challenge/prepareChallengeSession';
-export { ensureDeviceHasQuotaThunk } from './ensureDeviceHasQuotaThunk';
+export { createPrepareChallengeSession } from './challenge/prepareChallengeSession';
+export { createCheckStorageByOwnerId, createCheckStorageByPublicKey } from './storage/checkStorage';
+export { quotaManagerFetch } from './quotaManagerFetch';
+export { createRegisterStorage } from './storage/createRegisterStorage';
+export type { RegisterStorage, RegisterStorageDep } from './storage/createRegisterStorage';
+export { createTransferStorage } from './storage/createTransferStorage';
+export type { TransferStorage, TransferStorageDep } from './storage/createTransferStorage';
+export type { QuotaManagerFetch, QuotaManagerFetchDep } from './quotaManagerFetch';
+export { createEnsureDeviceHasQuota } from './createEnsureDeviceHasQuota';
+export type { EnsureDeviceHasQuota, EnsureDeviceHasQuotaDep } from './createEnsureDeviceHasQuota';
 export {
-    ensureOwnerHasAllocatedQuotaThunk,
+    createEnsureOwnerHasAllocatedQuota,
+    NoQuotaLeftToAllocate,
     WriteModeRequiredForAllocation,
-} from './ensureOwnerHasAllocatedQuotaThunk';
-export { increaseOwnerQuotaThunk } from './increaseOwnerQuotaThunk';
+} from './createEnsureOwnerHasAllocatedQuota';
+export type { EnsureOwnerHasAllocatedQuotaDep } from './createEnsureOwnerHasAllocatedQuota';
+export { createIncreaseOwnerQuota } from './createIncreaseOwnerQuota';
+export type { IncreaseOwnerQuota, IncreaseOwnerQuotaDep } from './createIncreaseOwnerQuota';
 export type { EnsureQuotaDep } from './createEnsureQuota';
 export { createSuiteSyncQuotaManagerCompositionRoot } from './createSuiteSyncQuotaManagerCompositionRoot';
 export type { GetOwnerHasAllowanceDep } from './getOwnerHasAllowance';
@@ -21,7 +29,6 @@ export type { GetOwnerHasAllowanceDep } from './getOwnerHasAllowance';
 export {
     updateQuotaManagerBaseUrl,
     quotaManagerDeviceFetched,
-    quotaManagerFetchError,
     suiteSyncQuotaManagerActions,
     eraseFetchedData,
     noQuotaLeftWarningDismissed,

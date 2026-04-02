@@ -1,4 +1,3 @@
-import { increaseOwnerQuotaThunk } from '@suite-common/suite-sync-quota-manager';
 import {
     type CreateSuiteSyncErrorHandlerDep,
     type Errors,
@@ -10,11 +9,7 @@ export const createSuiteSyncErrorHandler =
     (error: Errors) => {
         switch (error.type) {
             case 'RelayQuotaExceeded':
-                deps.dispatch(
-                    increaseOwnerQuotaThunk({
-                        ownerId: error.ownerId,
-                    }),
-                );
+                void deps.increaseOwnerQuota({ ownerId: error.ownerId });
 
                 return;
 

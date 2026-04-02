@@ -4,4 +4,5 @@ export type WriteModeRequiredForAllocationErrType = {
 
 export type QuotaManagerCommunicationFailedErrType = {
     type: 'QuotaManagerCommunicationFailed';
+    caused: unknown;
 };

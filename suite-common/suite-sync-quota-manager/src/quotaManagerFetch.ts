@@ -9,7 +9,22 @@ type SupportedMethod = 'GET' | 'POST' | 'DELETE';
 // explicit list of supported endpoints and their methods
 type SupportedPath = '/challenge' | '/storage/ask' | '/storage/register' | '/storage/add' | '/sync';
 
-type QuotaManagerFetchParams = {
+export type QuotaManagerHttpError = {
+    type: 'HttpError';
+    code: number;
+    message: string;
+};
+
+export type QuotaManagerFetchError = {
+    type: 'FetchError';
+    message: string;
+};
+
+export type QuotaManagerFetchCommunicationError = QuotaManagerHttpError | QuotaManagerFetchError;
+
+export type QuotaManagerFetchResult = Result<unknown, QuotaManagerFetchCommunicationError>;
+
+export type QuotaManagerFetchParams = {
     baseUrl: string | null;
     path: SupportedPath;
     method: SupportedMethod;
@@ -17,20 +32,15 @@ type QuotaManagerFetchParams = {
     queryParams?: Record<string, string | number | boolean>;
 };
 
-type HttpError = {
-    type: 'HttpError';
-    code: number;
-    message: string;
+export type QuotaManagerFetch = (
+    params: QuotaManagerFetchParams,
+) => Promise<QuotaManagerFetchResult>;
+
+export type QuotaManagerFetchDep = {
+    quotaManagerFetch: QuotaManagerFetch;
 };
 
-type FetchError = {
-    type: 'FetchError';
-    message: string;
-};
-
-type QuotaManagerFetchResult = Result<unknown, HttpError | FetchError>;
-
-export const quotaManagerFetch = async ({
+export const quotaManagerFetch: QuotaManagerFetch = async ({
     baseUrl,
     path,
     method,

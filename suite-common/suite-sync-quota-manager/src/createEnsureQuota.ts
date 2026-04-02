@@ -1,10 +1,9 @@
-import { type Dispatch } from '@reduxjs/toolkit';
-
 import { isTrezorDeviceWithState } from '@suite-common/device';
 import { type SuiteSyncOwner } from '@suite-common/suite-sync-storage';
-import {
-    type QuotaManagerCommunicationFailedErrType,
-    type WriteModeRequiredForAllocationErrType,
+import type {
+    NoQuotaLeftToAllocateErrType,
+    QuotaManagerCommunicationFailedErrType,
+    WriteModeRequiredForAllocationErrType,
 } from '@suite-common/suite-sync-types';
 import { type DelegatedIdentityKey } from '@suite-common/suite-types';
 import { parseDeviceStaticSessionId } from '@suite-common/wallet-utils';
@@ -12,17 +11,15 @@ import { type StaticSessionId } from '@trezor/connect';
 import { type Result, err, ok } from '@trezor/type-utils';
 import { isNotNull, isNotNullOrUndefined } from '@trezor/utils';
 
-import { ensureDeviceHasQuotaThunk } from './ensureDeviceHasQuotaThunk';
-import {
-    WriteModeRequiredForAllocation,
-    ensureOwnerHasAllocatedQuotaThunk,
-} from './ensureOwnerHasAllocatedQuotaThunk';
+import { type EnsureDeviceHasQuotaDep } from './createEnsureDeviceHasQuota';
+import { type EnsureOwnerHasAllocatedQuotaDep } from './createEnsureOwnerHasAllocatedQuota';
+import { WriteModeRequiredForAllocation } from './createEnsureOwnerHasAllocatedQuota';
 import { type GetDeviceForStaticSessionIdDep } from './getDeviceForStaticSessionId';
 import { type GetDeviceHasAllowanceDep } from './getDeviceHasAllowance';
 
-export type EnsureQuotaDeps = {
-    dispatch: Dispatch;
-} & GetDeviceForStaticSessionIdDep &
+export type EnsureQuotaDeps = GetDeviceForStaticSessionIdDep &
+    EnsureDeviceHasQuotaDep &
+    EnsureOwnerHasAllocatedQuotaDep &
     GetDeviceHasAllowanceDep;
 
 export type EnsureQuotaParams = {
@@ -35,7 +32,12 @@ export type EnsureQuotaParams = {
 export type EnsureQuota = (
     params: EnsureQuotaParams,
 ) => Promise<
-    Result<void, WriteModeRequiredForAllocationErrType | QuotaManagerCommunicationFailedErrType>
+    Result<
+        void,
+        | WriteModeRequiredForAllocationErrType
+        | QuotaManagerCommunicationFailedErrType
+        | NoQuotaLeftToAllocateErrType
+    >
 >;
 
 export type EnsureQuotaDep = {
@@ -58,22 +60,22 @@ export const createEnsureQuota =
         }
 
         if (isNotNull(device) && isTrezorDeviceWithState(device)) {
-            await deps.dispatch(
-                ensureDeviceHasQuotaThunk({
-                    device,
-                    delegatedKey,
-                }),
-            );
+            const deviceQuota = await deps.ensureDeviceHasQuota({
+                device,
+                delegatedKey,
+            });
+
+            if (!deviceQuota.success) {
+                return err(deviceQuota.error);
+            }
         }
 
-        const allocatedQuota = await deps.dispatch(
-            ensureOwnerHasAllocatedQuotaThunk({
-                deviceStaticSessionId,
-                ownerId: owner.ownerId,
-                delegatedKey,
-                isWriteMode,
-            }),
-        );
+        const allocatedQuota = await deps.ensureOwnerHasAllocatedQuota({
+            deviceStaticSessionId,
+            ownerId: owner.ownerId,
+            delegatedKey,
+            isWriteMode,
+        });
 
         if (
             !allocatedQuota.success &&
@@ -83,7 +85,7 @@ export const createEnsureQuota =
         }
 
         if (!allocatedQuota.success) {
-            return err({ type: 'QuotaManagerCommunicationFailed', caused: allocatedQuota.error });
+            return err(allocatedQuota.error);
         }
 
         return ok();
