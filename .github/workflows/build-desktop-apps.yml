@@ -129,7 +129,7 @@ jobs:
     env:
       platform: win
     container:
-      image: electronuserland/builder:18-wine
+      image: electronuserland/builder:22-wine
       options: --user 1001
     steps:
       - name: Checkout code
