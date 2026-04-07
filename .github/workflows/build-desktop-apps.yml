@@ -124,6 +124,7 @@ jobs:
   suite-desktop-win:
     if: (github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'build-desktop') || (github.event_name == 'push' && github.ref == 'refs/heads/develop')) && (github.repository == 'trezor/trezor-suite' || github.repository == 'trezor/trezor-suite-private')
     name: Build suite-desktop-win
+    needs: build-and-cache-renderer
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -142,6 +143,13 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
+      - name: Restore Electron renderer bundle
+        uses: actions/cache/restore@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+        with:
+          path: packages/suite-desktop/build
+          key: renderer-bundle-${{ github.sha }}
+          fail-on-cache-miss: true
+
       - name: Install deps and build libs
         run: |
           yarn install --immutable
@@ -155,9 +163,9 @@ jobs:
       - name: Build ${{env.platform}} suite-desktop
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        # TODO solve caching here as well: the container interferes with file permissions due to the --user 1001 option and cache/restore fails.
         run: |
-          yarn workspace @trezor/suite-desktop build:${{env.platform}}
+          yarn workspace @trezor/suite-desktop build:app
+          yarn workspace @trezor/suite-desktop build:app:electron:${{env.platform}}
           bash packages/suite-desktop-core/scripts/gnupg-sign.sh
           mv packages/suite-desktop/build-electron/* .
 
