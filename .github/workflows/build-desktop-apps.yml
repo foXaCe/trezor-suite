@@ -144,11 +144,10 @@ jobs:
           node-version-file: ".nvmrc"
 
       - name: Restore Electron renderer bundle
-        uses: actions/cache/restore@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         with:
           path: packages/suite-desktop/build
           key: renderer-bundle-${{ github.sha }}
-          fail-on-cache-miss: true
 
       - name: Install deps and build libs
         run: |
@@ -164,6 +163,8 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
+          echo "Does cache work?"
+          stat ./packages/suite-desktop/build
           yarn workspace @trezor/suite-desktop build:app
           yarn workspace @trezor/suite-desktop build:app:electron:${{env.platform}}
           bash packages/suite-desktop-core/scripts/gnupg-sign.sh
