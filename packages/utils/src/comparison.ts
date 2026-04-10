@@ -59,9 +59,7 @@ export const isChanged = (prev?: any, current?: any, filter?: { [k: string]: str
         if (prevDifference) return true;
 
         // 8. observe every key recursive
-        for (let i = 0; i < currentKeys.length; i++) {
-            const key = currentKeys[i];
-
+        for (const key of currentKeys) {
             if (
                 filter &&
                 Object.prototype.hasOwnProperty.call(filter, key) &&
@@ -70,12 +68,14 @@ export const isChanged = (prev?: any, current?: any, filter?: { [k: string]: str
             ) {
                 const prevFiltered = {};
                 const currentFiltered = {};
-                for (let i2 = 0; i2 < filter[key].length; i2++) {
-                    const field = filter[key][i2];
-                    // @ts-expect-error
-                    prevFiltered[field] = prev[key][field];
-                    // @ts-expect-error
-                    currentFiltered[field] = current[key][field];
+                const filterFields = filter[key];
+                if (filterFields) {
+                    for (const field of filterFields) {
+                        // @ts-expect-error
+                        prevFiltered[field] = prev[key][field];
+                        // @ts-expect-error
+                        currentFiltered[field] = current[key][field];
+                    }
                 }
                 if (isChanged(prevFiltered, currentFiltered)) return true;
             } else if (isChanged(prev[key], current[key])) {

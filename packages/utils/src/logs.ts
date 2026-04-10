@@ -27,7 +27,7 @@ export class Log {
     }
 
     setColors(colors: Record<string, string>) {
-        this.css = typeof window !== 'undefined' && colors[this.prefix] ? colors[this.prefix] : '';
+        this.css = typeof window !== 'undefined' ? (colors[this.prefix] ?? '') : '';
     }
 
     addMessage(

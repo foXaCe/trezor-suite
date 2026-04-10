@@ -185,7 +185,7 @@ export const scheduleAction = async <T>(
                     attemptCount,
                     (attempt, abort) =>
                         Promise.race([
-                            ...maybeRejectAfterMs(getParams(attempt).timeout, errorTimeout, clear),
+                            ...maybeRejectAfterMs(getParams(attempt)?.timeout, errorTimeout, clear),
                             resolveAction(action, abort),
                         ]),
                     (attempt, error) => {
@@ -193,7 +193,7 @@ export const scheduleAction = async <T>(
 
                         return errorHandlerResult
                             ? Promise.reject(errorHandlerResult)
-                            : resolveAfterMs(getParams(attempt).gap ?? 0, clear);
+                            : resolveAfterMs(getParams(attempt)?.gap ?? 0, clear);
                     },
                     graceful ? actionAborter.signal : clear,
                 ),

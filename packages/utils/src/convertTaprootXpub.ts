@@ -10,13 +10,17 @@ export const convertTaprootXpub = ({ xpub, direction }: ConvertTaprootXpubParams
     const replace = direction === 'h-to-apostrophe' ? "'" : 'h';
 
     const openingSquareBracketSplit = xpub.split('[');
-    if (openingSquareBracketSplit.length === 2) {
-        const [beforeOpeningBracket, afterOpeningBracket] = openingSquareBracketSplit;
-
+    const beforeOpeningBracket = openingSquareBracketSplit[0];
+    const afterOpeningBracket = openingSquareBracketSplit[1];
+    if (openingSquareBracketSplit.length === 2 && afterOpeningBracket !== undefined) {
         const closingSquareBracketSplit = afterOpeningBracket.split(']');
-        if (closingSquareBracketSplit.length === 2) {
-            const [path, afterClosingBracket] = closingSquareBracketSplit;
-
+        const path = closingSquareBracketSplit[0];
+        const afterClosingBracket = closingSquareBracketSplit[1];
+        if (
+            closingSquareBracketSplit.length === 2 &&
+            path !== undefined &&
+            afterClosingBracket !== undefined
+        ) {
             const correctedPath = path.replace(new RegExp(find, 'g'), replace); // .replaceAll()
 
             return `${beforeOpeningBracket}[${correctedPath}]${afterClosingBracket}`;

@@ -13,7 +13,9 @@ export const arrayShuffle = <T>(
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = randomInt(0, i + 1);
 
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        const temp = shuffled[i];
+        shuffled[i] = shuffled[j] as T;
+        shuffled[j] = temp as T;
     }
 
     return shuffled;

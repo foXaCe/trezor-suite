@@ -7,9 +7,14 @@ export const parseElectrumUrl = (url: string) => {
     const match = url.match(ELECTRUM_URL_REGEX);
     if (!match) return undefined;
 
+    const host = match[1] ?? match[2];
+    const port = match[3];
+    const protocol = match[4];
+    if (host === undefined || port === undefined || protocol === undefined) return undefined;
+
     return {
-        host: match[1] ?? match[2],
-        port: Number.parseInt(match[3], 10),
-        protocol: match[4] as 't' | 's',
+        host,
+        port: Number.parseInt(port, 10),
+        protocol: protocol as 't' | 's',
     };
 };

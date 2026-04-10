@@ -15,8 +15,8 @@ export const promiseAllSequence = async <
     // For some reason, the previous implementation with promise chaining
     // (https://github.com/trezor/trezor-suite/blob/100015c45451ed50e2b0906d78de73c0fd2883d1/packages/utils/src/promiseAllSequence.ts)
     // was significantly slower in some cases, therefore simple for cycle is used instead
-    for (let i = 0; i < actions.length; ++i) {
-        const result = await actions[i]();
+    for (const action of actions) {
+        const result = await action();
         results.push(result);
     }
 
