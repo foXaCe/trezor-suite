@@ -17,7 +17,7 @@ class GitHubReporter extends GitHubReporterBase implements LoggingFunctions {
     async onTestResult(_test: Test, testResult: TestResult): Promise<void> {
         const testTitle = testResult.testResults[0]?.title;
         this.log(`Processing test end for "${testTitle}"`);
-        const metadata = readMetadataForTest(testTitle);
+        const metadata = readMetadataForTest(testTitle ?? '');
         // this.log(`Metadata for test "${testTitle}":`, metadata);
         const report = new TestReportProvider(testResult, metadata);
 

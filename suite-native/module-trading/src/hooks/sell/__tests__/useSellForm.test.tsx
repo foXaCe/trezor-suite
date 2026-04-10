@@ -554,7 +554,13 @@ describe('useSellForm', () => {
             initFormAndQuoteRequest(result.current);
 
             act(() => {
-                store.dispatch(tradingSellActions.saveQuotes([sellQuotes[0], sellQuotes[2]]));
+                store.dispatch(
+                    tradingSellActions.saveQuotes(
+                        [sellQuotes[0], sellQuotes[2]].filter(
+                            (q): q is SellFiatTrade => q !== undefined,
+                        ),
+                    ),
+                );
             });
 
             expect(result.current.getValues('quote')).toEqual(sellQuotes[0]);
@@ -615,7 +621,11 @@ describe('useSellForm', () => {
                 });
 
                 act(() => {
-                    store.dispatch(tradingSellActions.saveQuotes([sellQuotes[1]]));
+                    store.dispatch(
+                        tradingSellActions.saveQuotes(
+                            [sellQuotes[1]].filter((q): q is SellFiatTrade => q !== undefined),
+                        ),
+                    );
                 });
 
                 expect(result.current.getValues('quote')).toEqual(sellQuotes[1]);

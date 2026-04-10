@@ -24,7 +24,7 @@ export class TestReportProvider extends TestReportProviderBase {
             throw new Error('Test results are empty');
         }
 
-        return this.test.testResults[0]?.title;
+        return this.test.testResults[0]?.title ?? '';
     }
 
     get testProject(): string {

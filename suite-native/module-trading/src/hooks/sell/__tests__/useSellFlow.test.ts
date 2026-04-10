@@ -9,7 +9,7 @@ import {
     initStore,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils';
-import { bankAccounts, getWalletState, sellQuotes } from '@suite-native/trading-fixtures';
+import { getWalletState, sellQuotes, verifiedBankAccount } from '@suite-native/trading-fixtures';
 
 import { useSellFlow } from '../useSellFlow';
 
@@ -66,6 +66,10 @@ jest.mock('../../general/useTradingTransaction', () => ({
 
 const btc1AccountKey = 'btc-account-1' as AccountKey; // Todo: create properly via `createAccountKey()`
 
+// Pre-typed fixture references to avoid noUncheckedIndexedAccess issues.
+const firstSellQuote: SellFiatTrade = sellQuotes[0] ?? ({} as SellFiatTrade);
+const firstBankAccount = verifiedBankAccount;
+
 describe('useSellFlow', () => {
     let store: TestStore;
 
@@ -83,7 +87,7 @@ describe('useSellFlow', () => {
     describe('doSellTrade', () => {
         it('should dispatch handleTradeThunk with correct parameters', async () => {
             const dispatchSpy = jest.spyOn(store, 'dispatch');
-            const trade = sellQuotes[0];
+            const trade = firstSellQuote;
 
             // Set up required state
             act(() => {
@@ -113,7 +117,7 @@ describe('useSellFlow', () => {
 
         it('should not dispatch thunk if sendAccount is missing', async () => {
             const dispatchSpy = jest.spyOn(store, 'dispatch');
-            const trade = sellQuotes[0];
+            const trade = firstSellQuote;
 
             // Set up quote but not account
             act(() => {
@@ -138,7 +142,7 @@ describe('useSellFlow', () => {
 
         it('should dispatch thunk even when selectedQuote is not set (uses passed trade)', async () => {
             const dispatchSpy = jest.spyOn(store, 'dispatch');
-            const trade = sellQuotes[0];
+            const trade = firstSellQuote;
 
             // Set up account but not selectedQuote
             act(() => {
@@ -165,8 +169,8 @@ describe('useSellFlow', () => {
     describe('confirmTrade', () => {
         it('should dispatch confirmTradeThunk with bank account and correct parameters', async () => {
             const dispatchSpy = jest.spyOn(store, 'dispatch');
-            const trade = sellQuotes[0];
-            const bankAccount = bankAccounts[0];
+            const trade = firstSellQuote;
+            const bankAccount = firstBankAccount;
 
             // Set up required state
             act(() => {
@@ -197,7 +201,7 @@ describe('useSellFlow', () => {
 
         it('should not dispatch thunk if selectedQuote is missing', async () => {
             const dispatchSpy = jest.spyOn(store, 'dispatch');
-            const bankAccount = bankAccounts[0];
+            const bankAccount = firstBankAccount;
 
             // Set up account but not quote
             act(() => {
@@ -220,8 +224,8 @@ describe('useSellFlow', () => {
 
         it('should not dispatch thunk if sendAccount is missing', async () => {
             const dispatchSpy = jest.spyOn(store, 'dispatch');
-            const trade = sellQuotes[0];
-            const bankAccount = bankAccounts[0];
+            const trade = firstSellQuote;
+            const bankAccount = firstBankAccount;
 
             // Set up quote but not account
             act(() => {
@@ -337,7 +341,7 @@ describe('useSellFlow', () => {
 
     describe('handleBrowser', () => {
         it('should navigate to browser when processResponseData is called with form data', async () => {
-            const trade = sellQuotes[0];
+            const trade = firstSellQuote;
 
             act(() => {
                 store.dispatch(tradingSellActions.setTradingAccountKey(btc1AccountKey));
