@@ -88,10 +88,10 @@ export const handleHandshakeInit = ({
     h = hashOfTwo(h, trezorEphemeralPubkey);
     // 5. Set ck, k = HKDF(protocol_name, X25519(host_ephemeral_privkey, trezor_ephemeral_pubkey)).
     point = curve25519(hostEphemeralKeys.privateKey, trezorEphemeralPubkey);
-    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     let [ck, k] = hkdf(getProtocolName(), point);
 
     // 6. Set trezor_masked_static_pubkey, success = AES-GCM-DECRYPT(key=k, IV=0^96 (bits, 12 bytes), ad=h, plaintext=encrypted_trezor_static_pubkey). Assert that success is True.
+    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     aes = aesgcm(k, iv0);
     aes.auth(h);
     const trezorStaticPubkey = trezorEncryptedStaticPubkey.subarray(0, 32);
@@ -105,6 +105,7 @@ export const handleHandshakeInit = ({
     [ck, k] = hkdf(ck, point);
 
     // 9. Set tag_of_empty_string, success = AES-GCM-DECRYPT(key=k, IV=0^96 (bits, 12 bytes), ad=h, plaintext=empty_string). Assert that success is True.
+    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     aes = aesgcm(k, iv0);
     aes.auth(h);
     aes.decrypt(Buffer.alloc(0), tag);
@@ -130,6 +131,7 @@ export const handleHandshakeInit = ({
         : randomBytes(32);
     const hostStaticKeys = getCurve25519KeyPair(staticKey);
     // 12. Set encrypted_host_static_pubkey = AES-GCM-ENCRYPT(key=k, IV=0^95 || 1, ad=h, plaintext=temp_host_static_pubkey).
+    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     aes = aesgcm(k, iv1);
     aes.auth(h);
     const hostEncryptedStaticPubkey = Buffer.concat([
@@ -147,6 +149,7 @@ export const handleHandshakeInit = ({
         host_pairing_credential: credentials?.credential,
     });
     // 16. Set *encrypted_payload* = AES-GCM-ENCRYPT(*key*=*k*, *IV*=*0^96*, *ad*=*h*, *plaintext*=*payload_binary*).
+    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     aes = aesgcm(k, iv0);
     aes.auth(h);
     const encryptedPayload = Buffer.concat([aes.encrypt(message), aes.finish()]);
