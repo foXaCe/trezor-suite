@@ -18,7 +18,7 @@ export class TorIdentities {
         timeout?: number,
         protocol?: 'http' | 'https',
     ): SocksProxyAgent {
-        const [user, password] = identity.split(':');
+        const [user = '', password] = identity.split(':');
 
         if (password && this.passwords[user] !== password) {
             if (this.identities[user]) {
@@ -33,13 +33,17 @@ export class TorIdentities {
         if (!this.identities[user]) {
             const socksServerUrl = new URL(`socks://${host}:${port}`);
             socksServerUrl.username = user;
-            socksServerUrl.password = password;
+            socksServerUrl.password = password ?? '';
             this.identities[user] = new SocksProxyAgent(socksServerUrl, {
                 timeout,
             });
         }
 
         const agent = this.identities[user];
+
+        if (!agent) {
+            throw new Error(`Failed to create agent for identity ${user}`);
+        }
 
         // @sentry/node (used in suite-desktop) is wrapping each outgoing request
         // and requires protocol to be explicitly set to https while using TOR + https/wss address combination
@@ -50,7 +54,7 @@ export class TorIdentities {
 
     public removeIdentity(user: string) {
         // looks like destroy does nothing, but just in case
-        this.identities[user].destroy();
+        this.identities[user]?.destroy();
         delete this.identities[user];
         delete this.passwords[user];
     }

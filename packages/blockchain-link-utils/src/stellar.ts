@@ -102,6 +102,9 @@ export const transformTransaction = (
     }
 
     const rawOp = parsedTx.operations[0];
+    if (!rawOp) {
+        return baseTx;
+    }
     const opSource = rawOp.source || rawTx.source_account;
     const fromAddress = extractBaseAddress(opSource);
 
@@ -151,7 +154,8 @@ export const transformTransaction = (
                 ...baseTx,
                 type: 'self',
                 stellarSpecific: {
-                    ...baseTx.stellarSpecific!,
+                    memo: baseTx.stellarSpecific?.memo,
+                    feeSource: baseTx.stellarSpecific?.feeSource ?? fromAddress,
                     operationType: 'changeTrust',
                     changeTrust: {
                         assetCode,

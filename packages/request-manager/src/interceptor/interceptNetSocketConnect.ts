@@ -21,7 +21,7 @@ export const interceptNetSocketConnect: Interceptor = ({ context, validateReques
                 ?.split(': ');
 
             if (allowedHeaders) {
-                const allowedKeys = allowedHeaders[1].split(';');
+                const allowedKeys = allowedHeaders[1]?.split(';') ?? [];
 
                 headers.forEach(line => {
                     const [key, value] = line.split(': ');
@@ -76,7 +76,7 @@ export const interceptNetSocketConnect: Interceptor = ({ context, validateReques
             details = typeof callback === 'string' ? `${callback}:${request}` : request.toString();
         }
 
-        const hostname = details.split(':')[0];
+        const hostname = details.split(':')[0] ?? '';
         validateRequest({ hostname });
 
         context.handler({

@@ -162,10 +162,13 @@ class BluetoothManager {
                     );
                     if (nearbyDeviceIndex >= 0) {
                         const oldNearbyDevice = this.nearbyDevices[nearbyDeviceIndex];
-                        nearbyDevice.connectionStatus = oldNearbyDevice.connectionStatus;
+                        if (oldNearbyDevice) {
+                            nearbyDevice.connectionStatus = oldNearbyDevice.connectionStatus;
+                        }
                         this.nearbyDevices[nearbyDeviceIndex] = nearbyDevice;
                         if (
-                            nearbyDevice.manufacturerData[0] !== oldNearbyDevice.manufacturerData[0]
+                            nearbyDevice.manufacturerData[0] !==
+                            oldNearbyDevice?.manufacturerData[0]
                         ) {
                             this.emitNearbyDevicesChange();
                         }
@@ -235,12 +238,12 @@ class BluetoothManager {
             connectionStatus: { type: 'connecting' },
         });
 
-        let device: Device;
+        let device: Device | undefined;
 
         // Get a list of known devices by their identifiers.
         const devices = await this.getBleManager().devices([deviceId]);
         debugLog(`Found ${devices.length} already known device(s)`);
-        [device] = devices;
+        device = devices[0];
 
         if (!device) {
             // Get a list of the peripherals currently connected to the system which have discovered
@@ -250,7 +253,7 @@ class BluetoothManager {
             ]);
             const matchingConnectedDevices = connectedDevices.filter(d => d.id === deviceId);
             debugLog(`Found ${matchingConnectedDevices.length} already connected device(s)`);
-            [device] = matchingConnectedDevices;
+            device = matchingConnectedDevices[0];
         }
 
         const connectionOptions: ConnectionOptions = {

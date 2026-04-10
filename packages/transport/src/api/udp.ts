@@ -85,26 +85,31 @@ export class UdpApi extends AbstractApi {
                 buffer.copy(chunk);
             }
 
-            this.interface.send(chunk, Number.parseInt(port, 10), hostname, err => {
-                signal?.removeEventListener('abort', listener);
+            this.interface.send(
+                chunk,
+                Number.parseInt(port ?? '0', 10),
+                hostname ?? '127.0.0.1',
+                err => {
+                    signal?.removeEventListener('abort', listener);
 
-                if (signal?.aborted) {
-                    return;
-                }
+                    if (signal?.aborted) {
+                        return;
+                    }
 
-                if (err) {
-                    this.logger?.error(err.message);
+                    if (err) {
+                        this.logger?.error(err.message);
 
-                    resolve(
-                        error({
-                            code: ERRORS.INTERFACE_DATA_TRANSFER,
-                            message: err.message,
-                        }),
-                    );
-                }
+                        resolve(
+                            error({
+                                code: ERRORS.INTERFACE_DATA_TRANSFER,
+                                message: err.message,
+                            }),
+                        );
+                    }
 
-                resolve(success(undefined));
-            });
+                    resolve(success(undefined));
+                },
+            );
         });
     }
 

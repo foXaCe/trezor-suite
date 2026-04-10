@@ -49,7 +49,7 @@ export const verifyAuthenticityProof = async ({
     });
 
     // 1. parse all x509 certificates received from AuthenticityProof
-    const [deviceCert, caCert] = certificates.map((c, i) => {
+    const parsedCerts = certificates.map((c, i) => {
         const cert = parseCertificate(new Uint8Array(Buffer.from(c, 'hex')));
         if (i === 0) {
             // deviceCert is always at index 0
@@ -59,6 +59,11 @@ export const verifyAuthenticityProof = async ({
 
         return cert;
     });
+    const deviceCert = parsedCerts[0];
+    const caCert = parsedCerts[1];
+    if (!deviceCert || !caCert) {
+        throw new Error('Missing required certificates');
+    }
     const deviceCertAlgName = deviceCert.signatureAlgorithm.algorithmName;
     const caCertAlgName = caCert.signatureAlgorithm.algorithmName;
     if (deviceCertAlgName !== caCertAlgName) {
@@ -99,9 +104,9 @@ export const verifyAuthenticityProof = async ({
     }
 
     // 3. validate DEVICE certificate subject (Trezor features internal_model)
-    const [subject] = deviceCert.tbsCertificate.subject;
+    const subject = deviceCert.tbsCertificate.subject[0];
     // subject algorithm (OID) https://www.alvestrand.no/objectid/2.5.4.3.html
-    if (!subject.parameters || subject.algorithmOid !== '2.5.4.3') {
+    if (!subject?.parameters || subject.algorithmOid !== '2.5.4.3') {
         throw new Error('Missing certificate subject');
     }
     // slice 4 bytes from the subject (internal model)

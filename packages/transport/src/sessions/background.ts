@@ -148,10 +148,11 @@ export class SessionsBackground
             if (!this.pathInternalPathPublicMap[d.path]) {
                 this.pathInternalPathPublicMap[d.path] = PathPublic(`${(this.lastPathId += 1)}`);
             }
-            if (!this.descriptors[d.path]) {
+            const pathPublic = this.pathInternalPathPublicMap[d.path];
+            if (!this.descriptors[d.path] && pathPublic) {
                 this.descriptors[d.path] = {
                     ...d,
-                    path: this.pathInternalPathPublicMap[d.path],
+                    path: pathPublic,
                     session: null,
                     apiType: d.apiType,
                 };
@@ -229,8 +230,12 @@ export class SessionsBackground
     }
 
     private releaseDone(payload: ReleaseDoneRequest) {
-        this.descriptors[payload.path].session = null;
-        this.descriptors[payload.path].sessionOwner = undefined;
+        const descriptor = this.descriptors[payload.path];
+        if (!descriptor) {
+            return error({ code: ERRORS.DEVICE_NOT_FOUND });
+        }
+        descriptor.session = null;
+        descriptor.sessionOwner = undefined;
 
         this.clearLock();
 
@@ -274,9 +279,12 @@ export class SessionsBackground
     private clearLock() {
         const lock = this.locksQueue[0];
         if (lock) {
-            this.locksQueue[0].dfd.resolve(undefined);
+            lock.dfd.resolve(undefined);
             this.locksQueue.shift();
-            clearTimeout(this.locksTimeoutQueue[0]);
+            const timeout = this.locksTimeoutQueue[0];
+            if (timeout) {
+                clearTimeout(timeout);
+            }
             this.locksTimeoutQueue.shift();
         }
     }

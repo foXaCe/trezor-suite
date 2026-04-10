@@ -141,8 +141,9 @@ describe('encoding json -> protobuf -> json', () => {
                     parsedMessages,
                     () => {
                         i++;
+                        const chunk = chunks[i] ?? Buffer.alloc(0);
 
-                        return Promise.resolve({ success: true, payload: chunks[i] });
+                        return Promise.resolve({ success: true, payload: chunk } as const);
                     },
                     protocolV1,
                 );
@@ -248,7 +249,7 @@ describe('createChunks', () => {
     test('small packet = one chunk', () => {
         const result = createChunks(Buffer.alloc(63).fill(0x12), chunkHeader, 64);
         expect(result.length).toBe(1);
-        expect(result[0].toString('hex')).toBe('12'.repeat(63) + '00');
+        expect(result[0]?.toString('hex')).toBe('12'.repeat(63) + '00');
     });
 
     test('exact packet = one chunk', () => {
@@ -260,9 +261,9 @@ describe('createChunks', () => {
         const result = createChunks(Buffer.alloc(65).fill('a0a1'), chunkHeader, 64);
         expect(result.length).toBe(2);
         // header + last byte from data
-        expect(result[1].subarray(0, 2).toString('hex')).toBe('3f61');
+        expect(result[1]?.subarray(0, 2).toString('hex')).toBe('3f61');
         // the rest is filled with 00
-        expect(result[1].subarray(2).toString('hex')).toBe('00'.repeat(62));
+        expect(result[1]?.subarray(2).toString('hex')).toBe('00'.repeat(62));
     });
 
     test('exact packet, big chunkHeader = two chunks', () => {
@@ -281,13 +282,13 @@ describe('createChunks', () => {
             64,
         );
         expect(result.length).toBe(3);
-        expect(result[2].subarray(0, 8).toString('hex')).toBe('7373737373737312');
-        expect(result[2].subarray(8).toString('hex')).toBe('00'.repeat(64 - 8));
+        expect(result[2]?.subarray(0, 8).toString('hex')).toBe('7373737373737312');
+        expect(result[2]?.subarray(8).toString('hex')).toBe('00'.repeat(64 - 8));
     });
 
     test('chunkSize not set = one chunk', () => {
         const result = createChunks(Buffer.alloc(128).fill(0x12), Buffer.alloc(7).fill(0x73), 0);
         expect(result.length).toBe(1);
-        expect(result[0].byteLength).toBe(128);
+        expect(result[0]?.byteLength).toBe(128);
     });
 });

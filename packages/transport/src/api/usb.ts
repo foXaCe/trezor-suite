@@ -469,7 +469,7 @@ export class UsbApi extends AbstractApi {
                 return path;
             };
 
-            const [hidDevices, nonHidDevices] = this.filterDevices(devices);
+            const [hidDevices = [], nonHidDevices = []] = this.filterDevices(devices);
 
             const loadedDevices = await Promise.all(
                 nonHidDevices.map(async device => {

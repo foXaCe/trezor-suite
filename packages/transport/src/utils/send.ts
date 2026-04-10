@@ -39,7 +39,7 @@ export const buildMessage = ({ messages, name, data, protocol, thpState }: Build
     const protobufEncoder = (messageName: string, data: Record<string, unknown>) => {
         const { messageType, message } = encodeMessage(messages, messageName, data);
 
-        return protocol.encode(message, { messageType });
+        return protocol.encode(message, { messageType: Number(messageType) });
     };
 
     if (protocol.name === 'v2') {
@@ -48,7 +48,11 @@ export const buildMessage = ({ messages, name, data, protocol, thpState }: Build
             messageName: name,
             data,
             thpState,
-            protobufEncoder: (messageName, data) => encodeMessage(messages, messageName, data),
+            protobufEncoder: (messageName, data) => {
+                const result = encodeMessage(messages, messageName, data);
+
+                return { ...result, messageType: Number(result.messageType) };
+            },
         });
     }
 
@@ -59,8 +63,8 @@ export const sendChunks = async <T, E extends string>(
     chunks: Buffer[],
     apiWrite: (chunk: Buffer) => AsyncResultWithTypedError<T, E>,
 ) => {
-    for (let i = 0; i < chunks.length; i++) {
-        const result = await apiWrite(chunks[i]);
+    for (const chunk of chunks) {
+        const result = await apiWrite(chunk);
         if (!result.success) {
             return result;
         }

@@ -28,6 +28,7 @@ background.on('releaseRequest', descriptor => {
 
 self.onconnect = function (e) {
     const port = e.ports[0];
+    if (!port) return;
 
     ports.push(port);
 
