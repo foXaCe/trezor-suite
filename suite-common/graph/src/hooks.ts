@@ -133,7 +133,7 @@ export function useGraphForAccounts(params: useGraphForAccountsParams): {
                         }).then(events => {
                             normalizeExtremeGraphEvents(
                                 events,
-                                startOfTimeFrameDate ?? points[0].date,
+                                startOfTimeFrameDate ?? points[0]?.date ?? new Date(),
                                 endOfTimeFrameDate,
                             );
                             // We need to set events after graph points, othewise it will mess up events randomly

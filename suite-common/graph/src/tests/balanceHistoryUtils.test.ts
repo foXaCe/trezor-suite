@@ -108,7 +108,7 @@ describe('Account balance movement history', () => {
         });
 
         for (const token of Object.keys(balanceHistory.tokens)) {
-            const filteredBalanceHistory = ethTokenBalanceHistoryResult[token].filter(
+            const filteredBalanceHistory = (ethTokenBalanceHistoryResult[token] ?? []).filter(
                 item => item.time >= from && item.time <= to,
             );
 

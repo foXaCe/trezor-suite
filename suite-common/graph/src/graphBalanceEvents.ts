@@ -55,7 +55,8 @@ export const groupBalanceMovementEvents = (
     balanceMovements.forEach(balanceMovement => {
         if (
             A.isEmpty(currentGroup) ||
-            balanceMovement.date - currentGroup[currentGroup.length - 1].date < groupingThreshold
+            balanceMovement.date - (currentGroup[currentGroup.length - 1]?.date ?? 0) <
+                groupingThreshold
         ) {
             currentGroup.push(balanceMovement);
 
