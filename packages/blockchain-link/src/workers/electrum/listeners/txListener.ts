@@ -43,6 +43,7 @@ export const txListener = (worker: BaseWorker<ElectrumAPI>) => {
         const recent = history.reduce<HistoryTx | undefined>(mostRecent, undefined);
         if (!recent) return;
         const [tx] = await getTransactions(api(), [recent]);
+        if (!tx) return;
         worker.post({
             id: -1,
             type: RESPONSES.NOTIFICATION,
@@ -69,9 +70,10 @@ export const txListener = (worker: BaseWorker<ElectrumAPI>) => {
             state.addSubscription('notification');
         }
 
+        const client = api();
         await Promise.all(
             shToSubscribe.map(scripthash =>
-                api().request('blockchain.scripthash.subscribe', scripthash),
+                client.request('blockchain.scripthash.subscribe', scripthash),
             ),
         );
 

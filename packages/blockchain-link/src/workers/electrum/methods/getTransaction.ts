@@ -6,6 +6,7 @@ import { type Api, getTransactions } from '../utils';
 
 const getTransaction: Api<Req, Res> = async ({ client }, payload) => {
     const [tx] = await getTransactions(client, [{ tx_hash: payload, height: -1 }]);
+    if (!tx) throw new Error(`Transaction not found: ${payload}`);
 
     return transformTransaction(tx);
 };

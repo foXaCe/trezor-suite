@@ -79,7 +79,7 @@ const blockfrostFixture = {
 const blockfrostTx = {
     type: 'unknown',
     txid: 'deadbeef',
-    amount: blockfrostFixture.output_amount[0].quantity,
+    amount: blockfrostFixture.output_amount[0]?.quantity ?? '0',
     blockHash: blockfrostFixture.block,
     blockHeight: blockfrostFixture.block_height,
     fee: blockfrostFixture.fees,

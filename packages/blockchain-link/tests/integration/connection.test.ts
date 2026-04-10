@@ -53,8 +53,10 @@ backends.forEach((b, i) => {
 
         beforeEach(async () => {
             server = await BackendWebsocketServerMock.create(b.type);
+            const backend = backends[i];
+            if (!backend) throw new Error('Missing backend');
             blockchain = new BlockchainLink({
-                ...backends[i],
+                ...backend,
                 timeout: 1000,
                 server: [`ws://localhost:${server.options.port}`],
                 debug: false,

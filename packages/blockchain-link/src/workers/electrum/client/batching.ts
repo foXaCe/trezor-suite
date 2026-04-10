@@ -39,7 +39,7 @@ export class BatchingJsonRpcClient extends JsonRpcClient {
             this.batchTimer = undefined;
             while (queue.length) {
                 const q = queue.splice(0, this.maxQueueLength);
-                const content = q.length > 1 ? `[${q.join(',')}]` : q[0];
+                const content = q.length > 1 ? `[${q.join(',')}]` : (q[0] ?? '');
                 super.send(content);
             }
         }, this.timeoutMs);

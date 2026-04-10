@@ -274,10 +274,14 @@ const prepareResponse = (parent: HTMLElement, response: any, isError = false) =>
 
     const otherResponses = parent.getElementsByClassName('response');
     if (otherResponses.length > 0) {
-        if (otherResponses.length >= 3) {
-            parent.removeChild(otherResponses[2]);
+        const last = otherResponses[2];
+        if (otherResponses.length >= 3 && last) {
+            parent.removeChild(last);
         }
-        parent.insertBefore(div, otherResponses[0]);
+        const first = otherResponses[0];
+        if (first) {
+            parent.insertBefore(div, first);
+        }
     } else {
         parent.appendChild(div);
     }

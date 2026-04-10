@@ -20,7 +20,7 @@ describe('Electrum', () => {
 
     worker.onmessage = ({ data }: { data: Response }) => {
         if (resolvers[data.id]) {
-            resolvers[data.id](data);
+            resolvers[data.id]?.(data);
         }
     };
 

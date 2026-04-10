@@ -10,7 +10,7 @@ export const createEvmEncoder = <const T extends Abi>(
     if (functions.length === 0) throw new Error('No function in ABI');
     if (functions.length > 1) throw new Error('ABI must contain exactly one function');
 
-    const fn = functions[0];
+    const fn = functions[0] as AbiFunction;
 
     const paramNames = fn.inputs.map(input => {
         if (!input.name) {

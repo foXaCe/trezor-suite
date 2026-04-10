@@ -23,7 +23,10 @@ const fetchLatestLedger = async (api: Horizon.Server) => {
         throw new CustomError('worker_invalid_horizon_response');
     }
 
-    return latestLedgerInfo.records[0];
+    const record = latestLedgerInfo.records[0];
+    if (!record) throw new CustomError('worker_invalid_horizon_response');
+
+    return record;
 };
 
 const getInfo = async (request: Request<MessageTypes.GetInfo>, isTestnet: boolean) => {
