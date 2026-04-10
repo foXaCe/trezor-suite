@@ -177,14 +177,15 @@ export class DevicePrompt {
             .split('\n')
             .map(line => line.trim())
             .filter(line => line.length > 0);
+        const lastLine = lines[lines.length - 1] ?? '';
         const feeRateRegex = /^\d+(\.\d+)?\s+sat\/vB$/;
-        if (!feeRateRegex.test(lines[lines.length - 1])) {
+        if (!feeRateRegex.test(lastLine)) {
             throw new Error(
-                `Last line does not match the expected format of a decimal number followed by 'sat/vB': ${lines[lines.length - 1]}`,
+                `Last line does not match the expected format of a decimal number followed by 'sat/vB': ${lastLine}`,
             );
         }
 
-        return lines[lines.length - 1];
+        return lastLine;
     }
 
     @step()

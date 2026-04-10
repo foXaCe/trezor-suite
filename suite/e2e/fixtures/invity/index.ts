@@ -94,7 +94,12 @@ export const getCompanyNameFromList = (name: string, type: 'buyList' | 'sellList
         );
     }
 
-    return filteredProviders[0].companyName;
+    const provider = filteredProviders[0];
+    if (!provider) {
+        throw new Error('No provider found');
+    }
+
+    return provider.companyName;
 };
 
 export {

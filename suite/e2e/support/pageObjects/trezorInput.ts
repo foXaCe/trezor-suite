@@ -39,7 +39,7 @@ export class TrezorInput {
                 });
             } else {
                 await test.step(`Inputting word ${arrayMnemonic[position]} at position ${position}`, async () => {
-                    await this.inputWord(arrayMnemonic[position]);
+                    await this.inputWord(arrayMnemonic[position] ?? '');
                 });
             }
         }
