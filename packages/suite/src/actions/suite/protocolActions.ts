@@ -96,7 +96,8 @@ export const handleProtocolRequest =
             const anchor = uri.replace(SUITE_ANCHOR_DEEPLINK_PREFIX, '');
 
             if (isArrayMember(anchor, Object.values(SettingsAnchor))) {
-                const [domain] = anchor.split('/');
+                const domain = anchor.split('/')[0];
+                if (!domain) return;
 
                 const targetRoute =
                     mapAnchorToRoute[domain.replace(/^@/, '') as AnchorSettingSection];

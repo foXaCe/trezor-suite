@@ -272,7 +272,7 @@ export const useSendFormCompose = ({
         if (shouldSwitch && composed.type === 'error') {
             // find nearest possible tx
             const nearest = (Object.keys(composedLevels) as FeeLevel['label'][]).find(
-                key => composedLevels[key].type !== 'error',
+                key => composedLevels[key]?.type !== 'error',
             );
             // switch to it
             if (nearest) {

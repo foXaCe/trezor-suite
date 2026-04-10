@@ -32,9 +32,9 @@ describe('transaction reducer', () => {
     });
 
     it('reset transactions', () => {
-        const { key } = testAccounts[0];
-
         const account = testAccounts[0];
+        if (!account) throw new Error('missing account');
+        const { key } = account;
         delete testTransactions[key];
 
         expect(
@@ -52,9 +52,12 @@ describe('transaction reducer', () => {
 
     it('remove transactions', () => {
         const account = testAccounts[0];
+        if (!account) throw new Error('missing account');
         const { key } = account;
 
-        const otherAccountKey = testAccounts[1].key;
+        const otherAccount = testAccounts[1];
+        if (!otherAccount) throw new Error('missing other account');
+        const otherAccountKey = otherAccount.key;
         const otherAccountTransactions = testTransactions[otherAccountKey];
 
         expect(
@@ -64,7 +67,7 @@ describe('transaction reducer', () => {
                     type: transactionsActions.removeTransaction.type,
                     payload: {
                         account,
-                        txs: testTransactions[key],
+                        txs: testTransactions[key] ?? [],
                     },
                 },
             ),
@@ -76,7 +79,9 @@ describe('transaction reducer', () => {
 
     it('remove transactions (incl. nonexistent)', () => {
         const account = testAccounts[0];
-        const [tx1, tx2] = testTransactions[account.key];
+        if (!account) throw new Error('missing account');
+        const accountTxs = testTransactions[account.key] ?? [];
+        const [tx1, tx2] = accountTxs;
         const txsToRemove = [
             tx2,
             { ...tx1, txid: 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef' },
@@ -95,6 +100,7 @@ describe('transaction reducer', () => {
 
     it('add transactions', () => {
         const account = testAccounts[0];
+        if (!account) throw new Error('missing account');
         const { key } = account;
         expect(
             reducer(
@@ -103,7 +109,7 @@ describe('transaction reducer', () => {
                     type: transactionsActions.addTransaction.type,
                     payload: {
                         account,
-                        transactions: testTransactions[key],
+                        transactions: testTransactions[key] ?? [],
                     },
                 },
             ),

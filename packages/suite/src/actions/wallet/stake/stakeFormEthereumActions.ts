@@ -63,7 +63,10 @@ export const composeTransaction =
         const { account, feeInfo } = formState;
         if (!account || !feeInfo) return;
 
-        const { amount } = formValues.outputs[0];
+        const firstOutput = formValues.outputs[0];
+        if (!firstOutput) return;
+
+        const { amount } = firstOutput;
 
         if (!amount || amount === '0') return;
 
@@ -139,13 +142,14 @@ export const signTransaction =
 
         // transform to TrezorConnect.ethereumSignTransaction params
         const { stakeType } = formValues;
+        const outputAmount = formValues.outputs[0]?.amount ?? '';
         let txData;
         if (stakeType === 'stake') {
             txData = await prepareStakeEthTx({
                 symbol: account.symbol,
                 from: account.descriptor,
                 identity,
-                amount: formValues.outputs[0].amount,
+                amount: outputAmount,
                 gasPrice: transactionInfo.feePerByte,
                 feeLimit: transactionInfo.feeLimit,
                 maxFeePerGas: transactionInfo.maxFeePerGas,
@@ -159,7 +163,7 @@ export const signTransaction =
                 symbol: account.symbol,
                 from: account.descriptor,
                 identity,
-                amount: formValues.outputs[0].amount,
+                amount: outputAmount,
                 gasPrice: transactionInfo.feePerByte,
                 feeLimit: transactionInfo.feeLimit,
                 maxFeePerGas: transactionInfo.maxFeePerGas,

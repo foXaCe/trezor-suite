@@ -72,7 +72,7 @@ const search = async (query: string, pageMap: PageMap): Promise<SearchResult[]> 
         .filter(res => res.score)
         .sort((a, b) => b.score - a.score)
         .slice(0, MAX_RESULTS)
-        .map(({ preview, score, url }) => ({ page: pageMap[url], score, preview }));
+        .map(({ preview, score, url }) => ({ page: pageMap[url] as GuideArticle, score, preview }));
 };
 
 export const useGuideSearch = (query: string, pageRoot: GuideCategory | null) => {

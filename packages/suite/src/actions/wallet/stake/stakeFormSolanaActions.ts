@@ -100,13 +100,14 @@ const getTransactionData = async (
     const { account } = selectedAccount;
 
     const selectedBlockchain = blockchain[account.symbol];
+    const outputAmount = formValues.outputs[0]?.amount ?? '';
 
     let txData;
     if (stakeType === 'stake') {
         txData = await prepareStakeSolTx({
             from: account.descriptor,
             path: account.path,
-            amount: formValues.outputs[0].amount,
+            amount: outputAmount,
             symbol: account.symbol,
             selectedBlockchain,
             estimatedFee,
@@ -117,7 +118,7 @@ const getTransactionData = async (
         txData = await prepareUnstakeSolTx({
             from: account.descriptor,
             path: account.path,
-            amount: formValues.outputs[0].amount,
+            amount: outputAmount,
             symbol: account.symbol,
             selectedBlockchain,
             estimatedFee,
@@ -201,7 +202,10 @@ export const composeTransaction =
         const { account } = selectedAccount;
         const txData = await getTransactionData(formValues, selectedAccount, blockchain);
 
-        const { amount } = formValues.outputs[0];
+        const firstOutput = formValues.outputs[0];
+        if (!firstOutput) return;
+
+        const { amount } = firstOutput;
 
         if (!amount || amount === '0') return;
 

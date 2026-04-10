@@ -66,11 +66,10 @@ export const Recovery = ({ onCancel }: ForegroundAppProps) => {
     };
 
     const handleBackClick = () => {
-        dispatch(
-            recoveryActions.setStatus(
-                statesInProgressBar[statesInProgressBar.indexOf(recovery.status) - 1],
-            ),
-        );
+        const prevStatus = statesInProgressBar[statesInProgressBar.indexOf(recovery.status) - 1];
+        if (prevStatus) {
+            dispatch(recoveryActions.setStatus(prevStatus));
+        }
     };
 
     if (!isDeviceAcquired(device) || !deviceModelInternal) {

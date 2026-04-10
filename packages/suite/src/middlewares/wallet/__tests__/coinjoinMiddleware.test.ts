@@ -88,7 +88,7 @@ describe('coinjoinMiddleware', () => {
 
     fixtures.forEach(f => {
         it(f.description, async () => {
-            const store = initStore(f.state);
+            const store = initStore(f.state as Partial<State>);
 
             if (f.connect) {
                 testMocks.setTrezorConnectFixtures(f.connect);

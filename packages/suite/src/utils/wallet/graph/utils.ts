@@ -125,12 +125,13 @@ export const getMinMaxValueFromData = <TType extends TypeName, TValue extends Bi
     extractReceivedValue: (sourceData: GraphDataPoint<TType>) => TValue | undefined,
     extractBalanceValue: (sourceData: GraphDataPoint<TType>) => TValue | undefined,
 ): [TValue, TValue] => {
-    if (!data || data.length === 0) {
+    const firstDataPoint = data?.[0];
+    if (!data || !firstDataPoint) {
         return [new BigNumber(0) as TValue, new BigNumber(0) as TValue];
     }
-    let maxSent = new BigNumber(extractSentValue(data[0]) || 0);
-    let maxReceived = new BigNumber(extractReceivedValue(data[0]) || 0);
-    let maxBalance = new BigNumber(extractBalanceValue(data[0]) || 0);
+    let maxSent = new BigNumber(extractSentValue(firstDataPoint) || 0);
+    let maxReceived = new BigNumber(extractReceivedValue(firstDataPoint) || 0);
+    let maxBalance = new BigNumber(extractBalanceValue(firstDataPoint) || 0);
 
     let minSent: BigNumber | undefined;
     let minReceived: BigNumber | undefined;
@@ -237,8 +238,8 @@ export const calcXDomain = (
     data: { time: number }[],
     range: GraphRange,
 ): [number, number] => {
-    const start = ticks[0];
-    const lastTick = ticks[ticks.length - 1];
+    const start = ticks[0] ?? 0;
+    const lastTick = ticks[ticks.length - 1] ?? 0;
     const lastData = data[data.length - 1];
     // if the last data point is after last tick/label use datapoint's timestamp to mark the end of the interval
     const end = lastData && lastTick < lastData.time ? lastData.time : lastTick;

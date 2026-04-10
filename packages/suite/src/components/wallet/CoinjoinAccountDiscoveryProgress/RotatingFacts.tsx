@@ -71,7 +71,7 @@ export const RotatingFacts = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4, ease: motionEasing.transition }}
             >
-                <Translation id={FACTS[factIndex]} />
+                {FACTS[factIndex] && <Translation id={FACTS[factIndex]} />}
             </Fact>
         </AnimatePresence>
     );

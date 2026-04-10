@@ -70,18 +70,19 @@ export const GraphTooltipAccount = ({
     const formatters = useFormatters();
 
     // Note: payload is [] when discovery is paused.
-    if (!active || !payload?.length) {
+    const firstPayload = payload?.[0];
+    if (!active || !firstPayload) {
         return null;
     }
 
-    const balance = balanceValueFn(payload[0].payload);
-    const receivedAmountString = receivedValueFn(payload[0].payload);
-    const sentAmountString = sentValueFn(payload[0].payload);
+    const balance = balanceValueFn(firstPayload.payload);
+    const receivedAmountString = receivedValueFn(firstPayload.payload);
+    const sentAmountString = sentValueFn(firstPayload.payload);
 
     const receivedFiat: BaseCurrencyAmount | undefined =
-        payload[0].payload.receivedFiat[localCurrency] ?? undefined;
+        firstPayload.payload.receivedFiat[localCurrency] ?? undefined;
     const sentFiat: BaseCurrencyAmount | undefined =
-        payload[0].payload.sentFiat[localCurrency] ?? undefined;
+        firstPayload.payload.sentFiat[localCurrency] ?? undefined;
 
     return (
         <GraphTooltipBase

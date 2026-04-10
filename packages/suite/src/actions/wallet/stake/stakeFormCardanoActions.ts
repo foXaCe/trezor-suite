@@ -260,8 +260,11 @@ export const composeTransaction =
             txPlan?.totalSpent,
         );
 
+        const firstOutput = formValues.outputs[0];
+        if (!firstOutput) return;
+
         const outputExtended = {
-            ...formValues.outputs[0],
+            ...firstOutput,
             amount: amountAda,
         };
 
@@ -272,11 +275,11 @@ export const composeTransaction =
         };
 
         const estimatedFee =
-            txData?.txPlan.type === 'final'
+            txPlan.type === 'final'
                 ? {
                       success: true,
                       payload: {
-                          feePerTx: txData.txPlan.fee,
+                          feePerTx: txPlan.fee,
                           feePerUnit: '',
                           feeLimit: '',
                       },

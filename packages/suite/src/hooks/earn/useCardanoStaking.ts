@@ -111,7 +111,10 @@ export const useCardanoStaking = (): CardanoStaking => {
 
             if (!response.success) throw new Error(response.error.message);
 
-            return { txPlan: response.payload[0], certificates, withdrawals };
+            const txPlan = response.payload[0];
+            if (!txPlan) throw new Error('No transaction plan returned');
+
+            return { txPlan, certificates, withdrawals };
         },
         [account, isStakingActive, rewardsAmount, stakeAddress, cardanoPools],
     );

@@ -48,12 +48,13 @@ export const TransactionSummary = ({ account }: TransactionSummaryProps) => {
     const dispatch = useDispatch();
 
     const intervalGraphData = getGraphDataForInterval({ account, graph });
-    const data = intervalGraphData[0]?.data
+    const firstInterval = intervalGraphData[0];
+    const data = firstInterval?.data
         ? aggregateBalanceHistory(intervalGraphData, selectedRange.groupBy, 'account')
         : [];
 
-    const error = intervalGraphData[0]?.error ?? false;
-    const isLoading = intervalGraphData[0]?.isLoading ?? false;
+    const error = firstInterval?.error ?? false;
+    const isLoading = firstInterval?.isLoading ?? false;
 
     // aggregate values from shown graph data
     const minMaxValues = getMinMaxValueFromData(
@@ -72,11 +73,12 @@ export const TransactionSummary = ({ account }: TransactionSummaryProps) => {
     // Interval shown in InfoCard below the graph
     // For 'all' range pick first and last datapoint's timestamps
     // For other intervals do same date calculation as in calcTicks func
+    const firstIntervalData = firstInterval?.data;
     const dataInterval: [number, number] =
         selectedRange.label === 'all'
             ? [
-                  intervalGraphData[0]?.data[0]?.time,
-                  intervalGraphData[0]?.data[intervalGraphData[0].data.length - 1]?.time,
+                  firstIntervalData?.[0]?.time ?? 0,
+                  firstIntervalData?.[firstIntervalData.length - 1]?.time ?? 0,
               ]
             : [getUnixTime(selectedRange.startDate), getUnixTime(selectedRange.endDate)];
 

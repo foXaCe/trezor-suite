@@ -67,10 +67,12 @@ const useAssetsFiatBalances = (
 
         const fiatRateKey = getFiatRateKey(asset.network.symbol, localCurrency);
         const fiatRate = currentFiatRates?.[fiatRateKey];
-        const amount =
-            accounts[asset.network.symbol]
-                .reduce((balance, account) => balance + Number(account.formattedBalance), 0)
-                .toString() ?? '0';
+        const symbolAccounts = accounts[asset.network.symbol];
+        const amount = symbolAccounts
+            ? symbolAccounts
+                  .reduce((balance, account) => balance + Number(account.formattedBalance), 0)
+                  .toString()
+            : '0';
 
         const fiatBalance = toFiatCurrency({ amount, rate: fiatRate?.rate }) ?? BASE_CURRENCY_ZERO;
 
@@ -113,15 +115,15 @@ export const AssetsView = () => {
     const assetsData: AssetData[] = assetSymbols.map((symbol): AssetData => {
         const network = getNetwork(symbol);
 
-        const assetNativeCryptoBalance =
-            assets[symbol] !== undefined
-                ? asAmountUnit(
-                      assets[symbol].reduce(
-                          (total, account) => total.plus(account.formattedBalance),
-                          new BigNumber(0),
-                      ),
-                  )
-                : undefined;
+        const symbolAccounts = assets[symbol];
+        const assetNativeCryptoBalance = symbolAccounts
+            ? asAmountUnit(
+                  symbolAccounts.reduce(
+                      (total, account) => total.plus(account.formattedBalance),
+                      new BigNumber(0),
+                  ),
+              )
+            : undefined;
 
         const assetTokens = assets[symbol]?.reduce((allTokens: TokenInfo[], account) => {
             if (account.tokens) {

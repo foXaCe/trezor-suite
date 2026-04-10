@@ -18,11 +18,14 @@ export const PickQRFromGalleryButton = ({
 
     const handlePickImage = async () => {
         const pickedImage = await ImagePicker.launchImageLibraryAsync({});
-        const imageUri = pickedImage?.assets?.[0].uri;
+        const imageUri = pickedImage?.assets?.[0]?.uri;
+        if (!imageUri) return;
 
         try {
-            const scannedResults = await scanFromURLAsync(imageUri!, ['qr']);
-            const { data } = scannedResults[0];
+            const scannedResults = await scanFromURLAsync(imageUri, ['qr']);
+            const firstResult = scannedResults[0];
+            if (!firstResult) return;
+            const { data } = firstResult;
 
             onImagePicked(data);
         } catch {

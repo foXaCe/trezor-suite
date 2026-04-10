@@ -207,7 +207,7 @@ export const useCompose = <TFieldValues extends FormState>({
                 // find nearest possible tx
                 const nearest = Object.keys(composedLevels)
                     .reverse()
-                    .find((key): key is FeeLevel['label'] => composedLevels[key].type !== 'error');
+                    .find((key): key is FeeLevel['label'] => composedLevels[key]?.type !== 'error');
                 // switch to it
                 if (nearest) {
                     composed = composedLevels[nearest];

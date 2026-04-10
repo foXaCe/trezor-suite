@@ -55,7 +55,7 @@ export const RotatingPhrases = ({ interval = 10000 }: RotatingPhrasesProps) => {
                         transition={{ duration: 0.3, ease: motionEasing.enter }}
                     >
                         <Paragraph align="center">
-                            <Translation id={PHRASES[index]} />
+                            {PHRASES[index] && <Translation id={PHRASES[index]} />}
                         </Paragraph>
                     </motion.div>
                 </AnimatePresence>

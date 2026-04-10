@@ -174,7 +174,10 @@ export const useSendFormImport = ({
 
         // only one output allowed for ETH and XRP
         // TODO: create queue of transactions to sign to allow multiple outputs for ETH/XRP (overkill?)
-        return network.networkType === 'bitcoin' ? outputs : [outputs[0]];
+        if (network.networkType === 'bitcoin') return outputs;
+        const firstOutput = outputs[0];
+
+        return firstOutput ? [firstOutput] : [];
     };
 
     // successful importTransaction resets the form

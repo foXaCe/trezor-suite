@@ -91,7 +91,7 @@ export const useTradingFormAccount = (tradingType: TradingType) => {
 
     const pickFallbackAccount = useCallback(
         (accounts: Account[]) =>
-            accounts.find(acc => isAccountEligibleForTrade(acc)) ?? accounts[0],
+            accounts.find(acc => isAccountEligibleForTrade(acc)) ?? (accounts[0] as Account),
         [isAccountEligibleForTrade],
     );
 

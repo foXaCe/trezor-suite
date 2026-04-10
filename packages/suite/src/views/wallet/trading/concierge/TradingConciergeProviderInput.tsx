@@ -44,7 +44,7 @@ export const TradingConciergeProviderInput = ({
         if (providers?.length) {
             const hasSelectedProvider = providers.some(pvd => pvd.name === provider?.name);
             if (!hasSelectedProvider) {
-                onProviderSelect(providers[0]);
+                onProviderSelect(providers[0] ?? null);
             }
         }
 

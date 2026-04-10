@@ -131,11 +131,17 @@ export const onCodeChange = (value: string) => (dispatch: Dispatch, getState: Ge
             if (field.type === 'array') {
                 // ensure the array has the correct number of items
                 if (value) {
+                    const firstBatch = field.batch[0];
                     for (let i = field.items.length; i < value.length; i++) {
-                        dispatch(onBatchAdd(field, field.batch[0].fields));
+                        if (firstBatch) {
+                            dispatch(onBatchAdd(field, firstBatch.fields));
+                        }
                     }
                     for (let i = field.items.length; i > value.length; i--) {
-                        dispatch(onBatchRemove(field, field.items[i - 1]));
+                        const item = field.items[i - 1];
+                        if (item) {
+                            dispatch(onBatchRemove(field, item));
+                        }
                     }
                 }
 

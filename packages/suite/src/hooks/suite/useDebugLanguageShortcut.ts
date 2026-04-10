@@ -29,19 +29,21 @@ export const useDebugLanguageShortcut = () => {
 
             if (event.ctrlKey && event.key === KEYBOARD_CODE.FUNCTION_KEY_NINE) {
                 const nextIndex = (currentIndex + 1) % languages.length;
+                const nextLang = languages[nextIndex];
 
                 if (isLanguageAutodetect) {
                     dispatch(suiteSettingsActions.setAutodetect({ language: false }));
                 }
-                dispatch(suiteSettingsActions.setLanguage(languages[nextIndex].value || 'en'));
+                dispatch(suiteSettingsActions.setLanguage(nextLang?.value ?? 'en'));
             }
 
             if (event.ctrlKey && event.key === KEYBOARD_CODE.FUNCTION_KEY_SEVEN) {
                 const nextIndex = (currentIndex - 1 + languages.length) % languages.length;
+                const nextLang = languages[nextIndex];
                 if (isLanguageAutodetect) {
                     dispatch(suiteSettingsActions.setAutodetect({ language: false }));
                 }
-                dispatch(suiteSettingsActions.setLanguage(languages[nextIndex].value));
+                dispatch(suiteSettingsActions.setLanguage(nextLang?.value ?? 'en'));
             }
         },
         [language, dispatch, isLanguageAutodetect],

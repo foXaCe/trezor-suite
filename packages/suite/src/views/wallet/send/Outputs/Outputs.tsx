@@ -45,7 +45,8 @@ export const Outputs = ({ disableAnim }: OutputsProps) => {
     useEffect(() => {
         if (!ref.current) return;
 
-        const observer = new ResizeObserver(([entry]) => {
+        const observer = new ResizeObserver(entries => {
+            const entry = entries[0];
             if (entry) {
                 setHeight(entry.contentRect.height);
             }
@@ -92,11 +93,11 @@ export const Outputs = ({ disableAnim }: OutputsProps) => {
                                     ) : (
                                         <Column gap={spacings.md}>
                                             <Address
-                                                output={outputs[index]}
+                                                output={output}
                                                 outputId={index}
                                                 outputsCount={outputs.length}
                                             />
-                                            <Amount output={outputs[index]} outputId={index} />
+                                            <Amount output={output} outputId={index} />
                                             {outputs.length === 1 && isSendingTokens && (
                                                 <CardanoMinAmountInfo />
                                             )}

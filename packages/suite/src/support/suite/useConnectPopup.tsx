@@ -75,9 +75,9 @@ export const useConnectPopup = (
 
     // Process incoming messages.
     useEffect(() => {
-        if (!popupLink || incomingMessages.length === 0) return;
-
         const message = incomingMessages[0];
+        if (!popupLink || !message) return;
+
         onMessagesConsumed();
 
         const processMessage = async (event: ConnectPopupMessage) => {

@@ -29,12 +29,13 @@ export const GraphTooltipDashboard = ({
     const { BaseCurrencyAmountFormatter } = useFormatters();
 
     // Note: payload is [] when discovery is paused.
-    if (!active || !payload?.length) {
+    const firstPayload = payload?.[0];
+    if (!active || !firstPayload) {
         return null;
     }
 
-    const receivedAmountString = receivedValueFn(payload[0].payload);
-    const sentAmountString = sentValueFn(payload[0].payload);
+    const receivedAmountString = receivedValueFn(firstPayload.payload);
+    const sentAmountString = sentValueFn(firstPayload.payload);
 
     const receivedAmount = (
         <BaseCurrencyAmountFormatter

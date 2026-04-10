@@ -127,7 +127,10 @@ describe('Suite Actions', () => {
             const store = initStore(state);
             f.actions.forEach((action: any, i: number) => {
                 store.dispatch(action);
-                expect(store.getState().suite).toMatchObject(f.result[i]);
+                const expected = f.result[i];
+                if (expected) {
+                    expect(store.getState().suite).toMatchObject(expected);
+                }
             });
         });
     });
@@ -179,7 +182,10 @@ describe('Suite Actions', () => {
             const actions = filterThunkActionTypes(store.getActions());
             expect(actions.length).toEqual(f.result.length);
             actions.forEach((a, i) => {
-                expect(a.payload.device).toMatchObject(f.result[i]);
+                const expected = f.result[i];
+                if (expected) {
+                    expect(a.payload.device).toMatchObject(expected);
+                }
             });
         });
     });

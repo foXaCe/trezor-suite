@@ -45,8 +45,10 @@ export const useCoinjoinSessionPhase = (accountKey: AccountKey) => {
         const { isExpired, currentTimestamp } = checkExpiration(lastChangeTimestamp);
 
         if (isExpired && sessionPhaseQueue) {
+            const firstPhase = sessionPhaseQueue[0];
+            if (!firstPhase) return;
             setPhaseIndex(0);
-            setSessionPhase(sessionPhaseQueue[0]);
+            setSessionPhase(firstPhase);
             setLastChangeTimestamp(currentTimestamp);
         } else {
             /**

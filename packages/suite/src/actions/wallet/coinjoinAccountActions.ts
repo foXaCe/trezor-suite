@@ -357,12 +357,15 @@ export const updatePendingAccountInfo =
         if (!api) return;
 
         const { backend, client } = api;
-        const transactions = state.wallet.transactions.transactions[account.key];
+        const transactions = state.wallet.transactions.transactions[account.key] ?? [];
+
+        const firstCheckpoint = coinjoinAccount.checkpoints[0];
+        if (!firstCheckpoint) return;
 
         const accountInfo = await backend.getAccountInfo(
             account.descriptor,
             transactions,
-            coinjoinAccount.checkpoints[0],
+            firstCheckpoint,
             getAccountCache(account),
         );
 
@@ -375,7 +378,7 @@ export const updatePendingAccountInfo =
         dispatch(accountsActions.updateAccount(account, accountInfo));
 
         // Log anonymity gain if the newly added transaction is a coinjoin transaction.
-        if (accountInfo.history.transactions[0].type === 'joint') {
+        if (accountInfo.history.transactions[0]?.type === 'joint') {
             const anonymityBeforeUpdate = selectWeightedAnonymityByAccountKey(state, account.key);
             const anonymityAfterUpdate = selectWeightedAnonymityByAccountKey(
                 getState(),

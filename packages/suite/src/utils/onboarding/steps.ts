@@ -109,7 +109,7 @@ export const resolveNextAvailableStep = (
     if (nextStep.id === ID_SET_PIN_STEP && device) {
         // Skip PIN setup step only if device has PIN protection explicitly enabled
         if (device?.features?.pin_protection === true) {
-            return resolveNextAvailableStep(steps[currentIndex + 1]?.id, steps, device);
+            return resolveNextAvailableStep(steps[currentIndex + 1]?.id ?? null, steps, device);
         }
     }
 
@@ -135,9 +135,10 @@ export const findNextStep = (
 
 export const findPrevStep = (currentStepId: AnyStepId, steps: Step[]) => {
     const currentIndex = steps.findIndex((step: Step) => step.id === currentStepId);
-    if (!steps[currentIndex - 1]) {
+    const prevStep = steps[currentIndex - 1];
+    if (!prevStep) {
         throw new Error('no prev step exists');
     }
 
-    return steps[currentIndex - 1];
+    return prevStep;
 };

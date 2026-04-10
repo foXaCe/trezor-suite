@@ -17,6 +17,7 @@ const File = ({ disabled, field, onChange }: FileProps) => {
         const files = evt?.target.files;
         if (!files || files.length === 0) return;
         const file = files[0];
+        if (!file) return;
         const reader = new FileReader();
         reader.onload = event => {
             onChange(field, event?.target?.result);
@@ -26,7 +27,7 @@ const File = ({ disabled, field, onChange }: FileProps) => {
 
     return (
         <Row style={{ cursor: disabled ? 'default' : 'pointer' }}>
-            <Button onClick={() => document!.getElementById('files')?.click()}>Chose File</Button>
+            <Button onClick={() => document.getElementById('files')?.click()}>Chose File</Button>
 
             <input
                 style={{ display: 'none' }}

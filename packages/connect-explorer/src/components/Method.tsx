@@ -62,7 +62,12 @@ const getArray = (field: FieldWithBundle<any>, props: Props) => (
     <ArrayWrapper
         key={field.name}
         field={field}
-        onAdd={() => props.actions.onBatchAdd(field, field.batch[0].fields)}
+        onAdd={() => {
+            const firstBatch = field.batch[0];
+            if (firstBatch) {
+                props.actions.onBatchAdd(field, firstBatch.fields);
+            }
+        }}
     >
         {field.items?.map((batch, index) => {
             const key = `${field.name}-${index}`;
@@ -79,7 +84,12 @@ const getArray = (field: FieldWithBundle<any>, props: Props) => (
 const getUnion = (field: FieldWithUnion<any>, props: Props) => (
     <UnionWrapper
         field={field}
-        onChange={(option: number) => props.actions.onSetUnion(field, field.options[option])}
+        onChange={(option: number) => {
+            const selected = field.options[option];
+            if (selected) {
+                props.actions.onSetUnion(field, selected);
+            }
+        }}
     >
         {getFields(field.current, props)}
     </UnionWrapper>
@@ -225,8 +235,11 @@ export const VerifyButton = ({ name, onClick }: VerifyButtonProps) => {
     const index = signMethods.indexOf(name);
     if (index < 0) return null;
 
+    const url = verifyUrls[index];
+    if (!url) return null;
+
     return (
-        <Button margin={{ top: 12 }} onClick={() => onClick(verifyUrls[index])}>
+        <Button margin={{ top: 12 }} onClick={() => onClick(url)}>
             Verify response
         </Button>
     );

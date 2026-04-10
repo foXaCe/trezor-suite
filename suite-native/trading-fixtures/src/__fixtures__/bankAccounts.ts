@@ -21,5 +21,5 @@ export const bankAccounts: BankAccount[] = [
     },
 ];
 
-export const verifiedBankAccount: BankAccount = bankAccounts[0];
-export const unverifiedBankAccount: BankAccount = bankAccounts[1];
+export const verifiedBankAccount: BankAccount = bankAccounts[0] as BankAccount;
+export const unverifiedBankAccount: BankAccount = bankAccounts[1] as BankAccount;

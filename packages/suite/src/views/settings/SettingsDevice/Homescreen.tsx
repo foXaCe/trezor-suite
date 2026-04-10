@@ -48,7 +48,8 @@ export const Homescreen = ({ isDeviceLocked }: HomescreenProps) => {
     }
 
     const deviceModelInternal = device.features.internal_model;
-    if (!deviceModelInformation[deviceModelInternal]) {
+    const modelInfo = deviceModelInformation[deviceModelInternal];
+    if (!modelInfo) {
         // disallow homescreen updates for unknown/custom models
         return null;
     }
@@ -63,6 +64,7 @@ export const Homescreen = ({ isDeviceLocked }: HomescreenProps) => {
     const onUploadHomescreen = async (files: FileList | null) => {
         if (!files || !files.length) return;
         let file = files[0];
+        if (!file) return;
 
         let validationResult = await validateImage({ file, deviceModelInternal });
 
@@ -159,11 +161,9 @@ export const Homescreen = ({ isDeviceLocked }: HomescreenProps) => {
                                 <Translation
                                     id={validationError}
                                     values={{
-                                        width: deviceModelInformation[deviceModelInternal].width,
-                                        height: deviceModelInformation[deviceModelInternal].height,
-                                        maxImageSize:
-                                            deviceModelInformation[deviceModelInternal]
-                                                .maxImageSize / 1024,
+                                        width: modelInfo.width,
+                                        height: modelInfo.height,
+                                        maxImageSize: modelInfo.maxImageSize / 1024,
                                     }}
                                 />
                             </Paragraph>
@@ -176,7 +176,7 @@ export const Homescreen = ({ isDeviceLocked }: HomescreenProps) => {
                     ].includes(validationError) && (
                         <Col>
                             <img
-                                width={`${deviceModelInformation[deviceModelInternal].width}px`}
+                                width={`${modelInfo.width}px`}
                                 alt="Custom homescreen"
                                 id="custom-image"
                                 src={customHomescreen}

@@ -66,8 +66,9 @@ export const getComposeAddressPlaceholder = async (
                 // try to get the already discovered legacy account
                 const legacyPath = substituteBip43Path(bip43Path);
                 const legacyAccount = accounts?.find(a => a.path === legacyPath);
-                if (legacyAccount?.addresses?.unused[0]) {
-                    return legacyAccount?.addresses?.unused[0].address;
+                const unusedAddr = legacyAccount?.addresses?.unused[0];
+                if (unusedAddr) {
+                    return unusedAddr.address;
                 }
                 // if it is not discovered, get an address from trezor
                 const result = await TrezorConnect.getAddress({
@@ -83,7 +84,7 @@ export const getComposeAddressPlaceholder = async (
             }
 
             // as a fallback, use the change address of current account
-            return account.addresses?.change[0].address;
+            return account.addresses?.change[0]?.address;
         }
         case 'ethereum':
             // ethereum address is not used as it breaks calculating fee logic;

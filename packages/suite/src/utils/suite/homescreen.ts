@@ -179,9 +179,9 @@ const toig = (imageData: ImageData, deviceModelInternal: DeviceModelInternal) =>
         .map(row =>
             range(width).map(col => {
                 const i = row * width + col;
-                const r = imageData.data[4 * i];
-                const g = imageData.data[4 * i + 1];
-                const b = imageData.data[4 * i + 2];
+                const r = imageData.data[4 * i] ?? 0;
+                const g = imageData.data[4 * i + 1] ?? 0;
+                const b = imageData.data[4 * i + 2] ?? 0;
 
                 return toGrayscale(r, g, b);
             }),
@@ -191,8 +191,8 @@ const toig = (imageData: ImageData, deviceModelInternal: DeviceModelInternal) =>
     // Pack two grayscale pixels into one byte (each pixel is 4 bits)
     const bytes = [];
     for (let i = 0; i < pixels.length; i += 2) {
-        const even = pixels[i];
-        const odd = pixels[i + 1];
+        const even = pixels[i] ?? 0;
+        const odd = pixels[i + 1] ?? 0;
 
         // Use the even pixel for the higher 4 bits and odd pixel for the lower 4 bits.
         const packedByte = ((even & 0xf0) >> 4) | (odd & 0xf0);
@@ -325,7 +325,7 @@ const exportCanvas = (
     try {
         const mimeType = `image/${filetype}`;
         const outDataUrl = canvas.toDataURL(mimeType, quality);
-        const bin = atob(outDataUrl.split(',')[1]);
+        const bin = atob(outDataUrl.split(',')[1] ?? '');
         const arr = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
 

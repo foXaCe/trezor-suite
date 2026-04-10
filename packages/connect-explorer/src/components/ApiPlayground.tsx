@@ -96,6 +96,7 @@ export const ApiPlayground = ({ options }: ApiPlaygroundProps) => {
 
     useEffect(() => {
         const option = options[selectedOption];
+        if (!option) return;
         if ('legacyConfig' in option) {
             actions.onSetMethod(option.legacyConfig);
         } else {
@@ -134,7 +135,7 @@ export const ApiPlayground = ({ options }: ApiPlaygroundProps) => {
                                         label="Select method"
                                         value={{
                                             value: selectedOption,
-                                            label: options[selectedOption].title,
+                                            label: options[selectedOption]?.title ?? '',
                                         }}
                                         onChange={option => setSelectedOption(option.value)}
                                         options={options.map((option, index) => ({

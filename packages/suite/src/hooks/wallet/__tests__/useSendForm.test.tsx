@@ -162,8 +162,9 @@ const actionCallback = (
     // validate '@trezor/connect' params
     if (result.composeTransactionParams) {
         const composeTransactionCallsLength = TrezorConnect.composeTransaction.mock.calls.length;
-        const composeTransactionsParams =
-            TrezorConnect.composeTransaction.mock.calls[composeTransactionCallsLength - 1][0];
+        const lastCall =
+            TrezorConnect.composeTransaction.mock.calls[composeTransactionCallsLength - 1];
+        const composeTransactionsParams = lastCall?.[0];
 
         if (result.composeTransactionParams.account) {
             expect(composeTransactionsParams.account.utxo.length).toEqual(
@@ -371,7 +372,7 @@ describe('useSendForm hook', () => {
                 store.subscribe(() => {
                     const actions = filterThunkActionTypes(store.getActions());
                     const lastAction = actions[actions.length - 1];
-                    if (lastAction.payload?.decision) {
+                    if (lastAction?.payload?.decision) {
                         lastAction.payload.decision.resolve(true); // always resolve push tx request
                     }
                 });

@@ -440,12 +440,15 @@ export const onCoinjoinRoundChanged =
             ) {
                 await dispatch(setBusyScreen(accountKeys, round.roundDeadline - Date.now()));
 
-                dispatch(
-                    openModal({
-                        type: 'critical-coinjoin-phase',
-                        relatedAccountKey: coinjoinAccountsWithSession[0].key, // since all accounts share the round, any key can be used,
-                    }),
-                );
+                const firstSessionAccount = coinjoinAccountsWithSession[0];
+                if (firstSessionAccount) {
+                    dispatch(
+                        openModal({
+                            type: 'critical-coinjoin-phase',
+                            relatedAccountKey: firstSessionAccount.key, // since all accounts share the round, any key can be used,
+                        }),
+                    );
+                }
             }
         }
     };
@@ -482,7 +485,7 @@ const getOwnershipProof =
         const groupParamsByDevice = Object.keys(groupUtxosByAccount).flatMap(key => {
             const coinjoinAccount = coinjoin.accounts.find(r => r.key === key);
             const realAccount = accounts.find(a => a.key === key);
-            const utxos = groupUtxosByAccount[key];
+            const utxos = groupUtxosByAccount[key] ?? [];
             if (!coinjoinAccount || !realAccount) {
                 response.inputs.push(...coinjoinResponseError(utxos, 'Account not found'));
 
@@ -511,7 +514,7 @@ const getOwnershipProof =
 
             // TODO: double check if requested utxo exists in account?
 
-            const bundle = groupUtxosByAccount[key].map(utxo => ({
+            const bundle = utxos.map(utxo => ({
                 path: utxo.path,
                 coin: realAccount.symbol,
                 commitmentData: request.commitmentData,
@@ -528,9 +531,10 @@ const getOwnershipProof =
                 const proof = await TrezorConnect.getOwnershipProof({ device, bundle });
                 if (proof.success) {
                     proof.payload.forEach((p, i) => {
-                        if (!utxos[i]) return; // double check if data from Trezor corresponds with request
+                        const utxo = utxos[i];
+                        if (!utxo) return; // double check if data from Trezor corresponds with request
                         response.inputs.push({
-                            outpoint: utxos[i].outpoint,
+                            outpoint: utxo.outpoint,
                             ownershipProof: p.ownership_proof,
                         });
                     });
@@ -599,7 +603,7 @@ const signCoinjoinTx =
         const groupParamsByDevice = Object.keys(groupUtxosByAccount).flatMap(key => {
             const coinjoinAccount = coinjoin.accounts.find(r => r.key === key);
             const realAccount = accounts.find(a => a.key === key);
-            const utxos = groupUtxosByAccount[key];
+            const utxos = groupUtxosByAccount[key] ?? [];
             if (!coinjoinAccount || !realAccount) {
                 response.inputs.push(...coinjoinResponseError(utxos, 'Account not found'));
 
@@ -667,11 +671,14 @@ const signCoinjoinTx =
                             let utxoIndex = 0;
                             tx.inputs.forEach((input, index) => {
                                 if (input.script_type !== 'EXTERNAL') {
-                                    response.inputs.push({
-                                        outpoint: utxos[utxoIndex].outpoint,
-                                        signature: signTx.payload.signatures[index],
-                                        index,
-                                    });
+                                    const utxo = utxos[utxoIndex];
+                                    if (utxo) {
+                                        response.inputs.push({
+                                            outpoint: utxo.outpoint,
+                                            signature: signTx.payload.signatures[index] ?? '',
+                                            index,
+                                        });
+                                    }
                                     utxoIndex++;
                                 }
                             });
@@ -770,13 +777,14 @@ export const initCoinjoinService =
                 const realAccount = selectAccountByKey(state, account.key);
                 if (!realAccount) return [];
 
-                const utxos = realAccount.utxo!.map(getUtxoOutpoint);
-                const usedChange = realAccount
-                    .addresses!.change.filter(a => a.transfers > 0)
+                const utxos = (realAccount.utxo ?? []).map(getUtxoOutpoint);
+                const usedChange = (realAccount.addresses?.change ?? [])
+                    .filter(a => a.transfers > 0)
                     .map(a => a.address);
 
-                return Object.keys(account.prison!).flatMap(id => {
-                    const inmate = account.prison![id];
+                return Object.keys(account.prison ?? {}).flatMap(id => {
+                    const inmate = account.prison?.[id];
+                    if (!inmate) return [];
                     // clear outdated info with Infinity sentence
                     if (inmate.sentenceEnd === Infinity) {
                         // utxos which are no longer in account (spent utxos)

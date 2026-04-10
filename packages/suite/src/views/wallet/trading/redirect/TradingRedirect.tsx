@@ -39,8 +39,9 @@ export const TradingRedirect = () => {
 
     useEffect(() => {
         // get rid of parameters appended by some partners to url which we pass to them
-        const params = router?.hash?.replace(/^#/, '').split('?')[0].split('/');
-        if (!params) return;
+        const parts = router?.hash?.replace(/^#/, '').split('?');
+        const params = parts?.[0]?.split('/');
+        if (!params || params.length < 4) return;
 
         const redirectCommonParams = {
             routeType: params[0] as
@@ -49,9 +50,9 @@ export const TradingRedirect = () => {
                 | 'sell-detail'
                 | 'sell-offers'
                 | 'exchange-offers',
-            symbol: params[1] as Account['symbol'],
-            accountType: params[2] as Account['accountType'],
-            index: parseInt(params[3], 10),
+            symbol: (params[1] ?? '') as Account['symbol'],
+            accountType: (params[2] ?? '') as Account['accountType'],
+            index: parseInt(params[3] ?? '0', 10),
         };
 
         dispatch(updateFeeInfoThunk({ networkSymbol: redirectCommonParams.symbol }));
@@ -60,37 +61,38 @@ export const TradingRedirect = () => {
             redirectToBuyOffers({
                 ...redirectCommonParams,
                 wantCrypto: params[4] === 'qc',
-                fiatCurrency: params[6],
-                amount: params[7],
-                receiveCurrency: params[8] as CryptoId,
-                country: params[5],
-                paymentMethod: params[9] as BuyCryptoPaymentMethod,
+                fiatCurrency: params[6] ?? '',
+                amount: params[7] ?? '',
+                receiveCurrency: (params[8] ?? '') as CryptoId,
+                country: params[5] ?? '',
+                paymentMethod: (params[9] ?? '') as BuyCryptoPaymentMethod,
             });
         }
 
         if (redirectCommonParams.routeType === 'detail') {
-            redirectToBuyDetail({ ...redirectCommonParams, transactionId: params[4] });
+            redirectToBuyDetail({ ...redirectCommonParams, transactionId: params[4] ?? '' });
         }
 
         if (redirectCommonParams.routeType === 'sell-offers') {
             let feeIndex = 10;
             let orderId: string | undefined;
-            if (params[4].startsWith('p-')) {
+            const param4 = params[4] ?? '';
+            if (param4.startsWith('p-')) {
                 feeIndex = 11;
-                params[4] = params[4].substring(2);
+                params[4] = param4.substring(2);
 
                 orderId = params[10];
             }
             redirectToSellOffers({
                 ...redirectCommonParams,
                 amountInCrypto: params[4] === 'qc',
-                fiatCurrency: params[6],
-                amount: params[7],
-                cryptoCurrency: params[8] as CryptoId,
-                country: params[5],
-                paymentMethod: params[9] as SellCryptoPaymentMethod,
+                fiatCurrency: params[6] ?? '',
+                amount: params[7] ?? '',
+                cryptoCurrency: (params[8] ?? '') as CryptoId,
+                country: params[5] ?? '',
+                paymentMethod: (params[9] ?? '') as SellCryptoPaymentMethod,
                 orderId,
-                selectedFee: params[feeIndex] as FeeLevel['label'],
+                selectedFee: (params[feeIndex] ?? '') as FeeLevel['label'],
                 feePerByte: params[feeIndex + 1],
                 maxFeePerGas: params[feeIndex + 2],
                 maxPriorityFeePerGas: params[feeIndex + 3],
@@ -102,11 +104,11 @@ export const TradingRedirect = () => {
             const feeIndex = 8;
             redirectToExchangeOffers({
                 ...redirectCommonParams,
-                send: params[4] as CryptoId,
-                receive: params[5] as CryptoId,
-                amount: params[6],
+                send: (params[4] ?? '') as CryptoId,
+                receive: (params[5] ?? '') as CryptoId,
+                amount: params[6] ?? '',
                 orderId: params[7],
-                selectedFee: params[feeIndex] as FeeLevel['label'],
+                selectedFee: (params[feeIndex] ?? '') as FeeLevel['label'],
                 feePerByte: params[feeIndex + 1],
                 maxFeePerGas: params[feeIndex + 2],
                 maxPriorityFeePerGas: params[feeIndex + 3],

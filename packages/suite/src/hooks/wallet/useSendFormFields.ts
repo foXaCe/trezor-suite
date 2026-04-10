@@ -67,8 +67,8 @@ export const useSendFormFields = ({
             value,
         }: CalculateFiatFromAmountOrViceVersaParams) => {
             const { outputs } = getValues();
-            const output = outputs[outputId];
-            if (output.type !== 'payment') {
+            const output = outputs?.[outputId];
+            if (!output || output.type !== 'payment') {
                 return;
             }
             const targetValue = output[target];
@@ -81,7 +81,7 @@ export const useSendFormFields = ({
                 ? outputError[target === 'fiat' ? 'amount' : 'fiat']
                 : undefined;
             if (error || !value) {
-                if (targetValue.length > 0) {
+                if (targetValue && targetValue.length > 0) {
                     setValue(targetInputName, '');
                     clearErrors(targetInputName);
                 }
@@ -108,7 +108,8 @@ export const useSendFormFields = ({
         (outputId: number, amount: string) => {
             const convert = (amount: string, fiatRate: number) => {
                 const { outputs } = getValues();
-                const output = outputs[outputId];
+                const output = outputs?.[outputId];
+                if (!output) return null;
                 const baseCurrencyCode = output.currency.value;
 
                 if (baseCurrencyCode === '') {
@@ -147,7 +148,8 @@ export const useSendFormFields = ({
                 const cryptoDecimals = token ? token.decimals : network.decimals;
 
                 const { outputs } = getValues();
-                const output = outputs[outputId];
+                const output = outputs?.[outputId];
+                if (!output) return null;
 
                 const baseCurrencyCode = output.currency.value;
 

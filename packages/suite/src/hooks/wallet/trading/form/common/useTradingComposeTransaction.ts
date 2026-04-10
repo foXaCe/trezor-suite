@@ -58,7 +58,7 @@ export const useTradingComposeTransaction = <T extends TradingSellExchangeFormPr
         [networkType, rawFeeInfo],
     );
     const initState = useMemo(() => ({ account, network, feeInfo }), [account, network, feeInfo]);
-    const outputAddress = values?.outputs?.[0].address;
+    const outputAddress = values?.outputs?.[0]?.address;
     const [state, setState] = useState<TradingUseComposeTransactionStateProps>(initState);
 
     // sub-hook, Composing transaction
@@ -93,7 +93,7 @@ export const useTradingComposeTransaction = <T extends TradingSellExchangeFormPr
             );
 
             if (values?.outputs?.[0] && typeof address === 'string') {
-                if (!values.outputs[0].address) {
+                if (!values.outputs[0]?.address) {
                     setValue(TRADING_FORM_OUTPUT_ADDRESS, address);
                 }
                 setState(initState);

@@ -33,18 +33,18 @@ export const TradingFormOfferOTC = () => {
 
     const fiatInput = isTradingBuyContext(context)
         ? context.getValues().fiatInput
-        : context.getValues().outputs[0].fiat;
+        : context.getValues().outputs?.[0]?.fiat;
 
     let fiatCurrency = isTradingBuyContext(context)
         ? context.getValues().currencySelect.value
-        : context.getValues().outputs[0].currency.value;
+        : (context.getValues().outputs?.[0]?.currency.value ?? '');
     if (amountInCrypto) {
         fiatCurrency = baseCurrencyCode;
     }
 
     const cryptoAmount = isTradingBuyContext(context)
         ? context.getValues().cryptoInput
-        : context.getValues().outputs[0].amount;
+        : context.getValues().outputs?.[0]?.amount;
 
     let cryptoCurrency;
     if (isTradingBuyContext(context)) {

@@ -127,23 +127,25 @@ interface GraphTooltipBaseProps extends TooltipProps<number, any> {
 }
 
 export const GraphTooltipBase = (props: GraphTooltipBaseProps) => {
+    const firstPayload = props.payload?.[0];
+
     useEffect(() => {
-        if (!props.onShow || !props.extendedDataForInterval) {
+        if (!props.onShow || !props.extendedDataForInterval || !firstPayload) {
             return;
         }
 
         props.onShow(
             props.extendedDataForInterval.findIndex(
-                item => item.time === props.payload?.[0].payload.time,
+                item => item.time === firstPayload.payload.time,
             ),
         );
-    }, [props]);
+    }, [props, firstPayload]);
 
-    if (!props.active || !props.payload) {
+    if (!props.active || !firstPayload) {
         return null;
     }
 
-    const date = new Date(props.payload[0].payload.time * 1000);
+    const date = new Date(firstPayload.payload.time * 1000);
     const dateFormat =
         props.selectedRange?.label === 'year' || props.selectedRange?.label === 'all'
             ? 'month'
@@ -151,8 +153,8 @@ export const GraphTooltipBase = (props: GraphTooltipBaseProps) => {
 
     return (
         <CustomTooltipWrapper
-            $positionX={props.coordinate!.x!}
-            $boxWidth={props.viewBox!.width!}
+            $positionX={props.coordinate?.x ?? 0}
+            $boxWidth={(props.viewBox as { width?: number })?.width ?? 0}
             data-testid="@dashboard/customtooltip"
         >
             <Row margin={{ bottom: spacings.xxs, left: spacings.xs, right: spacings.xs }}>

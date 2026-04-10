@@ -23,6 +23,9 @@ export const MiscFeeCards = ({ feeOptions }: MiscFeeCardsProps) => {
 
     const isSolanaNetwork = networkType === 'solana';
     const fee = feeOptions[0];
+
+    if (!fee) return null;
+
     const shouldShowCurrentFee = !isSolanaNetwork || fee.networkAmount;
     const feeAmount = isSolanaNetwork ? fee.feePerTx : fee.feePerUnit;
 
@@ -35,7 +38,9 @@ export const MiscFeeCards = ({ feeOptions }: MiscFeeCardsProps) => {
                 isLoading={areFeesLoading}
                 topLeftChild={
                     <span data-testid={`@fee-card/${fee.value}`}>
-                        <Translation id={feeLevelTranslationMap[fee.value]} />
+                        {feeLevelTranslationMap[fee.value] && (
+                            <Translation id={feeLevelTranslationMap[fee.value]} />
+                        )}
                     </span>
                 }
                 bottomLeftChild={

@@ -29,11 +29,10 @@ export const CancelTransaction = ({ tx, selectedAccount }: CancelTransactionProp
         return;
     }
 
-    if (composedCancelTx.outputs.length !== 1) {
+    const output = composedCancelTx.outputs[0];
+    if (composedCancelTx.outputs.length !== 1 || !output) {
         return null;
     }
-
-    const output = composedCancelTx.outputs[0];
 
     const feePerByte = new BigNumber(composedCancelTx.feePerByte);
     const fee = formatNetworkAmount(composedCancelTx.fee, tx.symbol);
