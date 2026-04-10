@@ -10,6 +10,7 @@ import { Button, CollapsibleBox, Card as TrezorCard, variables } from '@trezor/c
 import { spacings, spacingsPx } from '@trezor/theme';
 
 import { BetaOnly } from '../components/BetaOnly';
+import { LinkButton } from '../components/LinkButton';
 import ZoomableIllustration from '../components/ZoomableIllustration';
 import IconExtension from '../components/icons/IconExtension';
 import IconMobile from '../components/icons/IconMobile';
@@ -133,15 +134,14 @@ export const ExampleHeading = styled.h3`
         <IconNode />
         <SdkName>Node.js</SdkName>
         <SdkTag></SdkTag>
-        <Button
+        <LinkButton
             intent="neutral"
             priority="secondary"
             size="small"
             iconLeft="bookOpenText"
-            target="_self"
             href="/readme/connect">
             README
-        </Button>
+        </LinkButton>
         <Button
             intent="neutral"
             priority="secondary"
@@ -230,15 +230,14 @@ export const ExampleHeading = styled.h3`
         <IconWeb />
         <SdkName>Web</SdkName>
         <SdkTag>DOM required</SdkTag>
-        <Button
+        <LinkButton
             intent="neutral"
             priority="secondary"
             size="small"
             iconLeft="bookOpenText"
-            target="_self"
             href="/readme/connect-web">
             README
-        </Button>
+        </LinkButton>
         <Button
             intent="neutral"
             priority="secondary"
@@ -342,15 +341,14 @@ export const ExampleHeading = styled.h3`
         <IconExtension />
         <SdkName>Web extension</SdkName>
         <SdkTag>Using service worker</SdkTag>
-        <Button
+        <LinkButton
             intent="neutral"
             priority="secondary"
             size="small"
             iconLeft="bookOpenText"
-            target="_self"
             href="/readme/connect-webextension">
             README
-        </Button>
+        </LinkButton>
         <Button
             intent="neutral"
             priority="secondary"
@@ -376,16 +374,15 @@ export const ExampleHeading = styled.h3`
             allowing secure connection to Trezor hardware wallets.
             By the end, you'll have a fully functional web extension.
 
-            <Button
+            <LinkButton
                 intent="neutral"
                 priority="secondary"
                 className="nx-mt-4 nx-mb-8"
                 size="small"
                 iconLeft="bookOpenText"
-                target="_self"
                 href="/guides/webextension-implementation-tutorial">
                 Open Tutorial  →
-            </Button>
+            </LinkButton>
         </SdkDescription>
         <ExamplesAside>
             <ExampleHeading>Examples:</ExampleHeading>
@@ -471,15 +468,14 @@ export const ExampleHeading = styled.h3`
         <IconMobile />
         <SdkName>Mobile</SdkName>
         <SdkTag>Using deep linking</SdkTag>
-        <Button
+        <LinkButton
             intent="neutral"
             priority="secondary"
             size="small"
             iconLeft="bookOpenText"
-            target="_self"
             href="/readme/connect-mobile">
             README
-        </Button>
+        </LinkButton>
         <Button
             intent="neutral"
             priority="secondary"
@@ -506,16 +502,15 @@ export const ExampleHeading = styled.h3`
 
             This can be done by implementing the following specification.
 
-            <Button
+            <LinkButton
                 intent="neutral"
                 priority="secondary"
                 className="nx-mt-4 nx-mb-8"
                 size="small"
                 iconRight="arrowRight"
-                target="_self"
                 href="/details/deeplinking">
                 Deep linking specification
-            </Button>
+            </LinkButton>
 
         </SdkDescription>
         <ExamplesAside>
