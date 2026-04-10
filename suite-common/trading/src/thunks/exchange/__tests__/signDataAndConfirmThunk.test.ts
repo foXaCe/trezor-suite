@@ -44,8 +44,8 @@ describe('signDataAndConfirmThunk', () => {
         const quoteNotTyped = MIN_MAX_QUOTES_OK[0];
         const quote = {
             ...quoteNotTyped,
-            send: quoteNotTyped.send as CryptoId,
-            receive: quoteNotTyped.receive as CryptoId,
+            send: quoteNotTyped?.send as CryptoId,
+            receive: quoteNotTyped?.receive as CryptoId,
             receiveAddress: 'receiveAddress',
             orderId: 'orderId',
         };

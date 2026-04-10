@@ -397,6 +397,8 @@ describe('handleSellRequestThunk', () => {
 
     it('should not proceed when requestData is null', async () => {
         const { input, store, mockTimerStop } = getMocks();
+        const firstOutput = input.formValues.outputs[0];
+        if (!firstOutput) throw new Error('Expected output');
 
         const modifiedInput = {
             ...input,
@@ -404,7 +406,7 @@ describe('handleSellRequestThunk', () => {
                 ...input.formValues,
                 outputs: [
                     {
-                        ...input.formValues.outputs[0],
+                        ...firstOutput,
                         amount: undefined as unknown as string, // Invalid amount
                         fiat: undefined as unknown as string, // Invalid fiat
                     },

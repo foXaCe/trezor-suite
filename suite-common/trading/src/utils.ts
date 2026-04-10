@@ -226,7 +226,8 @@ export const getTagAndInfoNote = (quote: { infoNote?: string }) => {
         const splitNote = infoNote?.split('#') || [];
         if (splitNote.length === 3) {
             // infoNote contains "#badge_text#info_note_text"
-            [, tag, infoNote] = splitNote;
+            tag = splitNote[1] ?? '';
+            infoNote = splitNote[2] ?? '';
         } else if (splitNote.length === 2) {
             // infoNote contains "#badge_text"
             infoNote = '';

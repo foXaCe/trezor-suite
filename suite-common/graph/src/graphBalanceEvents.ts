@@ -187,7 +187,7 @@ export const getAccountMovementEvents = async ({
     /** Determines relative maximum distance of adjacent balance movements to be grouped together. */
     const GROUPING_THRESHOLD =
         (endOfTimeFrameDate.getTime() -
-            (startOfTimeFrameDate?.getTime() ?? accountHistoryMovements[0].time * 1000)) /
+            (startOfTimeFrameDate?.getTime() ?? (accountHistoryMovements[0]?.time ?? 0) * 1000)) /
         GROUPING_DIVISOR;
 
     return pipe(

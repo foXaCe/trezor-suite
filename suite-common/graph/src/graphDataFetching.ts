@@ -318,8 +318,8 @@ export const getFiatRatesForNetworkInTimeFrame = async ({
     );
     if (G.isNullable(fiatRates)) return null;
 
-    const formattedFiatRates = fiatRates.tickers.map((ticker, index) => ({
-        time: timestamps[index],
+    const formattedFiatRates: FiatRatesItem[] = fiatRates.tickers.map((ticker, index) => ({
+        time: timestamps[index] ?? 0,
         rates: ticker.rates,
     }));
 
@@ -495,19 +495,21 @@ export const getMultipleAccountBalanceHistoryWithFiat = async ({
         ),
     );
 
-    const coinsFiatRates: Record<CoinKey, FiatRatesItem[]> = D.fromPairs(
+    const coinsFiatRates = D.fromPairs(
         // Some coins might not have fiat rates, so we need to filter them out
         pairs.filter(([, res]) => res?.[0]?.rates?.[baseCurrencyCode] !== -1),
-    );
+    ) as Record<string, FiatRatesItem[]>;
 
     if (A.length(accountsWithBalanceHistoryFlattened) === 1) {
         // If there is only one account, we don't need to merge anything.
         // We can also keep cryptoBalance in points.
-        const { symbol, contractId, balanceHistory } = A.head(accountsWithBalanceHistoryFlattened)!;
+        const head = A.head(accountsWithBalanceHistoryFlattened);
+        if (!head) return [];
+        const { symbol, contractId, balanceHistory } = head;
         const coinKey = getCoinKey({ symbol, contractId });
 
         return mapCryptoBalanceMovementToFixedTimeFrame({
-            fiatRates: coinsFiatRates[coinKey],
+            fiatRates: coinsFiatRates[coinKey] ?? [],
             baseCurrencyCode,
             balanceHistory,
         }) as FiatGraphPointWithCryptoBalance[];

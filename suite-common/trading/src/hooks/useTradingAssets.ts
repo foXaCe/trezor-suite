@@ -234,6 +234,10 @@ export function useTradingAssets() {
                         coins[cryptoId],
                 )
                 .map(cryptoId => [cryptoId, coins[cryptoId]] as const)
+                .filter(
+                    (pair): pair is [(typeof pair)[0], NonNullable<(typeof pair)[1]>] =>
+                        pair[1] != null,
+                )
                 .map(([cryptoId, coinInfo]) =>
                     createAssetOption({
                         cryptoId,

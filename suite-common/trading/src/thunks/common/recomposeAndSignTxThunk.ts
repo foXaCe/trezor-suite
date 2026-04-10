@@ -229,9 +229,9 @@ export const recomposeAndSignTxThunk = createThunk<
             ensure that the payment requests are created with the correct amount.
         */
         const isTradedWholeBalance = precomposedToSign.outputs.length === 1; // sending whole balance
-        const sendAmount = isTradedWholeBalance
-            ? precomposedToSign.outputs[0].amount.toString()
-            : undefined;
+        const firstOutput = precomposedToSign.outputs[0];
+        const sendAmount =
+            isTradedWholeBalance && firstOutput ? firstOutput.amount.toString() : undefined;
         const formattedMaxAmount = sendAmount
             ? subunitsToUnits({
                   value: asAmountSubunit(new BigNumber(sendAmount)),

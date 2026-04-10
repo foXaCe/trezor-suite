@@ -60,11 +60,11 @@ const normalizeExtremeGraphEvents = (
     const minimalEventDate = startOfTimeFrameDate.getTime() + minimalEdgeOffset;
     const maximalEventDate = endOfTimeFrameDate.getTime() - minimalEdgeOffset;
 
-    if (firstEvent.date.getTime() < minimalEventDate) {
+    if (firstEvent && firstEvent.date.getTime() < minimalEventDate) {
         firstEvent.date = new Date(minimalEventDate);
     }
 
-    if (lastEvent.date.getTime() > maximalEventDate) {
+    if (lastEvent && lastEvent.date.getTime() > maximalEventDate) {
         lastEvent.date = new Date(maximalEventDate);
     }
 };
@@ -124,9 +124,10 @@ export function useGraphForAccounts(params: useGraphForAccountsParams): {
                     });
 
                     // Process transaction events only for the single account detail graph.
-                    if (!isPortfolioGraph) {
+                    const firstAccount = accounts[0];
+                    if (!isPortfolioGraph && firstAccount) {
                         await getAccountMovementEvents({
-                            account: accounts[0],
+                            account: firstAccount,
                             startOfTimeFrameDate,
                             endOfTimeFrameDate,
                             dispatch,

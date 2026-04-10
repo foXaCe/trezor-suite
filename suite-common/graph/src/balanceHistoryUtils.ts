@@ -169,13 +169,12 @@ export const getAccountHistoryMovementItemETH = ({
             ethTxData.status === 1 /* TxStatusOK */ ||
             ethTxData.status === 0 /* TxStatusUnknown */
         ) {
-            if (tx.details.vout.length > 0) {
-                const bchainVout = tx.details.vout[0];
-                const value = new BigNumber(bchainVout.value || '0');
+            const bchainVout = tx.details.vout[0];
+            if (bchainVout) {
+                const value = new BigNumber(bchainVout.value ?? '0');
 
-                if (bchainVout.addresses && bchainVout.addresses.length > 0) {
-                    const txAddrDesc = bchainVout.addresses[0];
-
+                const txAddrDesc = bchainVout.addresses?.[0];
+                if (txAddrDesc) {
                     if (tx.descriptor === txAddrDesc) {
                         // Check if address is in selfAddrDesc
                         bh.received = bh.received.plus(value);
@@ -208,9 +207,8 @@ export const getAccountHistoryMovementItemETH = ({
         }
 
         for (const bchainVin of tx.details.vin) {
-            if (bchainVin.addresses && bchainVin.addresses.length > 0) {
-                const txAddrDesc = bchainVin.addresses[0];
-
+            const txAddrDesc = bchainVin.addresses?.[0];
+            if (txAddrDesc) {
                 if (txAddrDesc === tx.descriptor) {
                     if (ethTxData.status === 1 || ethTxData.status === 0) {
                         const value = new BigNumber(tx.details.vout[0]?.value || '0');

@@ -6,10 +6,12 @@ import { type FiatGraphPoint } from '@suite-common/graph';
  *
  */
 const minAndMaxGraphPointArrayItemIndex = (points: FiatGraphPoint[]) => {
-    let maxValue = points[0].value;
+    const firstPoint = points[0];
+    if (!firstPoint) return { maxIndex: 0, minIndex: 0 };
+    let maxValue = firstPoint.value;
     let maxIndex = 0;
     let minIndex = 0;
-    let minValue = points[0].value;
+    let minValue = firstPoint.value;
 
     points.forEach((point, index) => {
         if (point.value > maxValue) {
@@ -37,8 +39,8 @@ export const getExtremaFromGraphPoints = (points: FiatGraphPoint[]) => {
     if (numberOfPoints > 0) {
         const { maxIndex, minIndex } = minAndMaxGraphPointArrayItemIndex(points);
 
-        const { value: pointMaxima } = points[maxIndex];
-        const { value: pointMinima } = points[minIndex];
+        const pointMaxima = points[maxIndex]?.value ?? 0;
+        const pointMinima = points[minIndex]?.value ?? 0;
 
         return {
             max: {

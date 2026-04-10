@@ -15,6 +15,7 @@ export const migrateTransactionsBnbToBsc = (
         const oldTxns = oldTransactions[oldKey];
 
         const newKey = oldKey.replace('-bnb-', '-bsc-');
+        if (!oldTxns) continue;
         newTransactions[newKey] = oldTxns.map(oldTxn => ({
             ...oldTxn,
             symbol: oldTxn.symbol.replace('bnb', 'bsc'),

@@ -25,7 +25,8 @@ jest.mock('../../../utils', () => ({
 const { getUnusedAddressFromAccount } = require('../../../utils');
 
 describe('getRefundAddress thunk', () => {
-    const mockAccount: Account = accounts[0];
+    const mockAccount = accounts[0];
+    if (!mockAccount) throw new Error('Expected account');
 
     const mockPath = "m/84'/0'/0'/0/5";
     const mockAddress = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx';
@@ -331,7 +332,7 @@ describe('getRefundAddress thunk', () => {
 
             // Check if the action is in pending state
             const actions = store.getActions();
-            expect(actions[0].type).toBe(getRefundAddress.pending.type);
+            expect(actions[0]?.type).toBe(getRefundAddress.pending.type);
 
             const result = await promise;
             expect(result.type).toBe(getRefundAddress.fulfilled.type);

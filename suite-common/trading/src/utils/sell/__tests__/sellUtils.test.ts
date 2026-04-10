@@ -1,4 +1,4 @@
-import { type CryptoId, type SellFiatTrade } from 'invity-api';
+import { type CryptoId, type SellFiatTrade, type SellProviderInfo } from 'invity-api';
 
 import { type TradingSellInfoSelector } from '../../../selectors/tradingSelectors';
 import { sellUtilsFixtures } from '../__fixtures__/sellUtils';
@@ -156,7 +156,10 @@ describe('sellUtils', () => {
                     sellInfo: {
                         ...sellInfo,
                         providerInfos: {
-                            test: { ...sellInfo.providerInfos.test, flow: 'PAYMENT_GATE' },
+                            test: {
+                                ...(sellInfo.providerInfos['test'] as SellProviderInfo),
+                                flow: 'PAYMENT_GATE',
+                            },
                         },
                     },
                     quote,
