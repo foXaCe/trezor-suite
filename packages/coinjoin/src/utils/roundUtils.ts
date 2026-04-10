@@ -27,11 +27,10 @@ export const getRoundEvents = <T extends CoinjoinStateEvent['Type']>(
 
 export const getRoundParameters = (round: Round) => {
     const events = getRoundEvents('RoundCreated', round.CoinjoinState.Events);
-    if (events.length < 1) return;
+    const firstEvent = events[0];
+    if (!firstEvent) return;
 
-    const [{ RoundParameters }] = events;
-
-    return RoundParameters;
+    return firstEvent.RoundParameters;
 };
 
 // round commitmentData used in request for input ownershipProof
@@ -49,7 +48,10 @@ export const readTimeSpan = (ts: string) => {
 
     const date = new Date();
     const now = date.getTime();
-    const [days, hours, minutes, seconds] = span;
+    const days = span[0] ?? 0;
+    const hours = span[1] ?? 0;
+    const minutes = span[2] ?? 0;
+    const seconds = span[3] ?? 0;
 
     if (days > 0) {
         date.setDate(date.getDate() + days);
@@ -208,7 +210,7 @@ export const transformStatus = ({
     const { allowedInputAmounts, coordinationFeeRate } = getDataFromRounds(rounds);
     // coinJoinFeeRateMedians include an array of medians per day, week and month - we take the first (day) median as the recommended fee rate base.
     // The value is converted from kvBytes (kilo virtual bytes) to vBytes (how the value is displayed in UI).
-    const feeRateMedian = Math.round(CoinJoinFeeRateMedians[0].MedianFeeRate / 1000);
+    const feeRateMedian = Math.round((CoinJoinFeeRateMedians[0]?.MedianFeeRate ?? 0) / 1000);
 
     return {
         rounds,
@@ -278,7 +280,7 @@ export const getBroadcastedTxDetails = ({
             index: input.index,
             script: Buffer.allocUnsafe(0), // script is not used in calculation
             sequence,
-            witness: new BufferReader(Buffer.from(Witnesses[index], 'hex')).readVector(),
+            witness: new BufferReader(Buffer.from(Witnesses[index] ?? '', 'hex')).readVector(),
         });
     });
 

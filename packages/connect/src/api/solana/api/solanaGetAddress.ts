@@ -72,22 +72,28 @@ export default class SolanaGetAddress extends AbstractMethod<'solanaGetAddress',
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            const currentParam = this.params[this.progress];
+            if (!currentParam) return;
+
             return {
                 type: 'address' as const,
-                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(currentParam.proto.address_n),
+                address: currentParam.address || 'not-set',
             };
         }
     }
 
     get confirmation() {
+        const firstParam = this.params[0];
+        const accountIndex = firstParam?.proto.address_n[2];
+
         return {
             view: 'export-address' as const,
             label:
-                this.params.length > 1
+                this.params.length > 1 || !firstParam
                     ? 'Export multiple Solana addresses'
                     : `Export Solana address for account #${
-                          fromHardened(this.params[0].proto.address_n[2]) + 1
+                          accountIndex !== undefined ? fromHardened(accountIndex) + 1 : '?'
                       }`,
         };
     }
@@ -103,6 +109,7 @@ export default class SolanaGetAddress extends AbstractMethod<'solanaGetAddress',
         const responses: MethodReturnType<typeof this.name> = [];
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
+            if (!batch) continue;
 
             // silently get address and compare with requested address
             // or display as default inside popup
@@ -143,6 +150,15 @@ export default class SolanaGetAddress extends AbstractMethod<'solanaGetAddress',
             this.progress++;
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse === undefined) {
+            throw ERRORS.TypedError('Runtime', 'SolanaGetAddress: expected single response');
+        }
+
+        return firstResponse;
     }
 }

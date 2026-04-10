@@ -35,9 +35,13 @@ export const scanAccount = async (
     const xpub = params.descriptor;
     const { checkpoints } = params;
 
-    const addresses = new CoinjoinAddressController(xpub, network, checkpoints[0], params.cache);
+    const firstCheckpoint = checkpoints[0];
+    if (!firstCheckpoint) {
+        throw new Error('No checkpoints provided');
+    }
+    const addresses = new CoinjoinAddressController(xpub, network, firstCheckpoint, params.cache);
 
-    let [checkpoint] = checkpoints;
+    let checkpoint: ScanAccountCheckpoint = firstCheckpoint;
     const checkpointCooldown = createCooldown(CHECKPOINT_COOLDOWN);
 
     const txs = new Set<BlockbookTransaction>();

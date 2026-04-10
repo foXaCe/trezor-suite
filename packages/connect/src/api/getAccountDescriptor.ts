@@ -81,19 +81,22 @@ export default class GetAccountDescriptor extends AbstractMethod<
             [coin: string]: { coinInfo: CoinInfo; values: DerivationPath[] };
         } = {};
         this.params.forEach(b => {
-            if (!keys[b.coinInfo.label]) {
+            const existing = keys[b.coinInfo.label];
+            if (!existing) {
                 keys[b.coinInfo.label] = {
                     coinInfo: b.coinInfo,
-                    values: [],
+                    values: [b.address_n],
                 };
+            } else {
+                existing.values.push(b.address_n);
             }
-            keys[b.coinInfo.label].values.push(b.address_n);
         });
 
         // prepare html for popup
         const str: string[] = [];
         Object.keys(keys).forEach((k, _i, _a) => {
             const details = keys[k];
+            if (!details) return;
             details.values.forEach(acc => {
                 str.push(k);
                 str.push(' ');
@@ -119,10 +122,12 @@ export default class GetAccountDescriptor extends AbstractMethod<
         // find invalid ranges
         const invalid = [];
         for (let i = 0; i < this.params.length; i++) {
+            const batch = this.params[i];
+            if (!batch) continue;
             // set FW range for current batch
             this.firmwareRange = getFirmwareRange(
                 this.name,
-                this.params[i].coinInfo,
+                batch.coinInfo,
                 DEFAULT_FIRMWARE_RANGE,
             );
             const exception = super.checkFirmwareRange();
@@ -130,7 +135,7 @@ export default class GetAccountDescriptor extends AbstractMethod<
                 invalid.push({
                     index: i,
                     exception,
-                    coin: this.params[i].coin,
+                    coin: batch.coin,
                 });
             }
         }
@@ -164,6 +169,7 @@ export default class GetAccountDescriptor extends AbstractMethod<
 
         for (let i = 0; i < this.params.length; i++) {
             const request = this.params[i];
+            if (!request) continue;
 
             if (this.disposed) break;
 
@@ -196,7 +202,16 @@ export default class GetAccountDescriptor extends AbstractMethod<
 
         if (this.disposed) return new Promise<typeof responses>(() => []);
 
-        return this.hasBundle ? responses : responses[0]!;
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse == null) {
+            throw ERRORS.TypedError('Runtime', 'GetAccountDescriptor: expected single response');
+        }
+
+        return firstResponse;
     }
 
     dispose() {

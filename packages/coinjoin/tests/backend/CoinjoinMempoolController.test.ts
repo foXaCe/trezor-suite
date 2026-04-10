@@ -10,7 +10,7 @@ import {
 import { MockMempoolClient } from '../mocks/MockMempoolClient';
 
 const TXS = BLOCKS.flatMap(block => block.txs); // There is 6 of them
-const ADDRESS = SEGWIT_RECEIVE_ADDRESSES[1];
+const ADDRESS = SEGWIT_RECEIVE_ADDRESSES[1] ?? '';
 const TXS_MATCH = [TXS[1], TXS[3]];
 
 describe('CoinjoinMempoolController', () => {
@@ -44,27 +44,35 @@ describe('CoinjoinMempoolController', () => {
     });
 
     it('Progressing', async () => {
-        [TXS[0], TXS[1]].forEach(client.fireTx.bind(client));
+        for (const tx of [TXS[0], TXS[1]]) {
+            if (tx) client.fireTx(tx);
+        }
         expect(mempool.getTransactions()).toEqual([]);
 
         await mempool.start();
-        [TXS[2], TXS[3]].forEach(client.fireTx.bind(client));
+        for (const tx of [TXS[2], TXS[3]]) {
+            if (tx) client.fireTx(tx);
+        }
         expect(mempool.getTransactions()).toEqual([TXS[2], TXS[3]]);
 
-        client.setMempoolTxs([TXS[1], TXS[2], TXS[3]]);
+        client.setMempoolTxs(
+            [TXS[1], TXS[2], TXS[3]].filter((t): t is NonNullable<typeof t> => !!t),
+        );
         await mempool.update(true);
         expect(mempool.getTransactions()).toEqual([TXS[2], TXS[3]]);
 
-        [TXS[4]].forEach(client.fireTx.bind(client));
-        client.setMempoolTxs([TXS[3], TXS[4], TXS[5]]);
+        if (TXS[4]) client.fireTx(TXS[4]);
+        client.setMempoolTxs(
+            [TXS[3], TXS[4], TXS[5]].filter((t): t is NonNullable<typeof t> => !!t),
+        );
         await mempool.update(true);
         expect(mempool.getTransactions()).toEqual([TXS[3], TXS[4]]);
 
-        [TXS[5]].forEach(client.fireTx.bind(client));
+        if (TXS[5]) client.fireTx(TXS[5]);
         await mempool.update(true);
         expect(mempool.getTransactions()).toEqual([TXS[3], TXS[4], TXS[5]]);
 
-        client.setMempoolTxs([TXS[0], TXS[1]]);
+        client.setMempoolTxs([TXS[0], TXS[1]].filter((t): t is NonNullable<typeof t> => !!t));
         await mempool.update(true);
         expect(mempool.getTransactions()).toEqual([]);
     });
@@ -74,7 +82,8 @@ describe('CoinjoinMempoolController', () => {
             client,
             network: networks.regtest,
             filter: address =>
-                address === SEGWIT_RECEIVE_ADDRESSES[1] || address === SEGWIT_CHANGE_ADDRESSES[0],
+                address === (SEGWIT_RECEIVE_ADDRESSES[1] ?? '') ||
+                address === (SEGWIT_CHANGE_ADDRESSES[0] ?? ''),
         });
         client.setMempoolTxs(TXS);
         await mempool.init();
@@ -86,16 +95,23 @@ describe('CoinjoinMempoolController', () => {
         await mempool.init();
         expect(mempool.getTransactions()).toEqual(TXS);
 
-        mempool.removeTransactions([TXS[0].txid, TXS[2].txid, 'unknown', TXS[4].txid]);
+        mempool.removeTransactions([
+            TXS[0]?.txid ?? '',
+            TXS[2]?.txid ?? '',
+            'unknown',
+            TXS[4]?.txid ?? '',
+        ]);
         expect(mempool.getTransactions()).toEqual([TXS[1], TXS[3], TXS[5]]);
     });
 
     it('Replace-by-fee', async () => {
         const outpointCollision = { txid: 'foo', vout: 3 };
         const a1 = TXS[1];
-        a1.vin[0] = { ...a1.vin[0], ...outpointCollision };
         const b = TXS[2];
         const a2 = TXS[4];
+        if (!a1 || !b || !a2 || !a1.vin[0] || !a2.vin[1])
+            throw new Error('Missing test fixture data');
+        a1.vin[0] = { ...a1.vin[0], ...outpointCollision };
         a2.vin[1] = { ...a2.vin[1], ...outpointCollision };
 
         client.setMempoolTxs([a1]);

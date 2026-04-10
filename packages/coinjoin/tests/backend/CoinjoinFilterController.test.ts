@@ -16,7 +16,7 @@ const REORG_FILTER: MockBlockFilter = {
     blockHeight: 9,
     blockHash: 'nope',
     filter: 'nope',
-    prevHash: FILTERS[FILTER_MIDDLE - 1].blockHash,
+    prevHash: FILTERS[FILTER_MIDDLE - 1]?.blockHash ?? '',
     filterParams: { key: 'nope' },
 };
 
@@ -36,8 +36,8 @@ const FIXTURES = [
             batchSize: 5,
             checkpoints: [
                 {
-                    blockHash: FILTERS[FILTER_MIDDLE - 1].blockHash,
-                    blockHeight: FILTERS[FILTER_MIDDLE - 1].blockHeight,
+                    blockHash: FILTERS[FILTER_MIDDLE - 1]?.blockHash ?? '',
+                    blockHeight: FILTERS[FILTER_MIDDLE - 1]?.blockHeight ?? 0,
                 },
             ],
         },
@@ -101,7 +101,7 @@ describe('CoinjoinFilterController', () => {
 
             for await (const b of controller.getFilterIterator({
                 ...params,
-                checkpoints: [REORG_FILTER, FILTERS[5]],
+                checkpoints: [REORG_FILTER, FILTERS[5] ?? REORG_FILTER],
             })) {
                 received.push(b);
             }

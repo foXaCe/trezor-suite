@@ -56,12 +56,12 @@ describe('MiscFeeLevels – Solana', () => {
         // minFee clamp
         const feeMin = new MiscFeeLevels(SOL_COIN_INFO);
         await feeMin.load(makeBackend(TOO_LOW_RESPONSE), REQUEST);
-        expect(feeMin.levels[0].feePerUnit).toBe(SOL_COIN_INFO.minFee.toString());
+        expect(feeMin.levels[0]?.feePerUnit).toBe(SOL_COIN_INFO.minFee.toString());
 
         // maxFee clamp
         const feeMax = new MiscFeeLevels(SOL_COIN_INFO);
         await feeMax.load(makeBackend(TOO_HIGH_RESPONSE), REQUEST);
-        expect(feeMax.levels[0].feePerUnit).toBe(SOL_COIN_INFO.maxFee.toString());
+        expect(feeMax.levels[0]?.feePerUnit).toBe(SOL_COIN_INFO.maxFee.toString());
     });
 
     it('keeps default levels when backend throws', async () => {

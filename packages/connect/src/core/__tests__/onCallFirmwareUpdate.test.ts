@@ -71,8 +71,9 @@ const transportApiMock = (fixtures: ResponseFixture[]) => {
         },
         read: () => {
             const index = fixtures.findIndex(f => f.id === request);
-            if (index >= 0) {
-                const { data } = fixtures[index];
+            const found = fixtures[index];
+            if (index >= 0 && found) {
+                const { data } = found;
                 fixtures.splice(index, 1);
 
                 return response(data);
@@ -106,14 +107,19 @@ const buildProtobufMessage = (messages: any, override: any = {}) => {
     if (!latest) {
         throw new Error('Missing latest bundled release.');
     }
-    const [fw_major, fw_minor, fw_patch] = latest.version;
+    const fw_major = latest.version[0];
+    const fw_minor = latest.version[1];
+    const fw_patch = latest.version[2];
     const version = {
         major_version: fw_major,
         minor_version: fw_minor,
         patch_version: fw_patch,
     };
     if (override.data?.bootloader_mode) {
-        const [bl_major, bl_minor, bl_patch] = latest.bootloader_version || [major_version, 0, 0];
+        const blVersion = latest.bootloader_version ?? [major_version, 0, 0];
+        const bl_major = blVersion[0];
+        const bl_minor = blVersion[1];
+        const bl_patch = blVersion[2];
         version.major_version = bl_major;
         version.minor_version = bl_minor;
         version.patch_version = bl_patch;
@@ -215,7 +221,12 @@ const setupTest = () => {
     const context = {
         deviceList,
         postMessage,
-        selectDevice: () => deviceList.getAllDevices()[0],
+        selectDevice: () => {
+            const device = deviceList.getAllDevices()[0];
+            if (!device) throw new Error('No device found');
+
+            return device;
+        },
         registerEvents: () => {},
         log: new Log('Test', false),
         abortSignal: new AbortController().signal,
@@ -258,7 +269,7 @@ describe('onCallFirmwareUpdate', () => {
 
                 const version = /.*-(.*)?.bin$/
                     .exec(url)?.[1]
-                    .split('.')
+                    ?.split('.')
                     .map(i => Number(i));
 
                 return httpRequestMock(version);

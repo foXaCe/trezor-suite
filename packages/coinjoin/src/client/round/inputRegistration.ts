@@ -203,7 +203,7 @@ export const inputRegistration = async (
         result =>
             result.forEach((r, i) => {
                 if (r.status !== 'fulfilled') {
-                    inputs[i].setError(r.reason);
+                    inputs[i]?.setError(r.reason);
                 }
             }),
     );

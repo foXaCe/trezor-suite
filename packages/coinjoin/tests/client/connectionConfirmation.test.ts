@@ -186,7 +186,7 @@ describe('connectionConfirmation', () => {
         timestamps
             .map((a, i) => {
                 if (i > 0) {
-                    return a - timestamps[i - 1];
+                    return a - (timestamps[i - 1] ?? 0);
                 }
 
                 return 0;

@@ -500,7 +500,7 @@ describe('selectRound', () => {
         expect(spy).toHaveBeenCalledTimes(9);
 
         ['AA', 'AB', 'AC', 'CA'].forEach((outpoint, index) => {
-            expect(result!.inputs[index].outpoint).toEqual(outpoint);
+            expect(result?.inputs[index]?.outpoint).toEqual(outpoint);
         });
 
         expect(result).toMatchObject({

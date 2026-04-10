@@ -11,7 +11,7 @@ export class MockFilterClient implements FilterClient {
     fetchNetworkInfo(): ReturnType<FilterClient['fetchNetworkInfo']> {
         const tip = this.filters[this.filters.length - 1];
 
-        return Promise.resolve({ bestHeight: tip.blockHeight } as any);
+        return Promise.resolve({ bestHeight: tip?.blockHeight ?? 0 } as any);
     }
 
     fetchBlockFilters(
@@ -19,7 +19,7 @@ export class MockFilterClient implements FilterClient {
         count: number,
     ): ReturnType<FilterClient['fetchBlockFilters']> {
         const tip = this.filters[this.filters.length - 1];
-        if (knownHash === tip.blockHash) {
+        if (tip && knownHash === tip.blockHash) {
             return Promise.resolve({ status: 'up-to-date' });
         }
         const from = this.filters.findIndex(f => f.prevHash === knownHash);

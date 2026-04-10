@@ -6,8 +6,11 @@ type AddressPaths = {
     [address: string]: string;
 };
 
-const isCoinbaseUtxo = (tx: Transaction) =>
-    tx.details.vin.length === 1 && !tx.details.vin[0].isAddress && !tx.details.vin[0].txid;
+const isCoinbaseUtxo = (tx: Transaction) => {
+    const firstVin = tx.details.vin[0];
+
+    return tx.details.vin.length === 1 && firstVin && !firstVin.isAddress && !firstVin.txid;
+};
 
 const getHeightData = (tx: Transaction) =>
     tx.blockHeight && tx.blockHeight > 0
@@ -25,7 +28,7 @@ const getAddressData = (vout: VinVout, paths: AddressPaths) => {
 
     return {
         address,
-        path: paths[address],
+        path: paths[address] ?? '',
     };
 };
 

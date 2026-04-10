@@ -38,7 +38,10 @@ const getOutputAmounts = async (params: GetOutputAmountsParams) => {
                 input.accountKey === accountKey && compareOutpoint(input.outpoint, i.Coin.Outpoint),
         );
         if (internal) {
-            InternalAmounts.push(internal.confirmedAmountCredentials![0].Value);
+            const firstCredential = internal.confirmedAmountCredentials?.[0];
+            if (firstCredential) {
+                InternalAmounts.push(firstCredential.Value);
+            }
         } else {
             const size = getExternalOutputSize(i.Coin.TxOut.ScriptPubKey);
             const miningFee = Math.floor((size * roundParameters.MiningFeeRate) / 1000);
@@ -176,18 +179,30 @@ const credentialIssuance = async (params: CredentialIssuanceParams) => {
         { signal, baseUrl: middlewareUrl },
     );
 
+    const getCredPair = (
+        creds: middleware.Credentials[],
+        zeroCreds: middleware.Credentials[],
+        idx: number,
+    ) => {
+        const cred = creds[idx];
+        const zeroCred = zeroCreds[idx];
+        if (!cred || !zeroCred) throw new Error(`Missing credential at index ${idx}`);
+
+        return [cred, zeroCred];
+    };
+
     // return pairs of new credentials
     // requested Credentials
     const output = {
-        amountCredentials: [amountCredentialsOut[0], zeroAmountCredentialsOut[0]],
-        vsizeCredentials: [vsizeCredentialsOut[0], zeroVsizeCredentialsOut[0]],
+        amountCredentials: getCredPair(amountCredentialsOut, zeroAmountCredentialsOut, 0),
+        vsizeCredentials: getCredPair(vsizeCredentialsOut, zeroVsizeCredentialsOut, 0),
     };
 
     // or change output should be returned to pool
     // change Credentials
     const change = {
-        amountCredentials: [amountCredentialsOut[1], zeroAmountCredentialsOut[1]],
-        vsizeCredentials: [vsizeCredentialsOut[1], zeroVsizeCredentialsOut[1]],
+        amountCredentials: getCredPair(amountCredentialsOut, zeroAmountCredentialsOut, 1),
+        vsizeCredentials: getCredPair(vsizeCredentialsOut, zeroVsizeCredentialsOut, 1),
     };
 
     logger.info(
@@ -245,7 +260,13 @@ const findCredentialsForTarget = (
         })
         .find(pair => pair.length === 2);
 
-    return candidate ? [candidate[0], candidate[1]] : undefined;
+    if (candidate) {
+        const first = candidate[0];
+        const second = candidate[1];
+        if (first && second) return [first, second];
+    }
+
+    return undefined;
 };
 
 export interface Bob {
@@ -303,12 +324,13 @@ const createOutputsCredentials = async (params: CreateOutputsCredentials): Promi
         });
 
         // create Bob
-        const result = params.result.concat({
+        const newBob: Bob = {
             accountKey: params.accountKey,
             amount: amountPair.amount,
             amountCredentials: joined.output.amountCredentials,
             vsizeCredentials: joined.output.vsizeCredentials,
-        });
+        };
+        const result = [...params.result, newBob];
 
         // remove amount from list
         const amountIndex = amounts.findIndex(a => a === amountPair.amount);
@@ -421,8 +443,10 @@ export const outputDecomposition = async (
     // calculate amounts
     const outputAmounts = await Promise.all(
         Object.values(groupInputsByAccount).map(inputs => {
-            const { accountKey, inputSize, outputSize } = inputs[0]; // all inputs belongs to the same account (key, size)
-            const allVsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials!);
+            const firstInput = inputs[0];
+            if (!firstInput) throw new Error('No inputs in group');
+            const { accountKey, inputSize, outputSize } = firstInput; // all inputs belongs to the same account (key, size)
+            const allVsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials ?? []);
             // limit available vsize if it's bigger than available change addresses
             // prevent from creating amounts which cannot be assigned to address
             const availableAddresses =
@@ -448,17 +472,21 @@ export const outputDecomposition = async (
     // join inputs Credentials for each account separately
     const joinedCredentials = await Promise.all(
         Object.keys(groupInputsByAccount).map((accountKey, index) => {
-            if (!outputAmounts[index]) throw new Error(`Missing amounts at index ${index}`);
+            const amounts = outputAmounts[index];
+            if (!amounts) throw new Error(`Missing amounts at index ${index}`);
 
-            logger.info(`Create outputs: ${outputAmounts[index].join(',')}`);
+            logger.info(`Create outputs: ${amounts.join(',')}`);
             const inputs = groupInputsByAccount[accountKey];
-            const amountCredentials = inputs.flatMap(i => i.confirmedAmountCredentials!);
-            const vsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials!);
+            if (!inputs) throw new Error(`Missing inputs for account ${accountKey}`);
+            const amountCredentials = inputs.flatMap(i => i.confirmedAmountCredentials ?? []);
+            const vsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials ?? []);
+            const firstInput = inputs[0];
+            if (!firstInput) throw new Error('No inputs in group');
             const result = createOutputsCredentials({
                 round,
                 accountKey,
-                outputSize: inputs[0].outputSize, // all inputs are using same script type (size),
-                amounts: outputAmounts[index],
+                outputSize: firstInput.outputSize, // all inputs are using same script type (size),
+                amounts,
                 amountCredentials,
                 vsizeCredentials,
                 options,
@@ -471,12 +499,12 @@ export const outputDecomposition = async (
 
     // combine everything into DecomposedOutputs objects and return the result to outputRegistration
     return Object.keys(groupInputsByAccount).map((accountKey, index) => {
-        if (!joinedCredentials[index])
-            throw new Error(`Missing joined credentials at index ${index}`);
+        const outputs = joinedCredentials[index];
+        if (!outputs) throw new Error(`Missing joined credentials at index ${index}`);
 
         return {
             accountKey,
-            outputs: joinedCredentials[index],
+            outputs,
         };
     });
 };

@@ -24,7 +24,8 @@ export function parseArrayType(arrayTypeName: string) {
             `typename ${arrayTypeName} could not be parsed as an EIP-712 array`,
         );
     }
-    const [_, entryTypeName, arraySize] = arrayMatch;
+    const entryTypeName = arrayMatch[1] ?? '';
+    const arraySize = arrayMatch[2] ?? '';
 
     return {
         entryTypeName,
@@ -105,7 +106,8 @@ export function encodeData(typeName: string, data: any) {
     }
     const numberMatch = paramTypeNumber.exec(typeName);
     if (numberMatch) {
-        const [_, intType, bits] = numberMatch;
+        const intType = numberMatch[1] ?? '';
+        const bits = numberMatch[2] ?? '0';
         const bytes = Math.ceil(parseInt(bits, 10) / 8);
 
         return intToHex(data, bytes, intType === 'int');
@@ -140,7 +142,8 @@ export function getFieldType(
 ): PROTO.EthereumFieldType {
     const arrayMatch = paramTypeArray.exec(typeName);
     if (arrayMatch) {
-        const [_, arrayItemTypeName, arraySize] = arrayMatch;
+        const arrayItemTypeName = arrayMatch[1] ?? '';
+        const arraySize = arrayMatch[2] ?? '';
         const entryType = getFieldType(arrayItemTypeName, types);
 
         return {
@@ -152,7 +155,8 @@ export function getFieldType(
 
     const numberMatch = paramTypeNumber.exec(typeName);
     if (numberMatch) {
-        const [_, type, bits] = numberMatch;
+        const type = numberMatch[1] ?? '';
+        const bits = numberMatch[2] ?? '0';
 
         return {
             data_type: type === 'uint' ? PROTO.EthereumDataType.UINT : PROTO.EthereumDataType.INT,
@@ -162,7 +166,7 @@ export function getFieldType(
 
     const bytesMatch = paramTypeBytes.exec(typeName);
     if (bytesMatch) {
-        const [_, size] = bytesMatch;
+        const size = bytesMatch[1] ?? '';
 
         return {
             data_type: PROTO.EthereumDataType.BYTES,
@@ -177,10 +181,11 @@ export function getFieldType(
         };
     }
 
-    if (typeName in types) {
+    const structType = types[typeName];
+    if (structType) {
         return {
             data_type: PROTO.EthereumDataType.STRUCT,
-            size: types[typeName].length,
+            size: structType.length,
             struct_name: typeName,
         };
     }

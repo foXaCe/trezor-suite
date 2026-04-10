@@ -75,6 +75,7 @@ export default class GetOwnershipId extends AbstractMethod<
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
+            if (!batch) continue;
             const { message } = await cmd.typedCall('GetOwnershipId', 'OwnershipId', batch);
             responses.push({
                 ...message,
@@ -94,6 +95,15 @@ export default class GetOwnershipId extends AbstractMethod<
             }
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse === undefined) {
+            throw new Error('GetOwnershipId: expected single response');
+        }
+
+        return firstResponse;
     }
 }

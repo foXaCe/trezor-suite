@@ -80,6 +80,7 @@ export default class GetOwnershipProof extends AbstractMethod<
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
+            if (!batch) continue;
             if (this.preauthorized) {
                 await cmd.preauthorize(true);
             }
@@ -102,6 +103,15 @@ export default class GetOwnershipProof extends AbstractMethod<
             }
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse === undefined) {
+            throw new Error('GetOwnershipProof: expected single response');
+        }
+
+        return firstResponse;
     }
 }

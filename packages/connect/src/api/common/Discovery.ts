@@ -112,6 +112,7 @@ export class Discovery extends TypedEmitter<Events> {
         this.interrupted = false;
         while (!this.completed && !this.interrupted) {
             const accountType = this.types[this.typeIndex];
+            if (!accountType) break;
             const label = `Account #${this.index + 1}`;
             const overTheLimit = this.index >= limit;
 

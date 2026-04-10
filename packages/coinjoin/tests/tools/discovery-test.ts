@@ -2,7 +2,8 @@
 
 import { getAccountInfo, getAccountInfoParams } from './discovery';
 
-const [network, descriptor] = process.argv.slice(2);
+const network = process.argv[2] ?? '';
+const descriptor = process.argv[3] ?? '';
 const params = getAccountInfoParams(network, descriptor);
 
 (async () => {

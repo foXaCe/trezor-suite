@@ -12,9 +12,13 @@ const WASABI_URL = 'https://wasabiwallet.io';
 const BLOCKBOOK_URL = 'wss://staging-btc.trezor.io/websocket';
 const TIMEOUT = 20000;
 
-const [bestKnownHash, batchSizeString = '500', torSocket = ''] = process.argv.slice(2);
+const bestKnownHash = process.argv[2] ?? '';
+const batchSizeString = process.argv[3] ?? '500';
+const torSocket = process.argv[4] ?? '';
 const batchSize = Number(batchSizeString);
-const [host, port] = torSocket.split(':');
+const torParts = torSocket.split(':');
+const host = torParts[0];
+const port = torParts[1];
 const agent = host && port ? new SocksProxyAgent(`socks://${host}:${port}`) : undefined;
 
 // Copied from request-manager to remove disallowed headers because of Wasabi
@@ -28,7 +32,7 @@ const stripHeaders = () => {
                 .find(line => /^Allowed-Headers/i.test(line))
                 ?.split(': ');
 
-            if (allowedHeaders) {
+            if (allowedHeaders && allowedHeaders[1]) {
                 const allowedKeys = allowedHeaders[1].split(';');
 
                 headers.forEach(line => {
@@ -99,7 +103,7 @@ const filtersFromWasabi = async (hash: string) => {
         log(hash, bytes, buffer.byteLength);
 
         return filters.map(data => {
-            const [_blockHeight, blockHash, _filter, _prevHash, _blockTime] = data.split(':');
+            const [_blockHeight, blockHash = '', _filter, _prevHash, _blockTime] = data.split(':');
 
             return blockHash;
         });
@@ -176,7 +180,9 @@ const getWebsocket = async () => {
 
     let batch = await filtersFromWasabi(bestKnownHash);
     while (batch.length === batchSize) {
-        batch = await filtersFromWasabi(batch[batchSize - 1]);
+        const lastHash = batch[batchSize - 1];
+        if (!lastHash) break;
+        batch = await filtersFromWasabi(lastHash);
     }
 
     console.timeEnd('Wasabi filters');
@@ -189,7 +195,9 @@ const getWebsocket = async () => {
 
     batch = await filtersFromBlockbook(bestKnownHash);
     while (batch.length === batchSize) {
-        batch = await filtersFromBlockbook(batch[batchSize - 1]);
+        const lastHash = batch[batchSize - 1];
+        if (!lastHash) break;
+        batch = await filtersFromBlockbook(lastHash);
     }
 
     console.timeEnd('Blockbook filters');

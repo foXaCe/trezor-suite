@@ -21,7 +21,12 @@ const derivePubKeyHash = async (getHDNode: GetHDNode, address_n: number[], netwo
         const response = await getHDNode(address_n.slice(0, 4));
         const node = bip32.fromBase58(response.xpub, network);
 
-        return node.derive(address_n[address_n.length - 1]);
+        const lastIndex = address_n[address_n.length - 1];
+        if (lastIndex === undefined) {
+            throw ERRORS.TypedError('Runtime', 'derivePubKeyHash: empty address_n');
+        }
+
+        return node.derive(lastIndex);
     }
     // custom address_n
     const response = await getHDNode(address_n);
@@ -120,10 +125,11 @@ export const verifyTx = (
 
     outputs.forEach((output, i) => {
         if (output.amount) {
-            if (output.amount.toString() !== bitcoinTx.outs[i].value) {
+            const txOut = bitcoinTx.outs[i];
+            if (txOut && output.amount.toString() !== txOut.value) {
                 throw ERRORS.TypedError(
                     'Runtime',
-                    `verifyTx: Wrong output amount at output ${i}. Requested: ${output.amount}, signed: ${bitcoinTx.outs[i].value}`,
+                    `verifyTx: Wrong output amount at output ${i}. Requested: ${output.amount}, signed: ${txOut.value}`,
                 );
             }
         }
@@ -131,7 +137,9 @@ export const verifyTx = (
 
     // check outputs scripts
     for (let i = 0; i < outputs.length; i++) {
-        const scriptB = bitcoinTx.outs[i].script;
+        const txOut = bitcoinTx.outs[i];
+        if (!txOut) continue;
+        const scriptB = txOut.script;
 
         const scriptA = outputScripts[i];
         if (scriptA && scriptA.compare(scriptB) !== 0) {

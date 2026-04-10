@@ -275,8 +275,11 @@ export const BLOCKS = [
     },
 ];
 
+const _block5Tx0 = BLOCKS[5]?.txs[0];
+if (!_block5Tx0) throw new Error('Missing block 5 tx 0 fixture');
+
 export const TX_4_PENDING = {
-    ...BLOCKS[5].txs[0],
+    ..._block5Tx0,
     blockHeight: -1,
     blockTime: undefined,
 };
@@ -983,18 +986,23 @@ export const SEGWIT_XPUB_RESULT = {
     ],
 };
 
+const { addresses: _addrs, history: _hist, utxo: _utxo, ...rest } = SEGWIT_XPUB_RESULT;
+const { unused } = _addrs;
+const used1 = _addrs.used[0];
+const used2 = _addrs.used[1];
+const _firstChange = _addrs.change[0];
 const {
-    addresses: {
-        unused,
-        used: [used1, used2],
-        change: [{ balance, sent, received, transfers, ...change1 }, ...change],
-    },
-    history: {
-        transactions: [, , pending, ...transactions],
-    },
-    utxo: [utxo],
-    ...rest
-} = SEGWIT_XPUB_RESULT;
+    balance: _balance,
+    sent: _sent,
+    received: _received,
+    transfers: _transfers,
+    ..._change1Rest
+} = _firstChange ?? ({} as NonNullable<typeof _firstChange>);
+const change1 = _change1Rest;
+const change = _addrs.change.slice(1);
+const pending = _hist.transactions[2];
+const transactions = _hist.transactions.slice(3);
+const utxo = _utxo[0];
 
 export const SEGWIT_XPUB_RESULT_HALF = {
     ...rest,

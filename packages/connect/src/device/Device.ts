@@ -916,7 +916,9 @@ export class Device extends TypedEmitter<DeviceEvents> implements IDevice {
         const version = this.getVersion();
         if (!this.features || !version) return false;
         const modelVersion =
-            typeof versions === 'string' ? versions : versions[this.features.major_version - 1];
+            typeof versions === 'string'
+                ? versions
+                : (versions[this.features.major_version - 1] ?? versions[0] ?? '0');
 
         return versionUtils.isNewerOrEqual(version, modelVersion);
     }

@@ -2,6 +2,7 @@
 
 import {
     CipherKeyValue as CipherKeyValueSchema,
+    ERRORS,
     UI_REQUEST,
     createUiMessage,
 } from '@trezor/connect-common';
@@ -73,6 +74,14 @@ export default class CipherKeyValue extends AbstractMethod<
             }
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+        const first = responses[0];
+        if (!first) {
+            throw ERRORS.TypedError('Runtime', 'CipherKeyValue: No response received');
+        }
+
+        return first;
     }
 }

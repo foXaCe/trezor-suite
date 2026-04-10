@@ -97,7 +97,9 @@ describe(`CoinjoinBackend methods`, () => {
 
         // Only four blocks are known,
         // tx 44444444444444444444444444444444 is in mempool
-        client.setFixture(FIXTURES.BLOCKS.slice(0, 4), [FIXTURES.TX_4_PENDING]);
+        client.setFixture(FIXTURES.BLOCKS.slice(0, 4) as typeof FIXTURES.BLOCKS, [
+            FIXTURES.TX_4_PENDING,
+        ]);
 
         const context = getContext(progress => {
             txs = txs.concat(progress.transactions);
@@ -160,7 +162,10 @@ describe(`CoinjoinBackend methods`, () => {
     });
 
     it('scanAccount 1-block reorg', async () => {
-        const [PRELAST_BLOCK, LAST_BLOCK] = FIXTURES.BLOCKS.slice(-2);
+        const blocksSlice = FIXTURES.BLOCKS.slice(-2);
+        const PRELAST_BLOCK = blocksSlice[0];
+        const LAST_BLOCK = blocksSlice[1];
+        if (!PRELAST_BLOCK || !LAST_BLOCK) throw new Error('Missing test blocks');
         const PRELAST_CP = { blockHeight: PRELAST_BLOCK.height, blockHash: PRELAST_BLOCK.hash };
         const REORG_BLOCK = {
             ...LAST_BLOCK,
@@ -209,7 +214,9 @@ describe(`CoinjoinBackend methods`, () => {
     });
 
     it('scanAccount derive pending', async () => {
-        client.setFixture([{ ...FIXTURES.BLOCKS[0], txs: [] }]);
+        const block0 = FIXTURES.BLOCKS[0];
+        if (!block0) throw new Error('Missing block fixture');
+        client.setFixture([{ ...block0, txs: [] }]);
 
         const scan1 = await scanAccount(
             { descriptor: FIXTURES.SEGWIT_XPUB, checkpoints: [EMPTY_CHECKPOINT] },
@@ -226,7 +233,7 @@ describe(`CoinjoinBackend methods`, () => {
         expect(scan1.checkpoint.receiveCount).toBe(20);
         expect(info1.addresses.unused.length).toBe(20);
 
-        client.setFixture([{ ...FIXTURES.BLOCKS[0], txs: [] }], [FIXTURES.TX_4_PENDING]);
+        client.setFixture([{ ...block0, txs: [] }], [FIXTURES.TX_4_PENDING]);
 
         const scan2 = await scanAccount(
             { descriptor: FIXTURES.SEGWIT_XPUB, checkpoints: [scan1.checkpoint] },

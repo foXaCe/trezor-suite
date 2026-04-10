@@ -94,8 +94,9 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
 
     get info() {
         // set info
-        if (this.params.length === 1) {
-            return getLabel('Export #NETWORK address', this.params[0].coinInfo);
+        const firstParam = this.params[0];
+        if (this.params.length === 1 && firstParam) {
+            return getLabel('Export #NETWORK address', firstParam.coinInfo);
         }
         const requestedNetworks = this.params.map(b => b.coinInfo);
         const uniqNetworks = getUniqueNetworks(requestedNetworks);
@@ -108,10 +109,13 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            const currentParam = this.params[this.progress];
+            if (!currentParam) return;
+
             return {
                 type: 'address' as const,
-                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(currentParam.proto.address_n),
+                address: currentParam.address || 'not-set',
             };
         }
     }
@@ -146,6 +150,7 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
 
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
+            if (!batch) continue;
             // silently get address and compare with requested address
             // or display as default inside popup
             if (batch.proto.show_display) {
@@ -179,6 +184,15 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
             this.progress++;
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse === undefined) {
+            throw ERRORS.TypedError('Runtime', 'GetAddress: expected single response');
+        }
+
+        return firstResponse;
     }
 }

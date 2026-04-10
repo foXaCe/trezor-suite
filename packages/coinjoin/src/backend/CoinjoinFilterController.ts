@@ -31,9 +31,12 @@ export class CoinjoinFilterController implements FilterControllerShape {
         { abortSignal, onProgressInfo }: FilterControllerContext = {},
     ) {
         const batchSize = params?.batchSize ?? this.batchSize;
-        const [latestCheckpoint, ...olderCheckpoints] = params?.checkpoints?.length
-            ? params.checkpoints
-            : [this.baseBlock];
+        const checkpointList = params?.checkpoints?.length ? params.checkpoints : [this.baseBlock];
+        const latestCheckpoint = checkpointList[0];
+        if (!latestCheckpoint) {
+            return;
+        }
+        const olderCheckpoints = checkpointList.slice(1);
 
         const fetchFilterBatch = async ({ blockHeight, blockHash }: typeof latestCheckpoint) => ({
             height: blockHeight,
@@ -69,7 +72,8 @@ export class CoinjoinFilterController implements FilterControllerShape {
             const progressCooldown = createCooldown(PROGRESS_INFO_COOLDOWN);
             do {
                 const { filters, M, P, zeroedKey } = batch.response;
-                const [last] = filters.slice(-1);
+                const last = filters[filters.length - 1];
+                if (!last) continue;
 
                 // In case of new block mined during the discovery, its height
                 // is used as `to` instead of `bestHeight` from the beginning

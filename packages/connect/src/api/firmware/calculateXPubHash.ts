@@ -11,9 +11,12 @@ export const calculateXPubHash = (xpub: string): string =>
 
 export const calculateXPubHashes = (xpubs: Record<string, string>): XPubHashesPerBip43Path => {
     const hashes: XPubHashesPerBip43Path = {};
-    Object.keys(xpubs).forEach(path => {
-        hashes[path] = calculateXPubHash(xpubs[path]);
-    });
+    for (const path of Object.keys(xpubs)) {
+        const xpub = xpubs[path];
+        if (xpub !== undefined) {
+            hashes[path] = calculateXPubHash(xpub);
+        }
+    }
 
     return hashes;
 };

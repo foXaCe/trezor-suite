@@ -72,7 +72,9 @@ export default class MoneroGetAddress extends AbstractMethod<'moneroGetAddress',
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
-            const { proto, address } = this.params[this.progress];
+            const currentParam = this.params[this.progress];
+            if (!currentParam) return;
+            const { proto, address } = currentParam;
 
             return {
                 type: 'address' as const,
@@ -106,6 +108,7 @@ export default class MoneroGetAddress extends AbstractMethod<'moneroGetAddress',
 
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
+            if (!batch) continue;
             // silently get address and compare with requested address
             // or display as default inside popup
             if (batch.proto.show_display) {
@@ -132,6 +135,15 @@ export default class MoneroGetAddress extends AbstractMethod<'moneroGetAddress',
             this.progress++;
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse === undefined) {
+            throw ERRORS.TypedError('Runtime', 'MoneroGetAddress: expected single response');
+        }
+
+        return firstResponse;
     }
 }

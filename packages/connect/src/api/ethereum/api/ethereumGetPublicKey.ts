@@ -63,8 +63,9 @@ export default class EthereumGetPublicKey extends AbstractMethod<'ethereumGetPub
 
     get info() {
         // set info
-        if (this.params.length === 1) {
-            return getNetworkLabel('Export #NETWORK public key', this.params[0].network);
+        const firstParam = this.params[0];
+        if (this.params.length === 1 && firstParam) {
+            return getNetworkLabel('Export #NETWORK public key', firstParam.network);
         }
         const requestedNetworks = this.params.map(b => b.network);
         const uniqNetworks = getUniqueNetworks(requestedNetworks);
@@ -87,7 +88,9 @@ export default class EthereumGetPublicKey extends AbstractMethod<'ethereumGetPub
         const cmd = this.getDevice().getCommands();
 
         for (let i = 0; i < this.params.length; i++) {
-            const { address_n, show_display } = this.params[i].proto;
+            const param = this.params[i];
+            if (!param) continue;
+            const { address_n, show_display } = param.proto;
 
             const publicKey = await cmd.ethereumGetPublicKey({ address_n, show_display });
 
@@ -116,6 +119,15 @@ export default class EthereumGetPublicKey extends AbstractMethod<'ethereumGetPub
             }
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse === undefined) {
+            throw new Error('EthereumGetPublicKey: expected single response');
+        }
+
+        return firstResponse;
     }
 }

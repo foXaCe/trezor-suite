@@ -61,7 +61,7 @@ export const getScriptTypeFromScriptPubKey = (scriptPubKey: string): AllowedScri
 export function prefixScriptPubKey(scriptPubKey: string, useHex?: boolean): string;
 export function prefixScriptPubKey(scriptPubKey: string, useHex: false): Buffer;
 export function prefixScriptPubKey(scriptPubKey: string, useHex = true) {
-    const [OP, hash] = scriptPubKey.split(' ');
+    const [OP = '0', hash = ''] = scriptPubKey.split(' ');
     const script = bscript.fromASM(`OP_${OP} ${hash}`);
 
     return useHex ? script.toString('hex') : script;
@@ -112,8 +112,10 @@ const compareByteArray = (left: Buffer, right: Buffer) => {
 
     const min = Math.min(left.length, right.length);
     for (let i = 0; i < min; i++) {
-        if (left[i] < right[i]) return -1;
-        if (left[i] > right[i]) return 1;
+        const l = left[i] ?? 0;
+        const r = right[i] ?? 0;
+        if (l < r) return -1;
+        if (l > r) return 1;
     }
 
     return left.length - right.length;

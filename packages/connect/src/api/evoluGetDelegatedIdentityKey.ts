@@ -27,9 +27,12 @@ export default class EvoluGetDelegatedIdentityKey extends AbstractMethod<
     async run() {
         const thpState = this.getDevice().getThpState();
         if (thpState) {
-            this.params = {
-                thp_credential: thpState.pairingCredentials[0].credential,
-            };
+            const firstCredential = thpState.pairingCredentials[0];
+            if (firstCredential) {
+                this.params = {
+                    thp_credential: firstCredential.credential,
+                };
+            }
         }
 
         const cmd = this.getDevice().getCommands();

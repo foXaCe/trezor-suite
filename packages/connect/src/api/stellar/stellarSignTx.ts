@@ -16,8 +16,12 @@ const processTxRequest = async (
     operations: StellarOperationMessage[],
     index: number,
 ): Promise<PROTO.StellarSignedTx> => {
+    const operation = operations[index];
+    if (!operation) {
+        throw ERRORS.TypedError('Runtime', `processTxRequest: Missing operation at index ${index}`);
+    }
     const lastOp = index + 1 >= operations.length;
-    const { type, ...op } = operations[index];
+    const { type, ...op } = operation;
 
     if (lastOp) {
         const response = await typedCall(type, 'StellarSignedTx', op);

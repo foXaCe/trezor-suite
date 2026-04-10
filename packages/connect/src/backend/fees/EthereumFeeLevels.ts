@@ -15,7 +15,8 @@ export class EthereumFeeLevels extends MiscFeeLevels {
 
     async load(blockchain: Blockchain, request: Parameters<typeof blockchain.estimateFee>[0]) {
         try {
-            const [response] = await blockchain.estimateFee(request);
+            const response = (await blockchain.estimateFee(request))[0];
+            if (!response) return this.levels;
 
             const { eip1559 } = response;
 
@@ -72,11 +73,14 @@ export class EthereumFeeLevels extends MiscFeeLevels {
 
                 this.levels = levels.filter(level => level) as FeeLevel[];
             } else {
-                this.levels[0] = {
-                    ...this.levels[0],
-                    ...response,
-                    feePerUnit,
-                };
+                const existingLevel = this.levels[0];
+                if (existingLevel) {
+                    this.levels[0] = {
+                        ...existingLevel,
+                        ...response,
+                        feePerUnit,
+                    };
+                }
             }
             this.wasFetchedSuccessfully = true;
         } catch {

@@ -22,6 +22,7 @@ const transformVinVout = (vinvout: EnhancedVinVout, network: Network) => {
     if (!vinvout.isAddress || !vinvout.addresses || vinvout.addresses.length > 1) return [];
 
     const Address = vinvout.addresses[0];
+    if (!Address) return [];
     const Value = Number(vinvout.value);
 
     if (vinvout.isAccountOwned) return { Address, Value } as AnalyzeInternalVinVout;

@@ -9,7 +9,7 @@ describe('resetIdentityCircuit', () => {
         const oldPass = 'abcd';
         const id = resetIdentityCircuit(`username:${oldPass}`);
         expect(id).toMatch(/username:[a-zA-Z0-9]+/);
-        const [, pass] = id.split(':');
+        const pass = id.split(':')[1] ?? '';
         expect(pass).not.toEqual(oldPass);
         expect(pass.length).toEqual(16);
     });

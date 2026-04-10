@@ -75,26 +75,29 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
 
     async initAsync(): Promise<void> {
         for (let i = 0; i < this.params.length; i++) {
+            const param = this.params[i];
+            if (!param) continue;
             // network was maybe already set from 'well-known' definition in init method.
-            if (!this.params[i].network) {
-                const slip44 = getSlip44ByPath(this.params[i].proto.address_n);
+            if (!param.network) {
+                const slip44 = getSlip44ByPath(param.proto.address_n);
 
                 const definitions = await getEthereumDefinitions({ slip44 });
 
                 const decoded = decodeEthereumDefinition(definitions);
                 if (decoded.network) {
-                    this.params[i].network = ethereumNetworkInfoFromDefinition(decoded.network);
+                    param.network = ethereumNetworkInfoFromDefinition(decoded.network);
                 }
                 if (definitions.encoded_network) {
-                    this.params[i].proto.encoded_network = definitions.encoded_network;
+                    param.proto.encoded_network = definitions.encoded_network;
                 }
             }
         }
     }
 
     get info() {
-        if (this.params.length === 1) {
-            return getNetworkLabel('Export #NETWORK address', this.params[0].network);
+        const firstParam = this.params[0];
+        if (this.params.length === 1 && firstParam) {
+            return getNetworkLabel('Export #NETWORK address', firstParam.network);
         }
         const requestedNetworks = this.params.map(b => b.network);
         const uniqNetworks = getUniqueNetworks(requestedNetworks);
@@ -107,10 +110,13 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            const currentParam = this.params[this.progress];
+            if (!currentParam) return;
+
             return {
                 type: 'address' as const,
-                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(currentParam.proto.address_n),
+                address: currentParam.address || 'not-set',
             };
         }
     }
@@ -138,6 +144,7 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
 
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
+            if (!batch) continue;
 
             // silently get address and compare with requested address
             // or display as default inside popup
@@ -178,6 +185,15 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
             this.progress++;
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse === undefined) {
+            throw ERRORS.TypedError('Runtime', 'EthereumGetAddress: expected single response');
+        }
+
+        return firstResponse;
     }
 }

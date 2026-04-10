@@ -180,7 +180,11 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
 
         return feeLevels.map(level => {
             composer.composeCustomFee(level.feePerUnit);
-            const tx = { ...composer.composed.custom }; // needs to spread otherwise flow has a problem with ComposeResult vs PrecomposedTransaction (max could be undefined)
+            const composedTx = composer.composed.custom;
+            if (!composedTx) {
+                return { type: 'error' as const, error: 'ADDRESSES-NOT-SET' as const };
+            }
+            const tx = { ...composedTx }; // needs to spread otherwise flow has a problem with ComposeResult vs PrecomposedTransaction (max could be undefined)
             if (tx.type === 'final') {
                 return {
                     ...tx,
@@ -246,6 +250,9 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
             );
             const uiResp = await dfd.promise;
             const account = discovery.accounts[uiResp.payload];
+            if (!account) {
+                throw ERRORS.TypedError('Runtime', 'ComposeTransaction: Account not found');
+            }
             const utxo = await blockchain.getAccountUtxo(account.descriptor);
 
             return {
@@ -309,6 +316,9 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
         }
 
         const account = discovery.accounts[uiResp.payload];
+        if (!account) {
+            throw ERRORS.TypedError('Runtime', 'ComposeTransaction: Account not found');
+        }
         this.params.coinInfo = fixCoinInfoNetwork(this.params.coinInfo, account.address_n);
         const utxo = await blockchain.getAccountUtxo(account.descriptor);
 
@@ -382,8 +392,17 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
                 // wait for user action
                 return this._selectFeeUiResponse(composer, context);
 
-            case 'send':
-                return this._sign(composer.composed[resp.payload.value], context.sendCoreMessage);
+            case 'send': {
+                const selectedTx = composer.composed[resp.payload.value];
+                if (!selectedTx) {
+                    throw ERRORS.TypedError(
+                        'Runtime',
+                        'ComposeTransaction: Selected fee level not composed',
+                    );
+                }
+
+                return this._sign(selectedTx, context.sendCoreMessage);
+            }
 
             default:
                 return 'change-account';

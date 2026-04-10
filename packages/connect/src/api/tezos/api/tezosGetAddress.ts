@@ -66,9 +66,12 @@ export default class TezosGetAddress extends AbstractMethod<'tezosGetAddress', P
     }
 
     get info() {
-        if (this.params.length === 1) {
+        const firstParam = this.params[0];
+        if (this.params.length === 1 && firstParam) {
+            const accountIndex = firstParam.proto.address_n[2];
+
             return `Export Tezos address for account #${
-                fromHardened(this.params[0].proto.address_n[2]) + 1
+                accountIndex !== undefined ? fromHardened(accountIndex) + 1 : '?'
             }`;
         }
 
@@ -77,10 +80,13 @@ export default class TezosGetAddress extends AbstractMethod<'tezosGetAddress', P
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            const currentParam = this.params[this.progress];
+            if (!currentParam) return;
+
             return {
                 type: 'address' as const,
-                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(currentParam.proto.address_n),
+                address: currentParam.address || 'not-set',
             };
         }
     }
@@ -104,6 +110,7 @@ export default class TezosGetAddress extends AbstractMethod<'tezosGetAddress', P
 
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
+            if (!batch) continue;
             // silently get address and compare with requested address
             // or display as default inside popup
             if (batch.proto.show_display) {
@@ -142,6 +149,15 @@ export default class TezosGetAddress extends AbstractMethod<'tezosGetAddress', P
             this.progress++;
         }
 
-        return this.hasBundle ? responses : responses[0];
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse === undefined) {
+            throw ERRORS.TypedError('Runtime', 'TezosGetAddress: expected single response');
+        }
+
+        return firstResponse;
     }
 }

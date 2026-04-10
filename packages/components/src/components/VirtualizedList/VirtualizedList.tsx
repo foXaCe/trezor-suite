@@ -153,11 +153,12 @@ export function VirtualizedListComponent<T extends BaseItemProps>({
             let newStartIndex = 0;
 
             for (let i = 0; i < itemHeights.length; i++) {
-                if (offset + itemHeights[i] >= scrollTop) {
+                const height = itemHeights[i] ?? 0;
+                if (offset + height >= scrollTop) {
                     newStartIndex = i;
                     break;
                 }
-                offset += itemHeights[i];
+                offset += height;
             }
 
             newStartIndex = Math.max(0, newStartIndex - beforeAfterBufferCount);
@@ -170,7 +171,7 @@ export function VirtualizedListComponent<T extends BaseItemProps>({
                 newEndIndex < items.length &&
                 visibleHeight < containerHeight + beforeAfterBufferCount * estimatedItemHeight
             ) {
-                visibleHeight += itemHeights[newEndIndex];
+                visibleHeight += itemHeights[newEndIndex] ?? 0;
                 newEndIndex++;
             }
             newEndIndex = Math.min(items.length, newEndIndex + beforeAfterBufferCount);

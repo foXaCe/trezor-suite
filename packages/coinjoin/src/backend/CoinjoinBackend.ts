@@ -118,7 +118,11 @@ export class CoinjoinBackend extends TypedEmitter<Events> {
     }
 
     async getAccountCheckpoint(xpub: string) {
-        const { address } = deriveAddresses([], xpub, 'receive', 0, 1, this.network)[0];
+        const derived = deriveAddresses([], xpub, 'receive', 0, 1, this.network)[0];
+        if (!derived) {
+            throw new Error('Failed to derive address');
+        }
+        const { address } = derived;
         const addressFirstPage = await this.client.fetchAddress(address);
 
         if (addressFirstPage.txs === 0) {
@@ -137,8 +141,11 @@ export class CoinjoinBackend extends TypedEmitter<Events> {
                 ? await this.client.fetchAddress(address, addressFirstPage.totalPages)
                 : addressFirstPage;
 
-        const transactions = latestPage.transactions!;
+        const transactions = latestPage.transactions ?? [];
         const oldestTx = transactions[transactions.length - 1];
+        if (!oldestTx) {
+            throw new Error('No transactions found');
+        }
         const blockHeight = oldestTx.blockHeight - 1;
         const blockHash = await this.client.fetchBlockHash(blockHeight);
 

@@ -112,7 +112,7 @@ const updateRawLiquidityClue = async (
                 .map(o => o.amount);
 
             return middleware.updateLiquidityClue(
-                account.rawLiquidityClue,
+                account.rawLiquidityClue ?? null,
                 round.roundParameters.MaxSuggestedAmount,
                 externalAmounts,
                 { baseUrl: options.middlewareUrl },
@@ -121,7 +121,7 @@ const updateRawLiquidityClue = async (
     );
 
     return accounts.map((account, index) => {
-        const rawLiquidityClue = result[index];
+        const rawLiquidityClue = result[index] ?? null;
         // NOTE: immediately update new value in Account
         // it's intentionally not updated by `updateAccount` to prevent race conditions
         account.updateRawLiquidityClue(rawLiquidityClue);

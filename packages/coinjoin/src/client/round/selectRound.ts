@@ -402,12 +402,25 @@ export const selectInputsForRound = async ({
     // get index of Round with maximum possible utxos
     const roundIndex = sumUtxosInRounds.findIndex(count => count === maxUtxosInRound);
     const selectedRound = normalRounds[roundIndex];
+    if (!selectedRound) {
+        logger.info('No results from selectInputsForRound');
+
+        return;
+    }
+
+    const roundUtxoSelection = utxoSelection[roundIndex];
+    if (!roundUtxoSelection) {
+        return;
+    }
 
     // setup new Round
     accountCandidates.forEach((account, accountIndex) => {
         // find utxos assigned to this Round and Account
-        const utxoIndexes = utxoSelection[roundIndex][accountIndex];
-        const selectedUtxos = utxoIndexes.map(utxoIndex => account.utxos[utxoIndex]);
+        const utxoIndexes = roundUtxoSelection[accountIndex];
+        if (!utxoIndexes) return;
+        const selectedUtxos = utxoIndexes
+            .map(utxoIndex => account.utxos[utxoIndex])
+            .filter((utxo): utxo is NonNullable<typeof utxo> => !!utxo);
 
         // Temporary workaround for middleware issue: https://github.com/zkSNACKs/WalletWasabi/issues/10759
         const feeRate = selectedRound.roundParameters.MiningFeeRate;

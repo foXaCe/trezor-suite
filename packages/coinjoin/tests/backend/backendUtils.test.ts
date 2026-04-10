@@ -9,8 +9,12 @@ const ADDRESSES = deriveAddressesOriginal(...PARAMS);
 const TAPROOT_ADDRESS = 'bcrt1pswrqtykue8r89t9u4rprjs0gt4qzkdfuursfnvqaa3f2yql07zmq2fdmpx';
 
 const NON_TAPROOT_TX = {
-    vin: [{ addresses: SEGWIT_RECEIVE_ADDRESSES.slice(1, 3) }, {}, { addresses: [] }],
-    vout: [{ addresses: [SEGWIT_RECEIVE_ADDRESSES[0]] }],
+    vin: [
+        { addresses: SEGWIT_RECEIVE_ADDRESSES.slice(1, 3) as string[] },
+        {},
+        { addresses: [] as string[] },
+    ],
+    vout: [{ addresses: [SEGWIT_RECEIVE_ADDRESSES[0] ?? ''] }],
 };
 
 const TAPROOT_TX = {

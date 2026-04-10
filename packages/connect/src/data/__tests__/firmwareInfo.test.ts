@@ -52,9 +52,10 @@ describe('data/firmwareInfo', () => {
         });
 
         it('should offer lastest release and intermediary v2 for T1B1 <  1.12.0', () => {
-            const [latestRelase] = Object.values(firmwareAssets.t1b1.universal).sort((a, b) =>
+            const latestRelase = Object.values(firmwareAssets.t1b1?.universal ?? {}).sort((a, b) =>
                 versionUtils.isNewer(b.version, a.version) ? 1 : -1,
-            );
+            )[0];
+            if (!latestRelase) throw new Error('missing release');
             const features = getDeviceFeatures({
                 bootloader_mode: null,
                 major_version: 1,

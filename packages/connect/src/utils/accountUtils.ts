@@ -47,8 +47,8 @@ export const getAccountAddressN = (
 
 export const getAccountLabel = (path: number[], coinInfo: CoinInfo) => {
     if (coinInfo.type === 'bitcoin') {
-        const accountType = fromHardened(path[0]);
-        const account = fromHardened(path[2]);
+        const accountType = fromHardened(path[0] ?? 0);
+        const account = fromHardened(path[2] ?? 0);
         let prefix = '';
 
         if (accountType === 48) {
@@ -61,7 +61,7 @@ export const getAccountLabel = (path: number[], coinInfo: CoinInfo) => {
 
         return `${prefix} account #${account + 1}`;
     }
-    const account = fromHardened(path[4]);
+    const account = fromHardened(path[4] ?? 0);
 
     return `account #${account + 1}`;
 };
@@ -76,16 +76,16 @@ export const getPublicKeyLabel = (path: number[], coinInfo?: BitcoinNetworkInfo)
         coinLabel = getCoinName(path);
     }
 
-    const p1 = fromHardened(path[0]);
-    let account = path.length >= 3 ? fromHardened(path[2]) : -1;
+    const p1 = fromHardened(path[0] ?? 0);
+    let account = path.length >= 3 ? fromHardened(path[2] ?? 0) : -1;
     let realAccountId = account + 1;
     let prefix = 'Export public key';
     let accountType = '';
 
     // Copay id
     if (p1 === 45342) {
-        const p2 = fromHardened(path[1]);
-        account = fromHardened(path[3]);
+        const p2 = fromHardened(path[1] ?? 0);
+        account = fromHardened(path[3] ?? 0);
         realAccountId = account + 1;
         prefix = 'Export Copay ID of';
         if (p2 === 48) {

@@ -114,10 +114,11 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
     }
 
     get confirmation() {
-        if (this.params.length === 1 && !this.params[0].path && !this.params[0].descriptor) {
+        const firstParam = this.params[0];
+        if (this.params.length === 1 && firstParam && !firstParam.path && !firstParam.descriptor) {
             return {
                 view: 'export-account-info' as const,
-                label: `Export info for ${this.params[0].coinInfo.label} account of your selection`,
+                label: `Export info for ${firstParam.coinInfo.label} account of your selection`,
                 customConfirmButton: {
                     label: 'Proceed to account selection',
                     className: 'not-empty-css',
@@ -128,19 +129,22 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                 [coin: string]: { coinInfo: CoinInfo; values: DerivationPath[] };
             } = {};
             this.params.forEach(b => {
-                if (!keys[b.coinInfo.label]) {
+                const existing = keys[b.coinInfo.label];
+                if (!existing) {
                     keys[b.coinInfo.label] = {
                         coinInfo: b.coinInfo,
-                        values: [],
+                        values: [b.descriptor || b.address_n],
                     };
+                } else {
+                    existing.values.push(b.descriptor || b.address_n);
                 }
-                keys[b.coinInfo.label].values.push(b.descriptor || b.address_n);
             });
 
             // prepare html for popup
             const str: string[] = [];
             Object.keys(keys).forEach((k, _i, _a) => {
                 const details = keys[k];
+                if (!details) return;
                 details.values.forEach(acc => {
                     // if (i === 0) str += this.params.length > 1 ? ': ' : ' ';
                     // if (i > 0) str += ', ';
@@ -172,10 +176,12 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
         // find invalid ranges
         const invalid = [];
         for (let i = 0; i < this.params.length; i++) {
+            const batch = this.params[i];
+            if (!batch) continue;
             // set FW range for current batch
             this.firmwareRange = getFirmwareRange(
                 this.name,
-                this.params[i].coinInfo,
+                batch.coinInfo,
                 DEFAULT_FIRMWARE_RANGE,
             );
             const exception = super.checkFirmwareRange();
@@ -183,7 +189,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                 invalid.push({
                     index: i,
                     exception,
-                    coin: this.params[i].coin,
+                    coin: batch.coin,
                 });
             }
         }
@@ -195,8 +201,9 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
     async run(context: MethodContext) {
         // address_n and descriptor are not set. use discovery
-        if (this.params.length === 1 && !this.params[0].path && !this.params[0].descriptor) {
-            return this.discover(this.params[0], context);
+        const firstParam = this.params[0];
+        if (this.params.length === 1 && firstParam && !firstParam.path && !firstParam.descriptor) {
+            return this.discover(firstParam, context);
         }
 
         const responses: MethodReturnType<typeof this.name> = [];
@@ -216,6 +223,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
         for (let i = 0; i < this.params.length; i++) {
             const request = this.params[i];
+            if (!request) continue;
             const { address_n } = request;
             let { descriptor } = request;
             let legacyXpub: string | undefined;
@@ -316,7 +324,16 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
         }
         if (this.disposed) return new Promise<typeof responses>(() => []);
 
-        return this.hasBundle ? responses : responses[0]!;
+        if (this.hasBundle) {
+            return responses;
+        }
+
+        const firstResponse = responses[0];
+        if (firstResponse == null) {
+            throw ERRORS.TypedError('Runtime', 'GetAccountInfo: expected single response');
+        }
+
+        return firstResponse;
     }
 
     private async discover(request: Request, context: MethodContext) {
@@ -368,6 +385,9 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
         discovery.stop();
 
         const account = discovery.accounts[uiResp.payload];
+        if (!account) {
+            throw ERRORS.TypedError('Runtime', 'GetAccountInfo: account not found');
+        }
 
         if (!discovery.completed) {
             await resolveAfter(501); // temporary solution, TODO: immediately resolve will cause "device call in progress"

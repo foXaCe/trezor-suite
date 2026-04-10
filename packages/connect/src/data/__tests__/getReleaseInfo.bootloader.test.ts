@@ -6,8 +6,10 @@ import { getReleaseInfo } from '../firmwareInfo';
 
 const { getDeviceFeatures, releasesT1B1, releasesT2T1 } = global.JestMocks;
 
-const [latestT1B1] = releasesT1B1;
-const [latestT2T1] = releasesT2T1;
+const latestT1B1 = releasesT1B1[0];
+if (!latestT1B1) throw new Error('missing T1B1 release');
+const latestT2T1 = releasesT2T1[0];
+if (!latestT2T1) throw new Error('missing T2T1 release');
 
 const fixtures = [
     {

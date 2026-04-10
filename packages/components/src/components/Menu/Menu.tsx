@@ -119,9 +119,10 @@ export const Menu = forwardRef<HTMLUListElement, MenuProps>(
                     e.preventDefault();
 
                     const focusedItem = visibleItems[focusedItemIndex];
+                    if (!focusedItem) return;
 
                     if (focusedItem.closeOnClick !== false) onClose?.();
-                    focusedItem?.onClick?.();
+                    focusedItem.onClick?.();
                 }
             };
 
@@ -152,7 +153,7 @@ export const Menu = forwardRef<HTMLUListElement, MenuProps>(
                     do {
                         indexCandidate = getNextIndex(indexCandidate, direction);
                     } while (
-                        visibleItems[indexCandidate].isDisabled &&
+                        visibleItems[indexCandidate]?.isDisabled &&
                         indexCandidate !== focusedItemIndex
                     );
 

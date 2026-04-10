@@ -237,7 +237,8 @@ export default class EthereumSignTypedData extends AbstractMethod<'ethereumSignT
             let memberData;
             let memberTypeName: string;
 
-            const [rootIndex, ...nestedMemberPath] = member_path;
+            const rootIndex = member_path[0];
+            const nestedMemberPath = member_path.slice(1);
             switch (rootIndex) {
                 case 0:
                     memberData = domain;
@@ -257,7 +258,20 @@ export default class EthereumSignTypedData extends AbstractMethod<'ethereumSignT
                     memberTypeName = parseArrayType(memberTypeName).entryTypeName;
                     memberData = memberData[index];
                 } else if (typeof memberData === 'object' && memberData !== null) {
-                    const memberTypeDefinition = types[memberTypeName][index];
+                    const typeDefinitions = types[memberTypeName];
+                    if (!typeDefinitions) {
+                        throw ERRORS.TypedError(
+                            'Runtime',
+                            `Type ${memberTypeName} was not defined in types object`,
+                        );
+                    }
+                    const memberTypeDefinition = typeDefinitions[index];
+                    if (!memberTypeDefinition) {
+                        throw ERRORS.TypedError(
+                            'Runtime',
+                            `Member at index ${index} not found in type ${memberTypeName}`,
+                        );
+                    }
                     memberTypeName = memberTypeDefinition.type;
                     memberData = memberData[memberTypeDefinition.name as keyof typeof memberData];
                 }

@@ -12,7 +12,9 @@ export const resolveDescriptorForTaproot = ({
     publicKey,
 }: ResolveDescriptorForTaprootParams) => {
     if (publicKey.descriptor !== null && publicKey.descriptor !== undefined) {
-        const [xpub, checksum] = publicKey.descriptor.split('#');
+        const parts = publicKey.descriptor.split('#');
+        const xpub = parts[0] ?? '';
+        const checksum = parts[1];
 
         // This is here to keep backwards compatibility, suite and block-books
         // are still using `'` over `h`.

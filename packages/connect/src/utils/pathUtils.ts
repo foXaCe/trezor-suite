@@ -12,7 +12,7 @@ import type {
 export const HD_HARDENED = 0x80000000;
 export const toHardened = (n: number) => (n | HD_HARDENED) >>> 0;
 export const fromHardened = (n: number) => (n & ~HD_HARDENED) >>> 0;
-export const getSlip44ByPath = (path: number[]) => fromHardened(path[1]);
+export const getSlip44ByPath = (path: number[]) => fromHardened(path[1] ?? 0);
 
 const PATH_NOT_VALID = ERRORS.TypedError('Method_InvalidParameter', 'Not a valid path');
 const PATH_NEGATIVE_VALUES = ERRORS.TypedError(
@@ -22,7 +22,7 @@ const PATH_NEGATIVE_VALUES = ERRORS.TypedError(
 
 export const getHDPath = (path: string): number[] => {
     const parts = path.toLowerCase().split('/');
-    if (parts[0] !== 'm') throw PATH_NOT_VALID;
+    if (!parts[0] || parts[0] !== 'm') throw PATH_NOT_VALID;
 
     return parts
         .filter(p => p !== 'm' && p !== '')
@@ -47,14 +47,26 @@ export const getHDPath = (path: string): number[] => {
         });
 };
 
-export const isSegwitPath = (path: number[] | undefined) =>
-    Array.isArray(path) && path[0] === toHardened(49);
+export const isSegwitPath = (path: number[] | undefined) => {
+    if (!Array.isArray(path)) return false;
+    const first = path[0];
 
-const isBech32Path = (path: number[] | undefined) =>
-    Array.isArray(path) && path[0] === toHardened(84);
+    return first === toHardened(49);
+};
 
-export const isTaprootPath = (path: number[] | undefined) =>
-    Array.isArray(path) && (path[0] === toHardened(86) || path[0] === toHardened(10025));
+const isBech32Path = (path: number[] | undefined) => {
+    if (!Array.isArray(path)) return false;
+    const first = path[0];
+
+    return first === toHardened(84);
+};
+
+export const isTaprootPath = (path: number[] | undefined) => {
+    if (!Array.isArray(path)) return false;
+    const first = path[0];
+
+    return first === toHardened(86) || first === toHardened(10025);
+};
 
 export const getAccountType = (path: number[] | undefined) => {
     if (isTaprootPath(path)) return 'p2tr';
@@ -72,7 +84,9 @@ export const getScriptType = (
 ): PROTO.InternalInputScriptType | undefined => {
     if (!Array.isArray(path) || path.length < 1) return undefined;
 
-    const p1 = fromHardened(path[0]);
+    const first = path[0];
+    if (first === undefined) return undefined;
+    const p1 = fromHardened(first);
     switch (p1) {
         case 44:
             return 'SPENDADDRESS';
@@ -81,7 +95,9 @@ export const getScriptType = (
         case 48: {
             if (path.length < 4) return undefined;
 
-            const p3 = fromHardened(path[3]);
+            const fourth = path[3];
+            if (fourth === undefined) return undefined;
+            const p3 = fromHardened(fourth);
 
             switch (p3) {
                 case 0:
@@ -113,7 +129,9 @@ export const getScriptType = (
 export const getOutputScriptType = (path?: number[]): PROTO.ChangeOutputScriptType | undefined => {
     if (!Array.isArray(path) || path.length < 1) return undefined;
 
-    const p = fromHardened(path[0]);
+    const first = path[0];
+    if (first === undefined) return undefined;
+    const p = fromHardened(first);
 
     switch (p) {
         case 44:
@@ -123,7 +141,9 @@ export const getOutputScriptType = (path?: number[]): PROTO.ChangeOutputScriptTy
         case 48: {
             if (path.length < 4) return undefined;
 
-            const p3 = fromHardened(path[3]);
+            const fourth = path[3];
+            if (fourth === undefined) return undefined;
+            const p3 = fromHardened(fourth);
             switch (p3) {
                 case 0:
                     return 'PAYTOMULTISIG';
