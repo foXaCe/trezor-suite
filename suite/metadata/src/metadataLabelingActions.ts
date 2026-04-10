@@ -392,16 +392,22 @@ export const addAccountMetadata =
                     return Promise.resolve({ success: true as const });
                 }
 
-                delete nextMetadata.outputLabels[payload.txid][payload.outputIndex];
-                if (Object.keys(nextMetadata.outputLabels[payload.txid]).length === 0) {
-                    delete nextMetadata.outputLabels[payload.txid];
+                const txOutputLabels = nextMetadata.outputLabels[payload.txid];
+                if (txOutputLabels) {
+                    delete txOutputLabels[payload.outputIndex];
+                    if (Object.keys(txOutputLabels).length === 0) {
+                        delete nextMetadata.outputLabels[payload.txid];
+                    }
                 }
             } else {
                 if (!nextMetadata.outputLabels[payload.txid]) {
                     nextMetadata.outputLabels[payload.txid] = {};
                 }
 
-                nextMetadata.outputLabels[payload.txid][payload.outputIndex] = payload.value;
+                const txLabels = nextMetadata.outputLabels[payload.txid];
+                if (txLabels) {
+                    txLabels[payload.outputIndex] = payload.value;
+                }
 
                 // 2.0.0
                 // metadata.outputLabels[payload.txid][payload.outputIndex] = {
@@ -488,7 +494,7 @@ export const setDeviceMetadataKey =
                 });
             }
 
-            const [stateAddress] = device.state.staticSessionId.split('@'); // address@device_id:instance
+            const stateAddress = device.state.staticSessionId.split('@')[0] ?? ''; // address@device_id:instance
             const metaKey = metadataUtils.deriveMetadataKey(result.payload.value, stateAddress);
             const fileName = metadataUtils.deriveFilenameForLabeling(metaKey, encryptionVersion);
             const aesKey = metadataUtils.deriveAesKey(metaKey);
@@ -591,7 +597,7 @@ export const init =
             dispatch({
                 type: METADATA.SET_ERROR_FOR_DEVICE,
                 payload: {
-                    deviceState: device.state!.staticSessionId,
+                    deviceState: device.state.staticSessionId,
                     failed: false,
                 },
             });
@@ -613,7 +619,7 @@ export const init =
                 dispatch({
                     type: METADATA.SET_ERROR_FOR_DEVICE,
                     payload: {
-                        deviceState: device.state!.staticSessionId,
+                        deviceState: device.state.staticSessionId,
                         failed: true,
                     },
                 });

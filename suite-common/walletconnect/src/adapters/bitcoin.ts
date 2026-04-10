@@ -150,22 +150,25 @@ const bitcoinRequestThunk = createThunk<
                 console.error('blockchainEstimateFee error', feeLevels);
                 throw new Error('blockchainEstimateFee error');
             }
+            if (!account.addresses || !account.utxo) {
+                throw new Error('Account addresses or utxo not loaded');
+            }
             const precomposedTransaction = await TrezorConnect.composeTransaction({
                 outputs,
                 coin: account.symbol,
                 identity: getAccountIdentity(account),
                 account: {
                     path: account.path,
-                    addresses: account.addresses!,
-                    utxo: account.utxo!,
+                    addresses: account.addresses,
+                    utxo: account.utxo,
                 },
                 feeLevels: feeLevels.payload.levels,
                 device,
             });
-            if (
-                !precomposedTransaction.success ||
-                precomposedTransaction.payload[0].type !== 'final'
-            ) {
+            const firstPayload = precomposedTransaction.success
+                ? precomposedTransaction.payload[0]
+                : undefined;
+            if (!precomposedTransaction.success || !firstPayload || firstPayload.type !== 'final') {
                 console.error('composeTransaction error', precomposedTransaction);
                 throw new Error('composeTransaction error');
             }
@@ -173,10 +176,10 @@ const bitcoinRequestThunk = createThunk<
                 trezorConnectPopupActions.connectPopupCallThunk({
                     method: 'signTransaction',
                     payload: {
-                        inputs: precomposedTransaction.payload[0].inputs,
-                        outputs: precomposedTransaction.payload[0].outputs,
+                        inputs: firstPayload.inputs,
+                        outputs: firstPayload.outputs,
                         account: {
-                            addresses: account.addresses!,
+                            addresses: account.addresses,
                         },
                         coin: account.symbol,
                         chunkify: true,

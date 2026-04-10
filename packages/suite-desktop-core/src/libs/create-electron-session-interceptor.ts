@@ -40,8 +40,8 @@ export const createElectronSessionInterceptor = (): RequestInterceptor => {
             return;
         }
 
-        for (let i = 0; i < beforeRequestListeners.length; ++i) {
-            const res = beforeRequestListeners[i](details);
+        for (const listener of beforeRequestListeners) {
+            const res = listener(details);
             if (res) {
                 callback(res);
 

@@ -88,27 +88,30 @@ const loadIndexesImpl = async (basePath: string, locale: string): Promise<void> 
         ++pageId;
 
         for (const [key, content] of Object.entries(structurizedData.data)) {
-            const [headingId, headingValue] = key.split('#');
+            const keyParts = key.split('#');
+            const headingId = keyParts[0];
+            const headingValue = keyParts[1];
             const url = route + (headingId ? '#' + headingId : '');
             const title = headingValue || structurizedData.title;
             const paragraphs = content.split('\n');
 
+            const firstParagraph = paragraphs[0];
             sectionIndex.add({
                 id: url,
                 url,
                 title,
                 pageId: `page_${pageId}`,
                 content: title,
-                ...(paragraphs[0] && { display: paragraphs[0] }),
+                ...(firstParagraph && { display: firstParagraph }),
             });
 
-            for (let i = 0; i < paragraphs.length; i++) {
+            for (const [i, paragraph] of paragraphs.entries()) {
                 sectionIndex.add({
                     id: `${url}_${i}`,
                     url,
                     title,
                     pageId: `page_${pageId}`,
-                    content: paragraphs[i],
+                    content: paragraph,
                 });
             }
 
@@ -130,8 +133,9 @@ const loadIndexesImpl = async (basePath: string, locale: string): Promise<void> 
 const loadIndexesPromises = new Map<string, Promise<void>>();
 const loadIndexes = (basePath: string, locale: string): Promise<void> => {
     const key = basePath + '@' + locale;
-    if (loadIndexesPromises.has(key)) {
-        return loadIndexesPromises.get(key)!;
+    const existing = loadIndexesPromises.get(key);
+    if (existing) {
+        return existing;
     }
     const promise = loadIndexesImpl(basePath, locale);
     loadIndexesPromises.set(key, promise);
@@ -148,7 +152,9 @@ export function Flexsearch({ className }: { className?: string }): ReactElement 
 
     const doSearch = (searchString: string) => {
         if (!searchString) return;
-        const [pageIndex, sectionIndex] = indexes[locale];
+        const localeIndexes = indexes[locale];
+        if (!localeIndexes) return;
+        const [pageIndex, sectionIndex] = localeIndexes;
 
         // Show the results for the top 5 pages
         const pageResults =
@@ -162,6 +168,7 @@ export function Flexsearch({ className }: { className?: string }): ReactElement 
 
         for (let i = 0; i < pageResults.length; i++) {
             const result = pageResults[i];
+            if (!result) continue;
             pageTitleMatches[i] = 0;
 
             // Show the top 5 results for each page
@@ -176,10 +183,12 @@ export function Flexsearch({ className }: { className?: string }): ReactElement 
             const occurred: Record<string, boolean> = {};
 
             for (let j = 0; j < sectionResults.length; j++) {
-                const { doc } = sectionResults[j];
+                const sectionResult = sectionResults[j];
+                if (!sectionResult) continue;
+                const { doc } = sectionResult;
                 const isMatchingTitle = doc.display !== undefined;
                 if (isMatchingTitle) {
-                    pageTitleMatches[i]++;
+                    pageTitleMatches[i] = (pageTitleMatches[i] ?? 0) + 1;
                 }
                 const { url, title } = doc;
                 const content = doc.display || doc.content;
@@ -223,8 +232,10 @@ export function Flexsearch({ className }: { className?: string }): ReactElement 
                     if (a._page_rk === b._page_rk) {
                         return a._section_rk - b._section_rk;
                     }
-                    if (pageTitleMatches[a._page_rk] !== pageTitleMatches[b._page_rk]) {
-                        return pageTitleMatches[b._page_rk] - pageTitleMatches[a._page_rk];
+                    const aMatches = pageTitleMatches[a._page_rk] ?? 0;
+                    const bMatches = pageTitleMatches[b._page_rk] ?? 0;
+                    if (aMatches !== bMatches) {
+                        return bMatches - aMatches;
                     }
 
                     return a._page_rk - b._page_rk;

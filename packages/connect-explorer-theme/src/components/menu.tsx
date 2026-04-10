@@ -118,9 +118,10 @@ export function Menu({
         stellar: 'xlm',
         tezos: 'xtz',
         tron: 'trx',
-    };
-    const defaultActiveCoin = Object.keys(coinSymbols).includes(route.split('/')[2])
-        ? route.split('/')[2]
+    } as const;
+    const routeSegment = route.split('/')[2] ?? '';
+    const defaultActiveCoin = Object.keys(coinSymbols).includes(routeSegment)
+        ? routeSegment
         : 'bitcoin';
     const [activeCoin, setActiveCoin] = useState(defaultActiveCoin);
     useEffect(() => {
@@ -170,14 +171,16 @@ export function Menu({
                     value={methodsOptions.find(d => d.value === activeCoin)}
                     onChange={({ value }) => setActiveCoin(value)}
                     options={methodsOptions}
-                    formatOptionLabel={option => (
-                        <Option>
-                            {coinSymbols[option.value] && (
-                                <CoinLogo size={18} symbol={coinSymbols[option.value]} />
-                            )}
-                            <Label>{option.label}</Label>
-                        </Option>
-                    )}
+                    formatOptionLabel={option => {
+                        const coinSymbol = coinSymbols[option.value as keyof typeof coinSymbols];
+
+                        return (
+                            <Option>
+                                {coinSymbol && <CoinLogo size={18} symbol={coinSymbol} />}
+                                <Label>{option.label}</Label>
+                            </Option>
+                        );
+                    }}
                     menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
                     menuShouldScrollIntoView={false}
                     maxMenuHeight={400}
@@ -216,7 +219,7 @@ export const Folder = memo(function FolderInner(props: FolderProps) {
 
 export function FolderImpl({ item, anchors }: FolderProps): ReactElement {
     const routeOriginal = useFSRoute();
-    const [route] = routeOriginal.split('#');
+    const route = routeOriginal.split('#')[0] ?? '';
     const active = [route, route + '/'].includes(item.route + '/');
     const activeRouteInside = active || route.startsWith(item.route + '/');
 
@@ -266,7 +269,7 @@ export function FolderImpl({ item, anchors }: FolderProps): ReactElement {
         );
         // eslint-disable-next-line react-hooks/immutability
         item.children = Object.entries(menu.items || {}).map(([key, menuItem]) => {
-            const routeMenuItem = routes[key] || {
+            const routeMenuItem = routes[key] ?? {
                 name: key,
                 ...('locale' in menu && { locale: menu.locale }),
                 route: menu.route + '/' + key,
@@ -275,7 +278,7 @@ export function FolderImpl({ item, anchors }: FolderProps): ReactElement {
             return {
                 ...routeMenuItem,
                 ...menuItem,
-            };
+            } as PageItem;
         });
     }
 

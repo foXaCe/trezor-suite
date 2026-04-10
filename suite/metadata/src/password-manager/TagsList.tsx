@@ -36,15 +36,15 @@ export const TagsList = ({ tags, selectedTags, setSelectedTags }: TagsListProps)
                         if (allowMultiSelect) {
                             setSelectedTags({
                                 ...selectedTags,
-                                [key]: !selectedTags[key],
+                                [key]: !(selectedTags[key] ?? false),
                             });
                         } else {
                             setSelectedTags({
-                                [key]: !selectedTags[key],
+                                [key]: !(selectedTags[key] ?? false),
                             });
                         }
                     }}
-                    isSelected={selectedTags[key]}
+                    isSelected={selectedTags[key] ?? false}
                 />
             ))}
     </TagsListWrapper>

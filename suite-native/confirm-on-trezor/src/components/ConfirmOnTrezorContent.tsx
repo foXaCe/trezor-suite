@@ -92,16 +92,16 @@ export const ConfirmOnTrezorContent = ({
 
     const gradientColor = utils.colors.backgroundSurfaceElevation0;
 
+    const sp0 = snapPoints[0] ?? 0;
+    const sp1 = snapPoints[1] ?? 0;
+    const sp2 = snapPoints[2] ?? 0;
+
     const animatedSheetStyle = useAnimatedStyle(() => {
-        const paddingTop = interpolate(
-            translateY.value,
-            [snapPoints[2], snapPoints[1], snapPoints[0]],
-            [insets.top, 0, 0],
-        );
+        const paddingTop = interpolate(translateY.value, [sp2, sp1, sp0], [insets.top, 0, 0]);
 
         const borderRadius = interpolate(
             translateY.value,
-            [snapPoints[2], snapPoints[1], snapPoints[0]],
+            [sp2, sp1, sp0],
             [0, utils.borders.radii.r16, utils.borders.radii.r16],
         );
 
@@ -114,28 +114,20 @@ export const ConfirmOnTrezorContent = ({
     });
 
     const animatedHandleStyle = useAnimatedStyle(() => ({
-        opacity: interpolate(
-            translateY.value,
-            [snapPoints[2], snapPoints[1], snapPoints[0]],
-            [0, 1, 1],
-        ),
+        opacity: interpolate(translateY.value, [sp2, sp1, sp0], [0, 1, 1]),
         padding: interpolate(
             translateY.value,
-            [snapPoints[2], snapPoints[1], snapPoints[0]],
+            [sp2, sp1, sp0],
             [0, utils.spacings.sp16, utils.spacings.sp16],
         ),
     }));
 
     const animatedIndicatorStyle = useAnimatedStyle(() => ({
-        height: interpolate(
-            translateY.value,
-            [snapPoints[2], snapPoints[1], snapPoints[0]],
-            [0, 4, 4],
-        ),
+        height: interpolate(translateY.value, [sp2, sp1, sp0], [0, 4, 4]),
     }));
 
     const animatedGradientStyle = useAnimatedStyle(() => ({
-        opacity: interpolate(translateY.value, [snapPoints[1], snapPoints[0]], [0, 1]),
+        opacity: interpolate(translateY.value, [sp1, sp0], [0, 1]),
     }));
 
     return (

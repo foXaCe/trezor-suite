@@ -29,11 +29,9 @@ export const init: ModuleInit = ({ mainWindowProxy }) => {
                 ...protocols.map(protocol => argv.filter(arg => arg.startsWith(`${protocol}:`))),
             );
 
-            if (urls.length) {
+            const protocol = urls[0];
+            if (protocol) {
                 event.preventDefault();
-
-                // if there is custom protocol, then there is just one
-                const protocol = urls[0];
 
                 global.logger.debug(
                     SERVICE_NAME,
@@ -74,11 +72,12 @@ export const init: ModuleInit = ({ mainWindowProxy }) => {
     if (['win32', 'linux'].includes(process.platform)) {
         const { argv } = process;
 
-        if (argv[1]) {
+        const firstArg = argv[1];
+        if (firstArg) {
             logger.debug(SERVICE_NAME, 'App is launched via custom protocol (Linux, Windows)');
 
-            if (isValidProtocol(argv[1], protocols)) {
-                return { onLoad: firstRunOnly(argv[1]) };
+            if (isValidProtocol(firstArg, protocols)) {
+                return { onLoad: firstRunOnly(firstArg) };
             }
         }
     }

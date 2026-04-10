@@ -50,7 +50,8 @@ export const processStatePatch = (): ProcessStatePatchResult =>
         .map(arg => arg.match(STATE_ASSIGNMENT_REGEX))
         .filter(match => match !== null)
         .map((assignment: RegExpMatchArray) => {
-            const [_, key, value] = assignment;
+            const key = assignment[1] ?? '';
+            const value = assignment[2] ?? '';
 
             return { [key]: tryParseJson(value) };
         })

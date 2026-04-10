@@ -41,10 +41,14 @@ export const sessionAuthenticateThunk = createThunk<
     try {
         const accounts = selectAllSuccessfulAccountsToList(getState());
         const supportedNamespaces = getNamespaces(accounts);
+        const eip155Namespace = supportedNamespaces.eip155;
+        if (!eip155Namespace) {
+            throw new Error('No eip155 namespace found');
+        }
         const authPayload = populateAuthPayload({
             authPayload: event.params.authPayload,
-            chains: supportedNamespaces.eip155.chains,
-            methods: supportedNamespaces.eip155.methods,
+            chains: eip155Namespace.chains,
+            methods: eip155Namespace.methods,
         });
         const ethAccount = accounts.find(a => a.symbol === 'eth');
         if (!ethAccount) {
@@ -228,12 +232,13 @@ export const switchSelectedAccountThunk = createThunk<
         if (!adapter) {
             return console.warn(`No adapter found for network type ${account.networkType}`);
         }
-        const { chains } = session.namespaces[adapter.namespaceId];
-        if (!chains) {
+        const namespace = session.namespaces[adapter.namespaceId];
+        if (!namespace?.chains) {
             return console.warn(`No chains found for namespace ${adapter.namespaceId}`);
         }
+        const { chains } = namespace;
 
-        const approvedEvents = session.namespaces[adapter.namespaceId]?.events ?? [];
+        const approvedEvents = namespace.events ?? [];
         for (const chainId of chains) {
             if (network.chainId && approvedEvents.includes('chainChanged')) {
                 await walletKit.emitSessionEvent({
@@ -250,7 +255,7 @@ export const switchSelectedAccountThunk = createThunk<
                     topic: sessionTopic,
                     event: {
                         name: 'accountsChanged',
-                        data: [...updatedNamespaces[adapter.namespaceId].accounts],
+                        data: [...(updatedNamespaces[adapter.namespaceId]?.accounts ?? [])],
                     },
                     chainId,
                 });
@@ -402,10 +407,11 @@ export const walletConnectInitThunk = createThunk(
 
         // Populate active sessions
         const sessions = walletKit.getActiveSessions();
-        for (const topic in sessions) {
+        for (const [, sessionData] of Object.entries(sessions)) {
+            if (!sessionData) continue;
             dispatch(
                 walletConnectActions.saveSession({
-                    ...sessions[topic],
+                    ...sessionData,
                 }),
             );
         }

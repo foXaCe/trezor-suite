@@ -41,7 +41,7 @@ export const useConfirmOnTrezorSheet = ({ controlRef }: Props) => {
         return [containerHeight * 0.8, totalHeaderHeight, 0];
     }, [containerHeight, headerHeight, inset.top]);
 
-    const translateY = useSharedValue(snapPoints[defaultIndex]);
+    const translateY = useSharedValue(snapPoints[defaultIndex] ?? 0);
     const prevTranslationY = useSharedValue(0);
 
     const [isFullscreen, setIsFullscreen] = useState(!params?.initialSnapIndex);
@@ -51,7 +51,7 @@ export const useConfirmOnTrezorSheet = ({ controlRef }: Props) => {
     const snapToIndex = useCallback(
         (index: number) => {
             'worklet';
-            const targetY = snapPoints[index];
+            const targetY = snapPoints[index] ?? 0;
             translateY.value = withSpring(targetY, {
                 damping: 20,
                 stiffness: 180,
@@ -111,8 +111,8 @@ export const useConfirmOnTrezorSheet = ({ controlRef }: Props) => {
         .onUpdate(e => {
             translateY.value = clamp(
                 prevTranslationY.value + e.translationY,
-                snapPoints[1],
-                snapPoints[0],
+                snapPoints[1] ?? 0,
+                snapPoints[0] ?? 0,
             );
         })
         .onEnd(e => {

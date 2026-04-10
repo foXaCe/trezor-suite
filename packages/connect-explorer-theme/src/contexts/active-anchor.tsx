@@ -39,7 +39,9 @@ export const ActiveAnchorProvider = ({ children }: { children: ReactNode }): Rea
 
                     for (const entry of entries) {
                         if (entry?.rootBounds && slugs.has(entry.target)) {
-                            const [slug, index] = slugs.get(entry.target);
+                            const slugData = slugs.get(entry.target);
+                            if (!slugData) continue;
+                            const [slug, index] = slugData;
                             const aboveHalfViewport =
                                 entry.boundingClientRect.y + entry.boundingClientRect.height <=
                                 entry.rootBounds.y + entry.rootBounds.height;
@@ -56,22 +58,25 @@ export const ActiveAnchorProvider = ({ children }: { children: ReactNode }): Rea
                     let smallestIndexInViewport = Infinity;
                     let largestIndexAboveViewport = -1;
                     for (const s in ret) {
-                        ret[s].isActive = false;
-                        if (ret[s].insideHalfViewport && ret[s].index < smallestIndexInViewport) {
-                            smallestIndexInViewport = ret[s].index;
+                        const entry = ret[s];
+                        if (!entry) continue;
+                        entry.isActive = false;
+                        if (entry.insideHalfViewport && entry.index < smallestIndexInViewport) {
+                            smallestIndexInViewport = entry.index;
                             activeSlug = s;
                         }
                         if (
                             smallestIndexInViewport === Infinity &&
-                            ret[s].aboveHalfViewport &&
-                            ret[s].index > largestIndexAboveViewport
+                            entry.aboveHalfViewport &&
+                            entry.index > largestIndexAboveViewport
                         ) {
-                            largestIndexAboveViewport = ret[s].index;
+                            largestIndexAboveViewport = entry.index;
                             activeSlug = s;
                         }
                     }
 
-                    if (ret[activeSlug]) ret[activeSlug].isActive = true;
+                    const activeEntry = ret[activeSlug];
+                    if (activeEntry) activeEntry.isActive = true;
 
                     return ret;
                 });

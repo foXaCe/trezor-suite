@@ -32,7 +32,12 @@ export class InMemoryTestProvider extends AbstractMetadataProvider {
     }
 
     getFileContent(file: string) {
-        return Promise.resolve(this.ok(Buffer.from(this.#files[file], 'hex')));
+        const content = this.#files[file];
+        if (!content) {
+            return Promise.resolve(this.ok(undefined));
+        }
+
+        return Promise.resolve(this.ok(Buffer.from(content, 'hex')));
     }
 
     setFileContent(file: string, content: Buffer) {
@@ -46,7 +51,10 @@ export class InMemoryTestProvider extends AbstractMetadataProvider {
     }
 
     renameFile(from: string, to: string) {
-        this.#files[to] = this.#files[from];
+        const content = this.#files[from];
+        if (content !== undefined) {
+            this.#files[to] = content;
+        }
         delete this.#files[from];
 
         return Promise.resolve(this.ok(undefined));

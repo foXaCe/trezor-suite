@@ -18,7 +18,7 @@ const showDialog = async (mainWindow: BrowserWindow) => {
         buttons: ['Wait', 'Quit', 'Clear cache & restart'],
     });
 
-    return (['wait', 'quit', 'reload'] as const)[resp.response];
+    return (['wait', 'quit', 'reload'] as const)[resp.response] ?? 'wait';
 };
 
 type HandshakeAndHangDetectParams = {
