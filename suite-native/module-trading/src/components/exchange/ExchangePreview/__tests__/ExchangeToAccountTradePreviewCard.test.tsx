@@ -45,7 +45,7 @@ describe('ExchangeToAccountTradePreviewCard', () => {
 
         expect(getByText('To')).toBeOnTheScreen();
         expect(getByText('+0.00083554 BTC')).toBeOnTheScreen();
-        expect(getByText(`0.00083554-${exchangeQuotes[0].receive}`)).toBeOnTheScreen();
+        expect(getByText(`0.00083554-${exchangeQuotes[0]?.receive}`)).toBeOnTheScreen();
     });
 
     // Todo: https://github.com/trezor/trezor-suite/issues/24906

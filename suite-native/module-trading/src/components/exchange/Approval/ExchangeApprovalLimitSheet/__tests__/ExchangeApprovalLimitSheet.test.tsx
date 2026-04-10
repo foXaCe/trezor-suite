@@ -1,3 +1,5 @@
+import type { ExchangeTrade } from 'invity-api';
+
 import { getTranslation } from '@suite-native/intl';
 import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils';
 import { exchangeQuotes, getInitializedTradingState } from '@suite-native/trading-fixtures';
@@ -7,7 +9,7 @@ import { ExchangeApprovalLimitSheet } from '../ExchangeApprovalLimitSheet';
 const mockOnDismiss = jest.fn();
 const mockOnApprovalTypeSelect = jest.fn();
 
-const testQuote = exchangeQuotes[0];
+const testQuote = exchangeQuotes[0] ?? ({} as ExchangeTrade);
 
 const getPreloadedState = (): PreloadedState => ({
     wallet: {

@@ -46,7 +46,7 @@ describe('ExchangeFromAccountTradePreviewCard', () => {
         expect(getByText('From')).toBeOnTheScreen();
         expect(getByText('ETH Account #1')).toBeOnTheScreen();
         expect(getByText('-100 USDC')).toBeOnTheScreen();
-        expect(getByText(`100-${exchangeQuotes[0].send}`)).toBeOnTheScreen();
+        expect(getByText(`100-${exchangeQuotes[0]?.send}`)).toBeOnTheScreen();
     });
 
     // Todo: https://github.com/trezor/trezor-suite/issues/24906

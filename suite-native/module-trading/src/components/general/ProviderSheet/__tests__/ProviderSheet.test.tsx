@@ -1,3 +1,5 @@
+import type { BuyTrade } from 'invity-api';
+
 import { type TradingTradeType, type TradingType } from '@suite-common/trading';
 import { FeatureFlag } from '@suite-native/feature-flags';
 import { type PreloadedState, renderWithStoreProvider, screen } from '@suite-native/test-utils';
@@ -64,7 +66,7 @@ describe('ProviderSheet', () => {
 
     it('should render provided quotes', () => {
         const { queryByText, getByText } = renderProviderSheet(
-            { quotes: { fixed: [buyQuotes[0]] } },
+            { quotes: { fixed: [buyQuotes[0] as BuyTrade] } },
             { wallet: getWalletState() },
         );
 

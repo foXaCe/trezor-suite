@@ -81,7 +81,7 @@ describe('ExchangePreviewContinueButton', () => {
     it('should keep continue button enabled when dex quote approval prefetch is loading', async () => {
         const preloadedState = getPreloadedState();
         preloadedState!.wallet!.trading!.exchange!.dexQuoteApprovalPrefetchLoadingQuoteId =
-            exchangeQuotes[0].quoteId;
+            exchangeQuotes[0]?.quoteId;
 
         const { getByTestId, queryByTestId } = await renderExchangePreviewContinueButton(
             {},
@@ -145,7 +145,7 @@ describe('ExchangePreviewContinueButton', () => {
             name: 'TradingExchangeOutputsReview',
             params: {
                 accountKey: 'btc-account-1',
-                orderId: exchangeQuotes[0].orderId,
+                orderId: exchangeQuotes[0]?.orderId,
                 tokenContract: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
             },
         });

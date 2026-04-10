@@ -63,10 +63,10 @@ describe('ExchangeFiatDeviationWarning', () => {
         renderExchangeFiatDeviationWarning(quote);
 
         expect(mockExchangeFiatDeviation).toHaveBeenCalledWith({
-            sendCryptoId: quote.send,
-            sendAmount: quote.sendStringAmount,
-            receiveCryptoId: quote.receive,
-            receiveAmount: quote.receiveStringAmount,
+            sendCryptoId: quote?.send,
+            sendAmount: quote?.sendStringAmount,
+            receiveCryptoId: quote?.receive,
+            receiveAmount: quote?.receiveStringAmount,
             fiatCurrency: 'usd',
         });
     });
