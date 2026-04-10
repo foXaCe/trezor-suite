@@ -151,9 +151,7 @@ async function ensureDirectoryExists(path: string) {
 
     await ensureDirectoryExists(FILES_CRYPTOICONS_PATH);
 
-    for (let i = 0; i < coins.length; i++) {
-        const coin = coins[i];
-
+    for (const [i, coin] of coins.entries()) {
         console.log(`${i + 1}/${coins.length}: Start icon updating for ${coin.id}`);
         await updateIcon(coin);
 
