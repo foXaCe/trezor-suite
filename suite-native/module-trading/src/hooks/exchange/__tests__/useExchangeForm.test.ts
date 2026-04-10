@@ -95,9 +95,9 @@ describe('useExchangeForm', () => {
             act(() => {
                 store.dispatch(
                     tradingExchangeActions.saveQuotes([
-                        exchangeQuotes[0],
-                        exchangeQuotes[1],
-                        { ...exchangeQuotes[2], rate: 0.000008 },
+                        exchangeQuotes[0] as ExchangeTrade,
+                        exchangeQuotes[1] as ExchangeTrade,
+                        { ...exchangeQuotes[2], rate: 0.000008 } as ExchangeTrade,
                     ]),
                 );
             });
@@ -126,7 +126,10 @@ describe('useExchangeForm', () => {
             const { result } = renderUseExchangeForm();
             act(() => {
                 store.dispatch(
-                    tradingExchangeActions.saveQuotes([exchangeQuotes[0], exchangeQuotes[1]]),
+                    tradingExchangeActions.saveQuotes([
+                        exchangeQuotes[0] as ExchangeTrade,
+                        exchangeQuotes[1] as ExchangeTrade,
+                    ]),
                 );
             });
 
@@ -141,7 +144,10 @@ describe('useExchangeForm', () => {
             const { result } = renderUseExchangeForm();
             act(() => {
                 store.dispatch(
-                    tradingExchangeActions.saveQuotes([exchangeQuotes[2], exchangeQuotes[3]]),
+                    tradingExchangeActions.saveQuotes([
+                        exchangeQuotes[2] as ExchangeTrade,
+                        exchangeQuotes[3] as ExchangeTrade,
+                    ]),
                 );
             });
 
@@ -155,7 +161,9 @@ describe('useExchangeForm', () => {
         it('should select dex quote when no other quotes are available', () => {
             const { result } = renderUseExchangeForm();
             act(() => {
-                store.dispatch(tradingExchangeActions.saveQuotes([exchangeQuotes[3]]));
+                store.dispatch(
+                    tradingExchangeActions.saveQuotes([exchangeQuotes[3] as ExchangeTrade]),
+                );
             });
 
             expect(result.current.getValues('quote')).toEqual(

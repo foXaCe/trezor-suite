@@ -15,8 +15,8 @@ describe('SellPreviewView', () => {
         ...getSellTrade({ status: undefined }),
         data: {
             ...getSellTrade({ status: undefined }).data,
-            orderId: sellQuotes[1].orderId,
-            bankAccounts: sellQuotes[1].bankAccounts,
+            orderId: sellQuotes[1]?.orderId,
+            bankAccounts: sellQuotes[1]?.bankAccounts,
         },
     });
 

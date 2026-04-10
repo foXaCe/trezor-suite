@@ -303,7 +303,7 @@ describe('useBuyForm', () => {
                 result.current.setValue('fiatValue', '10');
                 result.current.setValue('asset', btcAsset);
                 // Only provide credit card quote
-                store.dispatch(tradingBuyActions.saveQuotes([buyQuotes[0]]));
+                store.dispatch(tradingBuyActions.saveQuotes([buyQuotes[0] as BuyTrade]));
             });
 
             expect(result.current.getValues('quote')).toEqual(
@@ -461,7 +461,7 @@ describe('useBuyForm', () => {
                 });
 
                 act(() => {
-                    store.dispatch(tradingBuyActions.saveQuotes([buyQuotes[0]]));
+                    store.dispatch(tradingBuyActions.saveQuotes([buyQuotes[0] as BuyTrade]));
                 });
 
                 expect(form.getValues('quote')).toEqual(

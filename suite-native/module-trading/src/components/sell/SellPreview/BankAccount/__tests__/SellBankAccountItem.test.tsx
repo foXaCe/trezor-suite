@@ -1,13 +1,15 @@
 import React from 'react';
 
+import type { BankAccount } from 'invity-api';
+
 import { renderWithBasicProvider, userEvent } from '@suite-native/test-utils';
 import { bankAccounts } from '@suite-native/trading-fixtures';
 
 import { BANK_ACCOUNT_ITEM_TEST_ID, SellBankAccountItem } from '../SellBankAccountItem';
 
 describe('SellBankAccountItem', () => {
-    const verifiedBankAccount = bankAccounts[0]; // John Doe - verified
-    const unverifiedBankAccount = bankAccounts[1]; // Jane Smith - not verified
+    const verifiedBankAccount = bankAccounts[0] as BankAccount; // John Doe - verified
+    const unverifiedBankAccount = bankAccounts[1] as BankAccount; // Jane Smith - not verified
 
     const renderSellBankAccountItem = (props = {}) =>
         renderWithBasicProvider(

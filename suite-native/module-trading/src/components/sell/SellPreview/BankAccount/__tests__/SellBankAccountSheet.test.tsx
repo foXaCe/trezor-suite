@@ -15,7 +15,7 @@ describe('SellBankAccountSheet', () => {
             <SellBankAccountSheet
                 ref={mockRef}
                 bankAccounts={bankAccounts}
-                selectedBankAccountIban={bankAccounts[0].bankAccount}
+                selectedBankAccountIban={bankAccounts[0]?.bankAccount ?? ''}
                 onBankAccountSelect={mockOnBankAccountSelect}
                 closeModal={mockCloseModal}
                 {...props}

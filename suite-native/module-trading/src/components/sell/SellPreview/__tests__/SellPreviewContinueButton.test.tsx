@@ -130,7 +130,7 @@ describe('SellPreviewContinueButton', () => {
             name: 'TradingSellOutputsReview',
             params: {
                 accountKey: 'eth-account-1',
-                orderId: sellQuotes[0].orderId,
+                orderId: sellQuotes[0]?.orderId,
                 tokenContract: undefined,
             },
         });

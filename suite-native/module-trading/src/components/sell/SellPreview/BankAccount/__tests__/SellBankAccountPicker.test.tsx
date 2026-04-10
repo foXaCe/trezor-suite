@@ -93,7 +93,7 @@ describe('SellBankAccountPicker', () => {
             const { queryByTestId } = renderWithStoreProvider(
                 <SellBankAccountPicker
                     orderId={undefined}
-                    selectedBankAccountIban={bankAccounts[0].bankAccount}
+                    selectedBankAccountIban={bankAccounts[0]?.bankAccount ?? ''}
                     onBankAccountSelect={mockOnBankAccountSelect}
                 />,
                 { preloadedState },
