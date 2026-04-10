@@ -15,12 +15,14 @@ export const resolveCancelAddress = ({ account, tx }: ResolveCancelAddress): str
         firstChangeAddress.addresses !== undefined &&
         firstChangeAddress.addresses.length > 0
     ) {
-        return firstChangeAddress.addresses[0];
+        // Length check above guarantees this is defined.
+        return firstChangeAddress.addresses[0] ?? '';
     }
 
     if (account.addresses.unused.length < 1) {
         throw new Error('No unused addresses, should not happen!');
     }
 
-    return account.addresses.unused[0].address;
+    // Length check above guarantees this is defined.
+    return account.addresses.unused[0]?.address ?? '';
 };

@@ -62,7 +62,7 @@ const manageTrustline = async (
         feePerUnit = feeLevel.feePerUnit;
     }
 
-    const [code, issuer] = contractAddress.split('-');
+    const [code = '', issuer] = contractAddress.split('-');
 
     const asset = {
         type: code.length <= 4 ? StellarAssetType.ALPHANUM4 : StellarAssetType.ALPHANUM12,

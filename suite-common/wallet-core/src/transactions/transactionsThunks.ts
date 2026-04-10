@@ -150,7 +150,9 @@ export const addFakePendingTxThunk = createThunk(
         }>(
             (result, output) => {
                 if (output.addresses) {
-                    findAccountsByAddress(account.symbol, output.addresses[0], accounts).forEach(
+                    const firstAddress = output.addresses[0];
+                    if (!firstAddress) return result;
+                    findAccountsByAddress(account.symbol, firstAddress, accounts).forEach(
                         affectedAccount => {
                             if (affectedAccount.key === account.key) return accounts;
                             if (!result[affectedAccount.key]) {
@@ -168,6 +170,7 @@ export const addFakePendingTxThunk = createThunk(
 
         Object.keys(affectedAccounts).forEach(key => {
             const affectedAccount = affectedAccounts[key];
+            if (!affectedAccount) return;
             if (!isRbfBumpFeeTransaction(precomposedTransaction)) {
                 // create and profile pending transaction for affected account if it's not a replacement tx
                 const affectedAccountTransaction = blockbookUtils.transformTransaction(
@@ -222,8 +225,11 @@ const buildFakePendingEvmTx = ({
     token?: TokenInfo;
 }): AccountTransaction & Partial<WalletAccountTransaction> => {
     const output = precomposedTransaction.outputs[0];
+    if (!output) {
+        throw new Error('Missing output in precomposed transaction');
+    }
     const fromAddress = account.descriptor;
-    const toAddress = output.address!;
+    const toAddress = output.address ?? '';
     const amount = output.amount.toString();
     const isLegacyTx = !isEip1559(precomposedTransaction);
 

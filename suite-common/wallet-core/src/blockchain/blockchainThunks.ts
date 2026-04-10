@@ -318,6 +318,9 @@ export const onBlockchainNotificationThunk = createThunk(
         }
 
         const account = accounts[0];
+        if (!account) {
+            return;
+        }
 
         // ripple worker sends two notifications for the same tx (pending + confirmed/rejected)
         // dispatch only recv notifications

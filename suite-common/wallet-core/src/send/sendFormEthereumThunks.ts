@@ -68,7 +68,7 @@ export const calculate = (
     );
 
     const availableTokenBalance = token
-        ? convertAmountUnitsToSubunits(token.balance!, token.decimals)
+        ? convertAmountUnitsToSubunits(token.balance ?? '0', token.decimals)
         : undefined;
 
     if (output.type === 'send-max' || output.type === 'send-max-noaddress') {
@@ -191,9 +191,10 @@ export const composeEthereumTransactionFeeLevelsThunk = createThunk<
         const { transactionData } = formState;
 
         const isApproveTx = isEvmApprovalTx(transactionData);
+        const firstOutput = formState.outputs[0];
         const contract = isApprovalFlowSupported(device)
-            ? (formState.outputs[0].token ?? undefined)
-            : formState.outputs[0].address;
+            ? (firstOutput?.token ?? undefined)
+            : firstOutput?.address;
 
         if (isApproveTx && !contract) {
             return rejectWithValue({
@@ -214,14 +215,17 @@ export const composeEthereumTransactionFeeLevelsThunk = createThunk<
 
         const { output, tokenInfo, decimals } = composedOutput;
         const { availableBalance } = account;
-        const { address, amount } = formState.outputs[0];
+        const { address, amount } = formState.outputs[0] ?? {
+            address: undefined,
+            amount: undefined,
+        };
 
         const ethereumEstimateFeeParams =
             isApproveTx && contract
                 ? getEthereumEstimateFeeParams(contract, '0', undefined, formState.transactionData)
                 : getEthereumEstimateFeeParams(
                       address || account.descriptor,
-                      amount || (tokenInfo ? tokenInfo.balance! : account.formattedBalance),
+                      amount || (tokenInfo ? (tokenInfo.balance ?? '0') : account.formattedBalance),
                       tokenInfo,
                       formState.transactionData,
                   );
@@ -242,7 +246,7 @@ export const composeEthereumTransactionFeeLevelsThunk = createThunk<
 
         let customFeeLimit: BigNumber;
         if (estimatedFee.success) {
-            customFeeLimit = new BigNumber(estimatedFee.payload.levels[0].feeLimit || '');
+            customFeeLimit = new BigNumber(estimatedFee.payload.levels[0]?.feeLimit ?? '');
         } else {
             customFeeLimit = new BigNumber(
                 tokenInfo || transactionData
@@ -301,7 +305,9 @@ export const composeEthereumTransactionFeeLevelsThunk = createThunk<
             ),
         );
         response.forEach((tx, index) => {
-            const feeLabel = predefinedLevels[index].label as FeeLevel['label'];
+            const level = predefinedLevels[index];
+            if (!level) return;
+            const feeLabel = level.label as FeeLevel['label'];
             resultLevels[feeLabel] = tx;
         });
 
@@ -309,6 +315,7 @@ export const composeEthereumTransactionFeeLevelsThunk = createThunk<
         // update errorMessage values (symbol)
         Object.keys(resultLevels).forEach(key => {
             const tx = resultLevels[key];
+            if (!tx) return;
             if (tx.type !== 'error') {
                 tx.max = tx.max ? convertAmountSubunitsToUnits(tx.max, decimals) : undefined;
                 tx.estimatedFeeLimit = !customFeeLimit.isNaN()
@@ -404,8 +411,8 @@ export const signEthereumSendFormTransactionThunk = createThunk<
         const transaction = prepareEthereumTransaction({
             token: precomposedTransaction.token,
             chainId: network.chainId,
-            to: formState.outputs[0].address,
-            amount: formState.outputs[0].amount,
+            to: formState.outputs[0]?.address ?? '',
+            amount: formState.outputs[0]?.amount ?? '0',
             data: formState.transactionData,
             gasLimit: precomposedTransaction.feeLimit || '',
             maxFeePerGas: precomposedTransaction.maxFeePerGas,

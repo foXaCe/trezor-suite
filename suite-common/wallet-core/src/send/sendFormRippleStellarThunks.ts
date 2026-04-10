@@ -48,7 +48,7 @@ const calculate = (
     let max: string | undefined;
     const availableTokenBalance = token
         ? unitsToSubunits({
-              value: asAmountUnit(new BigNumber(token.balance!)),
+              value: asAmountUnit(new BigNumber(token.balance ?? '0')),
               decimals: token.decimals,
           }).toString()
         : undefined;
@@ -129,7 +129,7 @@ export const composeRippleStellarTransactionFeeLevelsThunk = createThunk<
 
         const { output, tokenInfo } = composeOutputs;
         const { availableBalance } = account;
-        const { address } = formState.outputs[0];
+        const { address } = formState.outputs[0] ?? { address: undefined };
 
         const predefinedLevels = feeInfo.levels.filter(l => l.label !== 'custom');
         // in case when selectedFee is set to 'custom' construct this FeeLevel from values
@@ -152,7 +152,7 @@ export const composeRippleStellarTransactionFeeLevelsThunk = createThunk<
             });
             if (accountResponse.success && accountResponse.payload.empty) {
                 // TODO(stellar): check if the recipient has a trust line before sending.
-                requiredAmount = new BigNumber(accountResponse.payload.misc!.reserve!);
+                requiredAmount = new BigNumber(accountResponse.payload.misc?.reserve ?? '0');
             }
         }
 
@@ -162,7 +162,9 @@ export const composeRippleStellarTransactionFeeLevelsThunk = createThunk<
             calculate(availableBalance, output, level, requiredAmount, tokenInfo),
         );
         response.forEach((tx, index) => {
-            const feeLabel = predefinedLevels[index].label as FeeLevel['label'];
+            const level = predefinedLevels[index];
+            if (!level) return;
+            const feeLabel = level.label as FeeLevel['label'];
             resultLevels[feeLabel] = tx;
         });
 
@@ -170,7 +172,7 @@ export const composeRippleStellarTransactionFeeLevelsThunk = createThunk<
         // there is no valid tx in predefinedLevels and there is no custom level
         if (!hasAtLeastOneValid && !resultLevels.custom) {
             const { minFee } = feeInfo;
-            const lastKnownFee = predefinedLevels[predefinedLevels.length - 1].feePerUnit;
+            const lastKnownFee = predefinedLevels[predefinedLevels.length - 1]?.feePerUnit ?? '0';
             let maxFee = new BigNumber(lastKnownFee).minus(1);
             // generate custom levels in range from lastKnownFee -1 to feeInfo.minFee (coinInfo in @trezor/connect)
             const customLevels: FeeLevel[] = [];
@@ -185,7 +187,10 @@ export const composeRippleStellarTransactionFeeLevelsThunk = createThunk<
 
             const customValid = customLevelsResponse.findIndex(r => r.type !== 'error');
             if (customValid >= 0) {
-                resultLevels.custom = customLevelsResponse[customValid];
+                const validLevel = customLevelsResponse[customValid];
+                if (validLevel) {
+                    resultLevels.custom = validLevel;
+                }
             }
         }
 
@@ -193,6 +198,7 @@ export const composeRippleStellarTransactionFeeLevelsThunk = createThunk<
         // update errorMessage values (reserve)
         Object.keys(resultLevels).forEach(key => {
             const tx = resultLevels[key];
+            if (!tx) return;
             if (tx.type !== 'error' && tx.max) {
                 tx.max = formatNetworkAmount(tx.max, account.symbol);
             }
@@ -241,11 +247,13 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
 
         let response;
 
+        const firstOutput = formState.outputs[0];
+
         if (selectedAccount.networkType === 'ripple') {
             const payment: RipplePayment = {
-                destination: formState.outputs[0].address,
+                destination: firstOutput?.address ?? '',
                 amount: networkAmountToSmallestUnit(
-                    formState.outputs[0].amount,
+                    firstOutput?.amount ?? '0',
                     selectedAccount.symbol,
                 ),
             };
@@ -276,7 +284,7 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
             }
         } else if (selectedAccount.networkType === 'stellar') {
             const destinationAccount = await TrezorConnect.getAccountInfo({
-                descriptor: formState.outputs[0].address,
+                descriptor: firstOutput?.address ?? '',
                 coin: selectedAccount.symbol,
                 suppressBackupWarning: true,
             });
@@ -286,14 +294,20 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
 
             const { token } = precomposedTransaction;
             const asset = token
-                ? (([code, issuer]) => ({
-                      type:
-                          code.length <= 4
-                              ? StellarAssetType.ALPHANUM4
-                              : StellarAssetType.ALPHANUM12,
-                      code,
-                      issuer,
-                  }))(token.contract.split('-'))
+                ? (() => {
+                      const parts = token.contract.split('-');
+                      const code = parts[0] ?? '';
+                      const issuer = parts[1] ?? '';
+
+                      return {
+                          type:
+                              code.length <= 4
+                                  ? StellarAssetType.ALPHANUM4
+                                  : StellarAssetType.ALPHANUM12,
+                          code,
+                          issuer,
+                      };
+                  })()
                 : { type: StellarAssetType.NATIVE };
 
             let operation: StellarOperation;
@@ -301,14 +315,14 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
                 operation = {
                     type: 'payment',
                     asset,
-                    amount: toStroops(formState.outputs[0].amount).toString(),
-                    destination: formState.outputs[0].address,
+                    amount: toStroops(firstOutput?.amount ?? '0').toString(),
+                    destination: firstOutput?.address ?? '',
                 };
             } else {
                 operation = {
                     type: 'createAccount',
-                    startingBalance: toStroops(formState.outputs[0].amount).toString(),
-                    destination: formState.outputs[0].address,
+                    startingBalance: toStroops(firstOutput?.amount ?? '0').toString(),
+                    destination: firstOutput?.address ?? '',
                 };
             }
 
@@ -317,8 +331,8 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
                 sequence: selectedAccount.misc.stellarSequence,
                 fee: precomposedTransaction.feePerByte,
                 destinationActivated,
-                destination: formState.outputs[0].address,
-                amount: formState.outputs[0].amount,
+                destination: firstOutput?.address ?? '',
+                amount: firstOutput?.amount ?? '0',
                 asset,
                 destinationTag: formState.destinationTag,
                 isTestnet: isTestnet(selectedAccount.symbol),

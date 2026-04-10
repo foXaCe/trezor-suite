@@ -13,11 +13,11 @@ export type DiscoveryRootState = {
 export const discoveryInitialState: Discovery = {};
 
 const update = (draft: Discovery, payload: { status: DiscoveryStatus; path: DeviceUniquePath }) => {
-    if (!draft[payload.path]) {
+    const currentStatus = draft[payload.path];
+    if (!currentStatus) {
         return;
     }
 
-    const currentStatus = draft[payload.path];
     const hasLoadedAnyNonEmptyAccount =
         currentStatus.hasLoadedAnyNonEmptyAccount || payload.status.hasLoadedAnyNonEmptyAccount;
 

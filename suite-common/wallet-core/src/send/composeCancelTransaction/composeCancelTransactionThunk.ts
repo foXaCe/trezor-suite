@@ -84,7 +84,7 @@ const calculateNewTransactionSize = createThunk<
 
         const tempCancelTx = tempCancelTxResult.payload[0];
 
-        if (tempCancelTx.type !== 'final') {
+        if (!tempCancelTx || tempCancelTx.type !== 'final') {
             return rejectWithValue('Unexpected compose tempCancelTxResult (non-final)');
         }
 
@@ -136,7 +136,7 @@ export const composeCancelTransactionThunk = createThunk<
 
         const composedTx = sizeCalculationResponse.payload[0];
 
-        if (composedTx.type !== 'final') {
+        if (!composedTx || composedTx.type !== 'final') {
             return rejectWithValue('Unexpected compose result (non-final)');
         }
 

@@ -57,7 +57,7 @@ export const selectPoolStatsApy = (
                 }
             }
 
-            const bestPoolId = selectBestCardanoPool(poolStats).bech32;
+            const bestPoolId = selectBestCardanoPool(poolStats)?.bech32;
             const bestPool = bestPoolId
                 ? poolStats.find(pool => pool.id === bestPoolId)
                 : undefined;

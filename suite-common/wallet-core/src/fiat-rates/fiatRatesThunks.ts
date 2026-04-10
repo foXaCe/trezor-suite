@@ -80,7 +80,7 @@ export const updateTxsFiatRatesThunk = createThunk(
                 }
             }
 
-            const tokenTimestamps = groupedTokensTxs[token]
+            const tokenTimestamps = (groupedTokensTxs[token] ?? [])
                 .map(tx => (tx.blockTime !== undefined ? asTimestamp(tx.blockTime) : undefined))
                 .filter(it => it !== undefined);
 

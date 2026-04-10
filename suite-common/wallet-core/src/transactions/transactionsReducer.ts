@@ -132,8 +132,9 @@ export const prepareTransactionsReducer = createReducerWithExtraDeps(
                 };
             })
             .addCase(fetchAllTransactionsForAccountThunk.fulfilled, (state, { meta }) => {
+                const existing = state.fetchStatusDetail[meta.arg.accountKey];
                 state.fetchStatusDetail[meta.arg.accountKey] = {
-                    ...state.fetchStatusDetail[meta.arg.accountKey],
+                    ...(existing ?? { status: 'idle', error: null }),
                     areAllTransactionsLoaded: true,
                 };
             })

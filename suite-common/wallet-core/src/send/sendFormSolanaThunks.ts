@@ -51,7 +51,7 @@ const calculate = (
     let amount: string;
     let max: string | undefined;
     const availableTokenBalance = token
-        ? convertAmountUnitsToSubunits(token.balance!, token.decimals)
+        ? convertAmountUnitsToSubunits(token.balance ?? '0', token.decimals)
         : undefined;
     if (output.type === 'send-max' || output.type === 'send-max-noaddress') {
         max = availableTokenBalance || calculateMax(availableBalance, feeInLamports);
@@ -191,12 +191,13 @@ export const composeSolanaTransactionFeeLevelsThunk = createThunk<
                 message: 'Token accounts not found.',
             });
 
-        if (formState.setMaxOutputId !== undefined && !formState.outputs[0].amount) {
+        const firstOutput = formState.outputs[0];
+        if (firstOutput && formState.setMaxOutputId !== undefined && !firstOutput.amount) {
             if (tokenInfo?.balance) {
-                formState.outputs[0].amount = tokenInfo.balance;
+                firstOutput.amount = tokenInfo.balance;
             } else {
                 // minimal amount for purpose of fee estimation, at least to cover rent + 1 lamport
-                formState.outputs[0].amount = convertAmountSubunitsToUnits(
+                firstOutput.amount = convertAmountSubunitsToUnits(
                     (account.misc?.rent ?? 0) + 1,
                     decimals,
                 );
@@ -209,8 +210,8 @@ export const composeSolanaTransactionFeeLevelsThunk = createThunk<
         // The real transaction is constructed in `signTransaction`, this one is used solely for fee estimation and is never submitted.
         const transaction = await TrezorConnect.solanaComposeTransaction({
             fromAddress: account.descriptor,
-            toAddress: formState.outputs[0].address,
-            amount: formState.outputs[0].amount,
+            toAddress: firstOutput?.address ?? '',
+            amount: firstOutput?.amount ?? '0',
             token: tokenInfo
                 ? {
                       mint: tokenInfo.contract,
@@ -254,9 +255,9 @@ export const composeSolanaTransactionFeeLevelsThunk = createThunk<
         if (estimatedFee.success) {
             // We access the array directly like this because the fee response from the solana worker always returns an array of size 1
             const feeLevel = estimatedFee.payload.levels[0];
-            fetchedFee = feeLevel.feePerTx;
-            fetchedFeePerUnit = feeLevel.feePerUnit;
-            fetchedFeeLimit = feeLevel.feeLimit;
+            fetchedFee = feeLevel?.feePerTx;
+            fetchedFeePerUnit = feeLevel?.feePerUnit;
+            fetchedFeeLimit = feeLevel?.feeLimit;
         } else {
             // Error fetching fee, fall back on default values defined in `/packages/connect/src/data/defaultFeeLevels.ts`
             console.warn('Error fetching fee, using default values.', estimatedFee.error.message);
@@ -289,7 +290,9 @@ export const composeSolanaTransactionFeeLevelsThunk = createThunk<
             ),
         );
         response.forEach((tx, index) => {
-            const feeLabel = predefinedLevels[index].label as FeeLevel['label'];
+            const level = predefinedLevels[index];
+            if (!level) return;
+            const feeLabel = level.label as FeeLevel['label'];
             resultLevels[feeLabel] = tx;
         });
 
@@ -297,6 +300,7 @@ export const composeSolanaTransactionFeeLevelsThunk = createThunk<
         // update errorMessage values (symbol)
         Object.keys(resultLevels).forEach(key => {
             const tx = resultLevels[key];
+            if (!tx) return;
             if (tx.type !== 'error') {
                 tx.max = tx.max ? convertAmountSubunitsToUnits(tx.max, decimals) : undefined;
             }
@@ -357,8 +361,8 @@ export const signSolanaSendFormTransactionThunk = createThunk<
 
         const transaction = await TrezorConnect.solanaComposeTransaction({
             fromAddress: selectedAccount.descriptor,
-            toAddress: formState.outputs[0].address,
-            amount: formState.outputs[0].amount,
+            toAddress: formState.outputs[0]?.address ?? '',
+            amount: formState.outputs[0]?.amount ?? '0',
             token: token
                 ? {
                       mint: token.contract,
@@ -414,6 +418,6 @@ export const signSolanaSendFormTransactionThunk = createThunk<
             });
         }
 
-        return { serializedTx: response.payload.serializedTx! };
+        return { serializedTx: response.payload.serializedTx ?? '' };
     },
 );

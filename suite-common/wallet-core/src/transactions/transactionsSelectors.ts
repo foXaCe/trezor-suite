@@ -349,11 +349,13 @@ export const selectTransactionsWithMissingRates = (
     const transactions = selectTransactions(state);
     const historicFiatRates = selectHistoricFiatRates(state);
 
+    const txSource = accountKey ? { [accountKey]: transactions[accountKey] } : transactions;
+
     return pipe(
-        accountKey ? { [accountKey]: transactions[accountKey] } : transactions,
+        txSource as Record<string, WalletAccountTransaction[] | undefined>,
         D.mapWithKey((key, txs) => ({
             account: selectAccountByKey(state, key as AccountKey),
-            txs: txs.filter(tx => {
+            txs: (txs ?? []).filter(tx => {
                 const fiatRateKey = getFiatRateKey(tx.symbol, localCurrency as BaseCurrencyCode);
                 const roundedTimestamp = roundTimestampToNearestPastHour(tx.blockTime as Timestamp);
                 const historicRate = historicFiatRates?.[fiatRateKey]?.[roundedTimestamp];
