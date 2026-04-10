@@ -3,7 +3,6 @@ auto_sections: false
 icon: lightning
 ---
 
-import Link from 'next/link';
 import { Card, Cards, Steps, Tabs } from 'nextra/components';
 import styled from 'styled-components';
 
@@ -134,17 +133,15 @@ export const ExampleHeading = styled.h3`
         <IconNode />
         <SdkName>Node.js</SdkName>
         <SdkTag></SdkTag>
-        <Link href="/readme/connect" passHref legacyBehavior>
-            <Button
-                intent="neutral"
-                priority="secondary"
-                size="small"
-                iconLeft="bookOpenText"
-                target="_self"
-                href="#">
-                README
-            </Button>
-        </Link>
+        <Button
+            intent="neutral"
+            priority="secondary"
+            size="small"
+            iconLeft="bookOpenText"
+            target="_self"
+            href="/readme/connect">
+            README
+        </Button>
         <Button
             intent="neutral"
             priority="secondary"
@@ -233,17 +230,15 @@ export const ExampleHeading = styled.h3`
         <IconWeb />
         <SdkName>Web</SdkName>
         <SdkTag>DOM required</SdkTag>
-        <Link href="/readme/connect-web" passHref legacyBehavior>
-            <Button
-                intent="neutral"
-                priority="secondary"
-                size="small"
-                iconLeft="bookOpenText"
-                target="_self"
-                href="#">
-                README
-            </Button>
-        </Link>
+        <Button
+            intent="neutral"
+            priority="secondary"
+            size="small"
+            iconLeft="bookOpenText"
+            target="_self"
+            href="/readme/connect-web">
+            README
+        </Button>
         <Button
             intent="neutral"
             priority="secondary"
@@ -347,17 +342,15 @@ export const ExampleHeading = styled.h3`
         <IconExtension />
         <SdkName>Web extension</SdkName>
         <SdkTag>Using service worker</SdkTag>
-        <Link href="/readme/connect-webextension" passHref legacyBehavior>
-            <Button
-                intent="neutral"
-                priority="secondary"
-                size="small"
-                iconLeft="bookOpenText"
-                target="_self"
-                href="#">
-                README
-            </Button>
-        </Link>
+        <Button
+            intent="neutral"
+            priority="secondary"
+            size="small"
+            iconLeft="bookOpenText"
+            target="_self"
+            href="/readme/connect-webextension">
+            README
+        </Button>
         <Button
             intent="neutral"
             priority="secondary"
@@ -383,18 +376,16 @@ export const ExampleHeading = styled.h3`
             allowing secure connection to Trezor hardware wallets.
             By the end, you'll have a fully functional web extension.
 
-            <Link href="/guides/webextension-implementation-tutorial" passHref legacyBehavior>
-                <Button
-                    intent="neutral"
-                    priority="secondary"
-                    className="nx-mt-4 nx-mb-8"
-                    size="small"
-                    iconLeft="bookOpenText"
-                    target="_self"
-                    href="#">
-                    Open Tutorial  →
-                </Button>
-            </Link>
+            <Button
+                intent="neutral"
+                priority="secondary"
+                className="nx-mt-4 nx-mb-8"
+                size="small"
+                iconLeft="bookOpenText"
+                target="_self"
+                href="/guides/webextension-implementation-tutorial">
+                Open Tutorial  →
+            </Button>
         </SdkDescription>
         <ExamplesAside>
             <ExampleHeading>Examples:</ExampleHeading>
@@ -480,17 +471,15 @@ export const ExampleHeading = styled.h3`
         <IconMobile />
         <SdkName>Mobile</SdkName>
         <SdkTag>Using deep linking</SdkTag>
-        <Link href="/readme/connect-mobile" passHref legacyBehavior>
-            <Button
-                intent="neutral"
-                priority="secondary"
-                size="small"
-                iconLeft="bookOpenText"
-                target="_self"
-                href="#">
-                README
-            </Button>
-        </Link>
+        <Button
+            intent="neutral"
+            priority="secondary"
+            size="small"
+            iconLeft="bookOpenText"
+            target="_self"
+            href="/readme/connect-mobile">
+            README
+        </Button>
         <Button
             intent="neutral"
             priority="secondary"
@@ -517,18 +506,16 @@ export const ExampleHeading = styled.h3`
 
             This can be done by implementing the following specification.
 
-            <Link href="/details/deeplinking" passHref legacyBehavior>
-                <Button
-                    intent="neutral"
-                    priority="secondary"
-                    className="nx-mt-4 nx-mb-8"
-                    size="small"
-                    iconRight="arrowRight"
-                    target="_self"
-                    href="#">
-                    Deep linking specification
-                </Button>
-            </Link>
+            <Button
+                intent="neutral"
+                priority="secondary"
+                className="nx-mt-4 nx-mb-8"
+                size="small"
+                iconRight="arrowRight"
+                target="_self"
+                href="/details/deeplinking">
+                Deep linking specification
+            </Button>
 
         </SdkDescription>
         <ExamplesAside>
