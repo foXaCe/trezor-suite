@@ -1091,6 +1091,10 @@ export const init: ModuleInit = ({ mainWindowProxy, store }) => {
 
         // POST /mcp — main JSON-RPC endpoint
         httpServer.post('/mcp', [
+            (request: RequestWithParams, response: Response, next) => {
+                response.setHeader('Content-Type', 'application/json');
+                next(request, response);
+            },
             parseBodyJSONWithLimit(MAX_BODY_SIZE),
             async (request: RequestWithParams, response: Response) => {
                 // Per MCP spec, clients MUST include Mcp-Session-Id once assigned.
