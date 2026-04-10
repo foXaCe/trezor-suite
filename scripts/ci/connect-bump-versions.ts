@@ -19,7 +19,11 @@ const args = process.argv.slice(2);
 if (args.length < 1) {
     throw new Error('Check npm dependencies requires 1 parameter: semver');
 }
-const [semver] = args;
+const semver = args[0];
+
+if (!semver) {
+    throw new Error('semver argument is required');
+}
 
 /**
  *   The release version or type.  Can be one of the following:

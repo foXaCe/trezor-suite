@@ -55,7 +55,7 @@ const rootDir = path.resolve(currentDir, '..');
         );
     }
 
-    const [packageScope, packageName] = newPackage.split('/');
+    const [packageScope = '', packageName = ''] = newPackage.split('/');
 
     if (!isValidScope(packageScope)) {
         exitWithErrorMessage(
@@ -67,12 +67,8 @@ const rootDir = path.resolve(currentDir, '..');
         );
     }
 
-    const {
-        path: scopePath,
-        templatePath,
-        templatePackageJson,
-    } = scopes[packageScope as keyof typeof scopes];
-    const packagePath = path.join(rootDir, scopePath, packageName);
+    const scopeConfig = scopes[packageScope];
+    const packagePath = path.join(rootDir, scopeConfig.path, packageName);
 
     const workspacesNames = Object.keys(getWorkspacesList());
     if (fs.existsSync(packagePath)) {
@@ -87,7 +83,7 @@ const rootDir = path.resolve(currentDir, '..');
     }
 
     const packageJson = sortPackageJson({
-        ...templatePackageJson,
+        ...scopeConfig.templatePackageJson,
         name: newPackage,
     });
 
@@ -95,7 +91,7 @@ const rootDir = path.resolve(currentDir, '..');
     const serializeConfig = (config: Record<string, unknown>) =>
         prettier.format(JSON.stringify(config).replace(/\\\\/g, '/'), prettierConfig);
     try {
-        const templateSourcePath = path.join(currentDir, templatePath);
+        const templateSourcePath = path.join(currentDir, scopeConfig.templatePath);
         fsExtra.copySync(templateSourcePath, packagePath);
         fs.writeFileSync(
             path.join(packagePath, 'package.json'),

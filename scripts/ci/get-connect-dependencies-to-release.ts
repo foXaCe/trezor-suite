@@ -49,7 +49,7 @@ const checkNonReleasedDependencies = async (packageName: string) => {
             // eslint-disable-next-line no-continue
             continue;
         }
-        const [_prefix, name] = dependency.split('/');
+        const name = dependency.split('/')[1] ?? '';
 
         await checkNonReleasedDependencies(name);
     }
