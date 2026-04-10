@@ -67,14 +67,18 @@ export function getResult<
     }, new BN(result.fee));
 
     const max =
-        sendMaxOutputIndex >= 0 ? result.outputs[sendMaxOutputIndex].value.toString() : undefined;
+        sendMaxOutputIndex >= 0 ? result.outputs[sendMaxOutputIndex]?.value.toString() : undefined;
     const bytes = transactionBytes(result.inputs, result.outputs);
     const feePerByte = result.fee / bytes;
 
     const { complete, incomplete } = splitByCompleteness(request.outputs);
 
     if (incomplete.length > 0) {
-        const inputs = result.inputs.map(input => request.utxos[input.i]);
+        const inputs = result.inputs.flatMap(input => {
+            const utxo = request.utxos[input.i];
+
+            return utxo ? [utxo] : [];
+        });
 
         return {
             type: 'nonfinal',

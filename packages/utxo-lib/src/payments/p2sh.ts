@@ -22,7 +22,11 @@ const { OPS } = bscript;
 function stacksEqual(a: Buffer[], b: Buffer[]): boolean {
     if (a.length !== b.length) return false;
 
-    return a.every((x, i) => x.equals(b[i]));
+    return a.every((x, i) => {
+        const bItem = b[i];
+
+        return bItem !== undefined && x.equals(bItem);
+    });
 }
 
 // input: [redeemScriptSig ...] {redeemScript}

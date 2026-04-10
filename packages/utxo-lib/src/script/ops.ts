@@ -1,7 +1,12 @@
 import * as ops from 'bitcoin-ops';
 
 // extend with Decred OP codes
-const OPS: Record<string, number> = {
+const OPS: { [key: string]: number } & typeof ops & {
+        OP_SSTX: number;
+        OP_SSTXCHANGE: number;
+        OP_SSGEN: number;
+        OP_SSRTX: number;
+    } = {
     ...ops,
     OP_SSTX: 0xba,
     OP_SSTXCHANGE: 0xbd,
@@ -11,7 +16,10 @@ const OPS: Record<string, number> = {
 
 const REVERSE_OPS: string[] = [];
 Object.keys(OPS).forEach(code => {
-    REVERSE_OPS[OPS[code]] = code;
+    const value = OPS[code];
+    if (value !== undefined) {
+        REVERSE_OPS[value] = code;
+    }
 });
 
 export { OPS, REVERSE_OPS };

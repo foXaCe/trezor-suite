@@ -16,7 +16,8 @@ export const countUnusedFromEnd = <T>(
 ): number => {
     const boundary = array.length > lookout ? array.length - lookout : 0;
     for (let i = array.length; i > boundary; --i) {
-        if (!isUnused(array[i - 1])) {
+        const item = array[i - 1];
+        if (item !== undefined && !isUnused(item)) {
             return array.length - i;
         }
     }
@@ -42,7 +43,7 @@ export const createAddressCache = (network: Network | undefined) => {
                 cache[key] = derived.concat(newDerived);
             }
 
-            return cache[key].slice(from, from + count);
+            return (cache[key] ?? []).slice(from, from + count);
         };
 
         return { getAllDerived, getAddresses };

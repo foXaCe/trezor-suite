@@ -82,10 +82,10 @@ function search(
         } else {
             // Continue down this branch
             // Remove this utxo from the remaining utxo amount
-            remaining = remaining.sub(effectiveUtxos[depth].effectiveValue);
+            remaining = remaining.sub(effectiveUtxos[depth]?.effectiveValue ?? ZERO);
             // Inclusion branch first (Largest First Exploration)
             selected[depth] = true;
-            selectedAccum = selectedAccum.add(effectiveUtxos[depth].effectiveValue);
+            selectedAccum = selectedAccum.add(effectiveUtxos[depth]?.effectiveValue ?? ZERO);
             depth++;
         }
 
@@ -96,7 +96,7 @@ function search(
 
             // Walk backwards to find the first utxo which has not has its second branch traversed
             while (!selected[depth]) {
-                remaining = remaining.add(effectiveUtxos[depth].effectiveValue);
+                remaining = remaining.add(effectiveUtxos[depth]?.effectiveValue ?? ZERO);
 
                 // Step back one
                 depth--;
@@ -110,7 +110,7 @@ function search(
 
             // Now traverse the second branch of the utxo we have arrived at.
             selected[depth] = false;
-            selectedAccum = selectedAccum.sub(effectiveUtxos[depth].effectiveValue);
+            selectedAccum = selectedAccum.sub(effectiveUtxos[depth]?.effectiveValue ?? ZERO);
             depth++;
         }
         tries--;
@@ -188,7 +188,8 @@ export const branchAndBound: CoinSelectAlgorithm = (
 
         for (let i = 0; i < effectiveUtxos.length; i++) {
             if (selected[i]) {
-                inputs.push(effectiveUtxos[i].utxo);
+                const eu = effectiveUtxos[i];
+                if (eu) inputs.push(eu.utxo);
             }
         }
 

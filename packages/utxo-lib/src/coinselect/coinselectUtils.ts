@@ -296,8 +296,7 @@ export function anyOf(algorithms: CoinSelectAlgorithm[]): CoinSelectAlgorithm {
     return (utxos, outputs, feeRate, options) => {
         let result: ReturnType<CoinSelectAlgorithm> = { fee: 0 };
 
-        for (let i = 0; i < algorithms.length; i++) {
-            const algorithm = algorithms[i];
+        for (const algorithm of algorithms) {
             result = algorithm(utxos, outputs, feeRate, options);
             if (result.inputs) {
                 return result;

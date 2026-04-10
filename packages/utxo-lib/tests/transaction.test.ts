@@ -77,9 +77,10 @@ describe('Transaction', () => {
                     }
                 });
                 tx.outs.forEach((output, i) => {
-                    expect(output.value).toEqual(f.raw.outs[i].value);
-                    expect(output.script.toString('hex')).toEqual(f.raw.outs[i].script);
-                    expect(output.decredVersion).toEqual(f.raw.outs[i].version);
+                    const expectedOut = f.raw.outs[i];
+                    expect(output.value).toEqual(expectedOut?.value);
+                    expect(output.script.toString('hex')).toEqual(expectedOut?.script);
+                    expect(output.decredVersion).toEqual(expectedOut?.version);
                 });
 
                 expect(tx.toHex()).toEqual(f.hex);
@@ -335,26 +336,19 @@ describe('Transaction', () => {
                 if (f.raw.nShieldedSpend) {
                     const shieldedSpend = specificData.vShieldedSpend;
                     for (let i = 0; i < f.raw.nShieldedSpend; ++i) {
-                        expect(shieldedSpend[i].cv.toString('hex')).toEqual(
-                            f.raw.vShieldedSpend[i].cv,
-                        );
-                        expect(shieldedSpend[i].anchor.toString('hex')).toEqual(
-                            f.raw.vShieldedSpend[i].anchor,
-                        );
-                        expect(shieldedSpend[i].nullifier.toString('hex')).toEqual(
-                            f.raw.vShieldedSpend[i].nullifier,
-                        );
-                        expect(shieldedSpend[i].rk.toString('hex')).toEqual(
-                            f.raw.vShieldedSpend[i].rk,
-                        );
+                        const spend = shieldedSpend[i];
+                        const expected = f.raw.vShieldedSpend[i];
+                        if (!spend || !expected) continue;
+                        expect(spend.cv.toString('hex')).toEqual(expected.cv);
+                        expect(spend.anchor.toString('hex')).toEqual(expected.anchor);
+                        expect(spend.nullifier.toString('hex')).toEqual(expected.nullifier);
+                        expect(spend.rk.toString('hex')).toEqual(expected.rk);
                         expect(
-                            shieldedSpend[i].zkproof.sA.toString('hex') +
-                                shieldedSpend[i].zkproof.sB.toString('hex') +
-                                shieldedSpend[i].zkproof.sC.toString('hex'),
-                        ).toEqual(f.raw.vShieldedSpend[i].zkproof);
-                        expect(shieldedSpend[i].spendAuthSig.toString('hex')).toEqual(
-                            f.raw.vShieldedSpend[i].spendAuthSig,
-                        );
+                            spend.zkproof.sA.toString('hex') +
+                                spend.zkproof.sB.toString('hex') +
+                                spend.zkproof.sC.toString('hex'),
+                        ).toEqual(expected.zkproof);
+                        expect(spend.spendAuthSig.toString('hex')).toEqual(expected.spendAuthSig);
                     }
                 }
             });

@@ -115,7 +115,8 @@ export function fromBuffer(buffer: Buffer, options: TransactionOptions) {
 
     if (hasWitnesses) {
         for (let i = 0; i < vinLen; ++i) {
-            tx.ins[i].witness = bufferReader.readVector();
+            const input = tx.ins[i];
+            if (input) input.witness = bufferReader.readVector();
         }
 
         // was this pointless?

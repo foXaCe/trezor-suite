@@ -48,6 +48,7 @@ export const accumulative: CoinSelectAlgorithm = (
     // continue with the rest
     for (let i = 0; i < utxos.length; ++i) {
         const utxo = utxos[i];
+        if (!utxo) continue;
         const utxoBytes = inputBytes(utxo);
         const utxoFee = getFeeForBytes(feeRate, utxoBytes);
         const utxoValue = bignumberOrNaN(utxo.value);

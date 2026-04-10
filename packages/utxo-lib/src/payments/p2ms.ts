@@ -15,7 +15,11 @@ const OP_INT_BASE = OPS.OP_RESERVED; // OP_1 - 1
 function stacksEqual(a: Buffer[], b: Buffer[]): boolean {
     if (a.length !== b.length) return false;
 
-    return a.every((x, i) => x.equals(b[i]));
+    return a.every((x, i) => {
+        const bItem = b[i];
+
+        return bItem !== undefined && x.equals(bItem);
+    });
 }
 
 // input: OP_0 [signatures ...]
@@ -60,8 +64,8 @@ export function p2ms(a: Payment, opts?: PaymentOpts): Payment {
         if (decoded) return;
         decoded = true;
         chunks = bscript.decompile(output) as Stack;
-        o.m = (chunks[0] as number) - OP_INT_BASE;
-        o.n = (chunks[chunks.length - 2] as number) - OP_INT_BASE;
+        o.m = ((chunks[0] ?? 0) as number) - OP_INT_BASE;
+        o.n = ((chunks[chunks.length - 2] ?? 0) as number) - OP_INT_BASE;
         o.pubkeys = chunks.slice(1, -2) as Buffer[];
     }
 
@@ -121,8 +125,10 @@ export function p2ms(a: Payment, opts?: PaymentOpts): Payment {
     if (opts.validate) {
         if (a.output) {
             decode(a.output);
-            if (!isNumber(chunks[0])) throw new TypeError('Output is invalid');
-            if (!isNumber(chunks[chunks.length - 2])) throw new TypeError('Output is invalid');
+            if (chunks[0] === undefined || !isNumber(chunks[0]))
+                throw new TypeError('Output is invalid');
+            if (chunks[chunks.length - 2] === undefined || !isNumber(chunks[chunks.length - 2]))
+                throw new TypeError('Output is invalid');
             if (chunks[chunks.length - 1] !== OPS.OP_CHECKMULTISIG)
                 throw new TypeError('Output is invalid');
 

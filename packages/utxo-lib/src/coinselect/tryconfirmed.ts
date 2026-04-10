@@ -5,9 +5,7 @@ function filterUtxos(utxos: CoinSelectInput[], minConfOwn: number, minConfOther:
     const usable: CoinSelectInput[] = [];
     const unusable: CoinSelectInput[] = [];
 
-    for (let i = 0; i < utxos.length; i++) {
-        const utxo = utxos[i];
-
+    for (const utxo of utxos) {
         const isUsed = utxo.own
             ? utxo.confirmations >= minConfOwn
             : utxo.confirmations >= minConfOther;
@@ -62,6 +60,7 @@ export function tryConfirmed(
 
         for (i = 0; i < trials.length; i++) {
             const trial = trials[i];
+            if (!trial) continue;
 
             // since the restrictions are always loosening, we can just filter the unusable so far
             const filterResult = filterUtxos(unusable, trial.own, trial.other);

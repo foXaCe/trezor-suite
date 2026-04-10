@@ -74,7 +74,9 @@ export class TransactionBase<S = undefined> {
     }
 
     isCoinbase(): boolean {
-        return this.ins.length === 1 && isCoinbaseHash(this.ins[0].hash);
+        const firstIn = this.ins[0];
+
+        return this.ins.length === 1 && firstIn !== undefined && isCoinbaseHash(firstIn.hash);
     }
 
     hasWitnesses(): boolean {

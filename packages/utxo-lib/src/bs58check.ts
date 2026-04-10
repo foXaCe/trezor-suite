@@ -10,7 +10,12 @@ export function decodeBlake(buffer: Buffer) {
     const payload = buffer.subarray(0, -4);
     const got = blake256(blake256(payload)).subarray(0, 4);
 
-    if ((want[0] ^ got[0]) | (want[1] ^ got[1]) | (want[2] ^ got[2]) | (want[3] ^ got[3]))
+    if (
+        ((want[0] ?? 0) ^ (got[0] ?? 0)) |
+        ((want[1] ?? 0) ^ (got[1] ?? 0)) |
+        ((want[2] ?? 0) ^ (got[2] ?? 0)) |
+        ((want[3] ?? 0) ^ (got[3] ?? 0))
+    )
         throw new Error('invalid checksum');
 
     return payload;
@@ -72,7 +77,7 @@ export function decodeAddress(address: string, network = BITCOIN_NETWORK) {
     const multibyte = payload.length === 22;
     const offset = multibyte ? 2 : 1;
 
-    const version = multibyte ? payload.readUInt16BE(0) : payload[0];
+    const version = multibyte ? payload.readUInt16BE(0) : (payload[0] ?? 0);
     const hash = payload.subarray(offset);
 
     return { version, hash };

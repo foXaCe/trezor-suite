@@ -8,10 +8,11 @@ export const randomSortingStrategy: SortingStrategy = ({ result, request, conver
     const changeOutputPermutation: number[] = [];
 
     const convertedOutputs = result.outputs.map((output, index) => {
-        if (request.outputs[index]) {
+        const requestOutput = request.outputs[index];
+        if (requestOutput) {
             nonChangeOutputPermutation.push(index);
 
-            return convertOutput(output, request.outputs[index]);
+            return convertOutput(output, requestOutput);
         }
 
         changeOutputPermutation.push(index);
@@ -27,7 +28,11 @@ export const randomSortingStrategy: SortingStrategy = ({ result, request, conver
     const newPositionOfChange = getRandomInt(0, permutation.length + 1);
 
     permutation.splice(newPositionOfChange, 0, ...changeOutputPermutation);
-    const sortedOutputs = permutation.map(index => convertedOutputs[index]);
+    const sortedOutputs = permutation.flatMap(index => {
+        const output = convertedOutputs[index];
+
+        return output ? [output] : [];
+    });
 
     return {
         /** Randomly shuffle inputs to make it harder to fingerprint the Trezor Suite. */

@@ -19,17 +19,26 @@ export const bip69SortingStrategy: SortingStrategy = ({ result, request, convert
     const defaultPermutation: number[] = [];
     const convertedOutputs = result.outputs.map((output, index) => {
         defaultPermutation.push(index);
-        if (request.outputs[index]) {
-            return convertOutput(output, request.outputs[index]);
+        const requestOutput = request.outputs[index];
+        if (requestOutput) {
+            return convertOutput(output, requestOutput);
         }
 
         return convertOutput(output, { type: 'change', ...request.changeAddress });
     });
 
-    const permutation = defaultPermutation.sort((a, b) =>
-        outputComparator(result.outputs[a], result.outputs[b]),
-    );
-    const sortedOutputs = permutation.map(index => convertedOutputs[index]);
+    const permutation = defaultPermutation.sort((a, b) => {
+        const outputA = result.outputs[a];
+        const outputB = result.outputs[b];
+        if (!outputA || !outputB) return 0;
+
+        return outputComparator(outputA, outputB);
+    });
+    const sortedOutputs = permutation.flatMap(index => {
+        const output = convertedOutputs[index];
+
+        return output ? [output] : [];
+    });
 
     return {
         inputs: convertedInputs.sort(inputComparator),
