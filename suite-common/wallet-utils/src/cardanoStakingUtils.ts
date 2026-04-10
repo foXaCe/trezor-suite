@@ -108,6 +108,9 @@ export const selectBestCardanoPool = (pools?: AdaPools['pools']) => {
 
     // pick the last one (lowest saturation)
     const fallback = pools[pools.length - 1];
+    if (!fallback) {
+        return undefined;
+    }
 
     return {
         hex: poolBech32ToHex(fallback.id),

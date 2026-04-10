@@ -161,7 +161,7 @@ export const isPoolOverSaturated = (pool: StakePool, additionalStake?: string) =
         .toNumber() > 0.8;
 
 export const getStakePoolForDelegation = (trezorPools: PoolsResponse, accountBalance: string) => {
-    let pool = trezorPools.next;
+    let pool: StakePool | undefined = trezorPools.next;
     if (isPoolOverSaturated(pool, accountBalance)) {
         pool = trezorPools.pools[0];
     }
@@ -191,8 +191,8 @@ export const formatMaxOutputAmount = (
     }
 
     // output with a token, format using token decimals
-    const tokenDecimals =
-        account.tokens?.find(t => t.contract === maxOutput.assets[0].unit)?.decimals ?? 0;
+    const firstAssetUnit = maxOutput.assets[0]?.unit;
+    const tokenDecimals = account.tokens?.find(t => t.contract === firstAssetUnit)?.decimals ?? 0;
 
     return convertAmountSubunitsToUnits(maxAmount, tokenDecimals);
 };

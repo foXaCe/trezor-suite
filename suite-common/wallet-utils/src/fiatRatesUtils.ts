@@ -46,18 +46,22 @@ export const roundTimestampsToNearestPastHour = (timestamps: Timestamp[]): Times
 const combineFiatRates = (fiatRates: RatesByTimestamps, accountRates: RatesByTimestamps) => {
     for (const fiatRateKey of typedObjectKeys(accountRates)) {
         if (Object.prototype.hasOwnProperty.call(accountRates, fiatRateKey)) {
-            if (!fiatRates[fiatRateKey]) {
-                fiatRates[fiatRateKey] = accountRates[fiatRateKey];
+            const accountRate = accountRates[fiatRateKey];
+            if (!accountRate) continue;
+
+            const existingRate = fiatRates[fiatRateKey];
+            if (!existingRate) {
+                fiatRates[fiatRateKey] = accountRate;
             } else {
-                for (const timestamp of typedObjectKeys(accountRates[fiatRateKey])) {
+                for (const timestamp of typedObjectKeys(accountRate)) {
                     if (
-                        Object.prototype.hasOwnProperty.call(
-                            accountRates[fiatRateKey],
-                            timestamp,
-                        ) &&
-                        !fiatRates[fiatRateKey][timestamp]
+                        Object.prototype.hasOwnProperty.call(accountRate, timestamp) &&
+                        !existingRate[timestamp]
                     ) {
-                        fiatRates[fiatRateKey][timestamp] = accountRates[fiatRateKey][timestamp];
+                        const value = accountRate[timestamp];
+                        if (value !== undefined) {
+                            existingRate[timestamp] = value;
+                        }
                     }
                 }
             }
@@ -71,10 +75,14 @@ export const buildHistoricRatesFromStorage = (storageHistoricRates: RatesByTimes
     storageHistoricRates.forEach(fiatRates => {
         for (const fiatRateKey of typedObjectKeys(fiatRates)) {
             if (Object.prototype.hasOwnProperty.call(fiatRates, fiatRateKey)) {
-                if (!historicFiatRates[fiatRateKey]) {
-                    historicFiatRates[fiatRateKey] = fiatRates[fiatRateKey];
+                const rate = fiatRates[fiatRateKey];
+                if (!rate) continue;
+
+                const existing = historicFiatRates[fiatRateKey];
+                if (!existing) {
+                    historicFiatRates[fiatRateKey] = rate;
                 } else {
-                    combineFiatRates(historicFiatRates[fiatRateKey], fiatRates[fiatRateKey]);
+                    combineFiatRates(existing, rate);
                 }
             }
         }
@@ -98,11 +106,13 @@ export const selectHistoricRatesByTransactions = (
                 fiatRateKey.startsWith(symbol) ||
                 tokens.some(token => fiatRateKey.startsWith(`[${symbol}-${token.contract}]`))
             ) {
-                if (historicRates[fiatRateKey][timestamp]) {
+                const ratesByKey = historicRates[fiatRateKey];
+                const value = ratesByKey?.[timestamp];
+                if (value !== undefined) {
                     if (!selectedRates[fiatRateKey]) {
                         selectedRates[fiatRateKey] = {};
                     }
-                    selectedRates[fiatRateKey][timestamp] = historicRates[fiatRateKey][timestamp];
+                    selectedRates[fiatRateKey][timestamp] = value;
                 }
             }
         });
@@ -135,7 +145,7 @@ export const fetchTransactionsRates = async (
                 localCurrency,
                 rates: results.tickers.map((ticker, index) => ({
                     rate: ticker?.rates[localCurrency],
-                    lastTickerTimestamp: uniqueTimestamps[index],
+                    lastTickerTimestamp: uniqueTimestamps[index] ?? asTimestamp(0),
                 })),
             });
         }

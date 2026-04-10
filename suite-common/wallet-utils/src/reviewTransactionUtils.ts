@@ -126,7 +126,7 @@ const constructOldFlow = ({
         outputs.push(
             {
                 type: 'txid',
-                value: precomposedTx.prevTxid!,
+                value: precomposedTx.prevTxid ?? '',
             },
             {
                 type: 'fee-replace',
@@ -139,9 +139,9 @@ const constructOldFlow = ({
         if (typeof decreaseOutputId === 'number') {
             outputs.splice(1, 0, {
                 type: 'reduce-output',
-                label: precomposedTx.outputs[decreaseOutputId].address!,
+                label: precomposedTx.outputs[decreaseOutputId]?.address ?? '',
                 value: precomposedTx.feeDifference,
-                value2: precomposedTx.outputs[decreaseOutputId].amount.toString(),
+                value2: precomposedTx.outputs[decreaseOutputId]?.amount.toString() ?? '',
             });
         }
     } else if (isCardano) {
@@ -321,7 +321,7 @@ const constructNewFlow = ({
         outputs.push(
             {
                 type: 'txid',
-                value: precomposedTx.prevTxid!,
+                value: precomposedTx.prevTxid ?? '',
             },
             {
                 type: 'fee-replace',
@@ -334,9 +334,9 @@ const constructNewFlow = ({
         if (typeof decreaseOutputId === 'number') {
             outputs.splice(1, 0, {
                 type: 'reduce-output',
-                label: precomposedTx.outputs[decreaseOutputId].address!,
+                label: precomposedTx.outputs[decreaseOutputId]?.address ?? '',
                 value: precomposedTx.feeDifference,
-                value2: precomposedTx.outputs[decreaseOutputId].amount.toString(),
+                value2: precomposedTx.outputs[decreaseOutputId]?.amount.toString() ?? '',
             });
         }
     } else if (isCardano) {

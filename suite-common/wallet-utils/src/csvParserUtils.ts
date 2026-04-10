@@ -60,7 +60,7 @@ export const parseCSV = (text: string, columns: string[] = [], delimiter?: strin
 
     const result: Result[] = [];
     lines.forEach(line => {
-        const output = parseLine(line, d, columns);
+        const output = parseLine(line, d ?? ',', columns);
         if (Object.keys(output).length) {
             // use only valid lines
             result.push(output);

@@ -281,10 +281,13 @@ describe('account utils', () => {
 
     it('sortByBIP44AddressIndex', () => {
         const path = 'm/1234';
-        const [a, b, c, d, e, f] = ['a', 'b', 'c', 'd', 'e', 'f'].map((address, i) => ({
-            address,
-            path: `${path}/${i}`,
-        }));
+        const mk = (address: string, i: number) => ({ address, path: `${path}/${i}` });
+        const a = mk('a', 0),
+            b = mk('b', 1),
+            c = mk('c', 2),
+            d = mk('d', 3),
+            e = mk('e', 4),
+            f = mk('f', 5);
         expect(sortByBIP44AddressIndex(path, [a, b, c, d, e, f])).toEqual([a, b, c, d, e, f]);
         expect(sortByBIP44AddressIndex(path, [f, e, d, c, b, a])).toEqual([a, b, c, d, e, f]);
         expect(sortByBIP44AddressIndex(path, [e, c, b, a, f, d])).toEqual([a, b, c, d, e, f]);

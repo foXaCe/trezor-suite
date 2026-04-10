@@ -144,15 +144,17 @@ export const groupJointTransactions = (transactions: WalletAccountTransaction[])
             const last = prev.pop();
             if (!last) return [[tx]];
 
-            return tx.type === 'joint' && last[0].type === 'joint'
+            return tx.type === 'joint' && last[0]?.type === 'joint'
                 ? [...prev, [...last, tx]]
                 : [...prev, last, [tx]];
         }, [])
-        .map(txs =>
-            txs.length > 1
+        .map(txs => {
+            const firstTx = txs[0];
+
+            return txs.length > 1 && firstTx
                 ? ({ type: 'joint-batch', rounds: txs } as const)
-                : ({ type: 'single-tx', tx: txs[0] } as const),
-        );
+                : ({ type: 'single-tx', tx: firstTx } as const);
+        });
 
 export const formatCardanoWithdrawal = (tx: WalletAccountTransaction) =>
     tx.cardanoSpecific?.withdrawal
@@ -343,7 +345,9 @@ export const findTransactions = (
     transactions: { [key: AccountKey]: WalletAccountTransaction[] },
 ) =>
     typedObjectKeys(transactions).flatMap(key => {
-        const tx = findTransaction(txid, transactions[key]);
+        const accountTxs = transactions[key];
+        if (!accountTxs) return [];
+        const tx = findTransaction(txid, accountTxs);
         if (!tx) return [];
 
         return [{ key, tx }];
@@ -360,7 +364,7 @@ export const findChainedTransactions = (
         const ownTxs = result.own.map(tx => tx.txid);
         const othersTxs = result.others.map(tx => tx.txid);
         // check if any pending transaction is using the utxo/vin with requested txid
-        const txs = transactions[accountKey].filter(tx => {
+        const txs = (transactions[accountKey] ?? []).filter(tx => {
             if (!isPending(tx) || !tx.details.vin.find(i => i.txid === txid)) {
                 return false;
             }
@@ -473,6 +477,7 @@ export const analyzeTransactions = (
             // use simple for loop to have possibility to `break`
             for (index; index < len; index++) {
                 const kTx = knownSorted[index];
+                if (!kTx) continue;
                 // known tx is pending, it will be removed
                 // move sliceIndex, set firstKnownIndex
                 if (isPending(kTx)) {
@@ -480,7 +485,7 @@ export const analyzeTransactions = (
                     sliceIndex = index + 1;
                 }
                 // known tx is "older"
-                if (!isPending(kTx) && kTx.blockHeight! < height) {
+                if (!isPending(kTx) && (kTx.blockHeight ?? 0) < height) {
                     // set sliceIndex
                     sliceIndex = isLast ? len : index;
                     // all fresh txs to this point needs to be added
@@ -557,7 +562,7 @@ export const getNftTokenId = (transfer: TokenTransfer) =>
     transfer.standard &&
     NFT_MULTITOKEN_STANDARDS.has(transfer.standard) &&
     transfer.multiTokenValues?.length
-        ? transfer.multiTokenValues[0].id
+        ? (transfer.multiTokenValues[0]?.id ?? transfer.amount)
         : transfer.amount;
 
 export const isSwapTransaction = (transaction: WalletAccountTransaction) => {
@@ -709,12 +714,16 @@ const getEthereumRbfParams = (
 
     const txSignature = getEvmTransactionTextSignature(transactionData);
 
-    const toAddress = vout[0].addresses![0];
+    const toAddress = vout[0]?.addresses?.[0] ?? '';
 
-    let output;
+    let output: { address: string; amount: string; formattedAmount: string; token?: string };
     switch (txSignature) {
         case 'transfer': {
             const token = tx.tokens[0];
+            if (!token) {
+                output = { address: toAddress, amount: '0', formattedAmount: '0' };
+                break;
+            }
 
             output = {
                 address: token.to,
@@ -744,8 +753,8 @@ const getEthereumRbfParams = (
         default:
             output = {
                 address: toAddress,
-                amount: vout[0].value!,
-                formattedAmount: formatNetworkAmount(vout[0].value!, account.symbol),
+                amount: vout[0]?.value ?? '0',
+                formattedAmount: formatNetworkAmount(vout[0]?.value ?? '0', account.symbol),
             };
     }
 
@@ -786,7 +795,7 @@ const getBitcoinRbfParams = (
             // TODO: this should be done in @trezor/connect, blockchain-link or even blockbook
             // blockbook sends output.hex as scriptPubKey with additional prefix where: 6a - OP_RETURN and XX - data len. this field should be parsed by @trezor/utxo-lib
             // blockbook sends ascii data in output.address[0] field in format: "OP_RETURN (ASCII-VALUE)". as a workaround we are extracting ascii data from here
-            const dataAscii = output.addresses![0].match(/^OP_RETURN \((.*)\)/)?.pop(); // strip ASCII data from brackets
+            const dataAscii = output.addresses?.[0]?.match(/^OP_RETURN \((.*)\)/)?.pop(); // strip ASCII data from brackets
             if (dataAscii) {
                 outputs.push({
                     type: 'opreturn',
@@ -798,9 +807,9 @@ const getBitcoinRbfParams = (
             const changeOutput = changeAddresses.find(a => output.addresses?.includes(a.address));
             outputs.push({
                 type: changeOutput ? 'change' : 'payment',
-                address: output.addresses![0],
-                amount: output.value!,
-                formattedAmount: formatNetworkAmount(output.value!, account.symbol),
+                address: output.addresses?.[0] ?? '',
+                amount: output.value ?? '0',
+                formattedAmount: formatNetworkAmount(output.value ?? '0', account.symbol),
             });
             if (changeOutput) {
                 changeAddress = changeOutput;
@@ -885,7 +894,9 @@ export const getTxHeaderSymbol = (transaction: WalletAccountTransaction) => {
     const isSingleTokenTransaction = transaction.tokens.length === 1;
 
     // if there's exactly one token, use its symbol; otherwise, use the main network symbol
-    const symbol = isSingleTokenTransaction ? transaction.tokens[0].symbol : transaction.symbol;
+    const symbol = isSingleTokenTransaction
+        ? (transaction.tokens[0]?.symbol ?? transaction.symbol)
+        : transaction.symbol;
 
     return symbol;
 };
