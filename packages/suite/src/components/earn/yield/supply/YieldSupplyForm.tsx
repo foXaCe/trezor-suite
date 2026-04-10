@@ -7,6 +7,7 @@ import { YieldActionStepWarning } from '../common/YieldActionStepWarning';
 import { YieldApproveModal } from '../common/YieldApproveModal';
 import { YieldApproveStep } from '../common/YieldApproveStep';
 import { YieldFlowComplete } from '../common/YieldFlowComplete';
+import { splitYieldPendingTransaction } from '../yieldFlowUtils';
 
 export const YieldSupplyForm = () => {
     const {
@@ -32,8 +33,6 @@ export const YieldSupplyForm = () => {
         isSubmittingSupply,
         setApproveAmount,
         setSupplyAmount,
-        setApproveMaxAmount,
-        setSupplyMaxAmount,
         submitApprove,
         submitSupply,
         submitRevoke,
@@ -50,13 +49,8 @@ export const YieldSupplyForm = () => {
         complete: completeStepState,
     } = flow.stepStates;
 
-    const isApprovalPending =
-        pendingTransaction?.type === 'approve' ||
-        pendingTransaction?.type === 'revoke' ||
-        pendingTransaction?.type === 'revoke-only';
-    const isSupplyPending = pendingTransaction?.type === 'supply';
-    const approvalPendingTransaction = isApprovalPending ? pendingTransaction : undefined;
-    const supplyPendingTransaction = isSupplyPending ? pendingTransaction : undefined;
+    const { approvalPendingTransaction, actionPendingTransaction: supplyPendingTransaction } =
+        splitYieldPendingTransaction(pendingTransaction, 'supply');
 
     return (
         <>
@@ -133,7 +127,7 @@ export const YieldSupplyForm = () => {
                                         }
                                         pendingApproveTransaction={approvalPendingTransaction}
                                         onAmountSelect={setApproveAmount}
-                                        onMaxClick={setApproveMaxAmount}
+                                        onMaxClick={() => setApproveAmount(maxAmount)}
                                         onApprove={submitApprove}
                                         onRevokeApproval={submitRevoke}
                                         onPendingTxClick={openPendingTransaction}
@@ -164,7 +158,7 @@ export const YieldSupplyForm = () => {
                                             }
                                             pendingTransaction={supplyPendingTransaction}
                                             onAmountSelect={setSupplyAmount}
-                                            onMaxClick={setSupplyMaxAmount}
+                                            onMaxClick={() => setSupplyAmount(maxAmount)}
                                             onSubmit={submitSupply}
                                             onPendingTxClick={openPendingTransaction}
                                         />

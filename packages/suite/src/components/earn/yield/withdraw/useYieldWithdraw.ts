@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { openModal } from '@suite/modal';
@@ -10,22 +10,21 @@ import { type Account } from '@suite-common/wallet-types';
 import { useDispatch } from 'src/hooks/suite';
 
 import type { YieldWithdrawContextValues } from './useYieldWithdrawContext';
-import type { YieldFlowFormValues } from '../common/types';
+import { useResolvedYieldFlowData } from '../hooks/useResolvedYieldFlowData';
+import { useYieldApprove } from '../hooks/useYieldApprove';
+import { useYieldPendingTransactionTracking } from '../hooks/useYieldPendingTransactionTracking';
+import { useYieldTransactionSend } from '../hooks/useYieldTransactionSend';
+import type { YieldFlowFormValues, YieldFlowStepId } from '../types';
+import { INITIAL_YIELD_FLOW_STATE, yieldFlowReducer } from '../yieldFlowReducer';
 import {
+    buildYieldFlowStepsResult,
     getWithdrawRequestAmount,
     getYieldApprovalModalParams,
     getYieldRevokeModalParams,
+    getYieldSpenderFromTransactions,
     getYieldWithdrawTransaction,
     isAmountGreaterThan,
-} from '../common/yieldFlowUtils';
-import { useResolvedYieldFlowData } from '../hooks/useResolvedYieldFlowData';
-import { useYieldApprovalFlow } from '../hooks/useYieldApprovalFlow';
-import { useYieldApprove } from '../hooks/useYieldApprove';
-import { useYieldFlowReset } from '../hooks/useYieldFlowReset';
-import { useYieldFlowState } from '../hooks/useYieldFlowState';
-import { useYieldFlowSteps } from '../hooks/useYieldFlowSteps';
-import { useYieldPendingTransactionTracking } from '../hooks/useYieldPendingTransactionTracking';
-import { useYieldTransactionSend } from '../hooks/useYieldTransactionSend';
+} from '../yieldFlowUtils';
 
 type UseYieldWithdrawProps = {
     account: Account;
@@ -36,12 +35,11 @@ export const useYieldWithdraw = ({
     account,
     routeParams,
 }: UseYieldWithdrawProps): YieldWithdrawContextValues | null => {
-    const dispatch = useDispatch();
-    const flow = useYieldFlowSteps();
-    const { goToStep } = flow;
+    const reduxDispatch = useDispatch();
+    const [state, dispatch] = useReducer(yieldFlowReducer, INITIAL_YIELD_FLOW_STATE);
     const methods = useForm<YieldFlowFormValues>({
         defaultValues: {
-            amountInput: '0',
+            amountInput: '',
         },
     });
     const { mutateAsync: exitYield } = useExitYieldOpportunity();
@@ -52,56 +50,46 @@ export const useYieldWithdraw = ({
         routeParams,
     });
 
-    const [withdrawAmount, setWithdrawAmount] = useState('');
     const {
-        completedAmount,
-        setCompletedAmount,
-        completedReceiptAmount,
-        setCompletedReceiptAmount,
-        pendingTransaction,
-        setPendingTransaction,
-        errorMessage,
-        setErrorMessage,
-        isSubmittingApprove,
-        setIsSubmittingApprove,
-        isSubmittingAction: isSubmittingWithdraw,
-        setIsSubmittingAction: setIsSubmittingWithdraw,
-        resetFlowState,
-    } = useYieldFlowState();
-
-    const {
-        approveAmount,
-        setApproveAmount,
-        approveModalState,
-        isApprovePending,
-        setIsApprovePending,
         openApproveModal,
-        resetApproveState,
         handleApproveSuccessTxid: handleApproveSuccessTxidBase,
-        handleApproveCancel: clearApproveModalState,
+        handleApproveCancel,
     } = useYieldApprove({
         account,
         contractAddress: receiptToken?.contractAddress ?? undefined,
-        setPendingTransaction,
-        setErrorMessage,
+        state,
+        dispatch,
     });
-    const goToApproveStep = useCallback(() => {
-        goToStep('approve');
-    }, [goToStep]);
-    const goToActionStep = useCallback(() => {
-        goToStep('action');
-    }, [goToStep]);
-    const goToCompleteStep = useCallback(() => {
-        goToStep('complete');
-    }, [goToStep]);
+
+    // Reset flow when navigating to a different vault
+    useEffect(() => {
+        if (!flowKey) {
+            return;
+        }
+
+        dispatch({ type: 'RESET' });
+        methods.reset({ amountInput: '' });
+    }, [flowKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useYieldPendingTransactionTracking({
+        account,
+        actionKind: 'withdraw',
+        pendingTransaction: state.pendingTransaction,
+        dispatch,
+    });
+
+    const goToStep = useCallback((step: YieldFlowStepId) => {
+        dispatch({ type: 'GO_TO_STEP', step });
+    }, []);
+
+    const flow = useMemo(
+        () => buildYieldFlowStepsResult(state.step, goToStep),
+        [state.step, goToStep],
+    );
 
     const openPendingTransaction = useCallback(
         (txid: string) => {
-            if (!account) {
-                return;
-            }
-
-            dispatch(
+            reduxDispatch(
                 openModal({
                     type: 'transaction-detail',
                     txid,
@@ -112,11 +100,31 @@ export const useYieldWithdraw = ({
                 }),
             );
         },
-        [account, dispatch],
+        [account, reduxDispatch],
+    );
+
+    // Converts withdraw amount (input token) to receipt token amount for the revoke modal
+    const getRevokeModalAmount = useCallback(
+        (amount: string): string => {
+            if (!account || !token || !receiptToken) {
+                return amount;
+            }
+
+            return (
+                getWithdrawRequestAmount({
+                    networkSymbol: account.symbol,
+                    amount,
+                    token,
+                    receiptToken,
+                    pricePerShare: vault?.state?.pricePerShareState?.price,
+                }) ?? amount
+            );
+        },
+        [account, token, receiptToken, vault?.state?.pricePerShareState?.price],
     );
 
     const getRequestAmount = useCallback(
-        (amount: string) => {
+        (amount: string): string | null => {
             if (!account || !token || !receiptToken) {
                 return null;
             }
@@ -129,33 +137,87 @@ export const useYieldWithdraw = ({
                 pricePerShare: vault?.state?.pricePerShareState?.price,
             });
         },
-        [account, receiptToken, token, vault?.state?.pricePerShareState?.price],
+        [account, token, receiptToken, vault?.state?.pricePerShareState?.price],
     );
-    const {
-        completeApproval,
-        enterModifyApproval,
-        handleApproveModalCancel,
-        handleApproveSuccessTxid,
-        handleRevokeSuccess,
-        isModifyMode,
-        lastApprovedAmount,
-        resetApprovalFlowState,
-        revokeRequired,
-        setApprovalResponseState,
-        setRevokeRequired,
-        submitRevoke,
-    } = useYieldApprovalFlow({
-        approveAmount,
-        approveModalState,
-        clearApproveModalState,
-        currentAmount: withdrawAmount,
-        getRevokeModalAmount: amount => getRequestAmount(amount) ?? amount,
-        goToActionStep,
-        goToApproveStep,
-        handleApproveSuccessTxidBase,
-        loadRevokeTransactions: async () => {
+
+    const openRevokeModal = useCallback(
+        (
+            transactions: Parameters<typeof getYieldRevokeModalParams>[0] | null,
+            fallbackSpender?: string | null,
+        ) => {
+            const revokeModalParams = transactions ? getYieldRevokeModalParams(transactions) : null;
+            const spender =
+                revokeModalParams?.spender ??
+                (transactions ? getYieldSpenderFromTransactions(transactions) : null) ??
+                fallbackSpender;
+
+            dispatch({ type: 'CLEAR_APPROVAL_TRANSITION' });
+
+            if (!spender) {
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
+
+                return;
+            }
+
+            openApproveModal({
+                amount: getRevokeModalAmount(state.approveAmount),
+                spender,
+                transactionId: revokeModalParams?.transactionId,
+                providerId: vault?.providerId,
+                preapprovedAmount: state.lastApprovedAmount || undefined,
+                txType: revokeModalParams ? 'revoke' : 'revoke-only',
+            });
+        },
+        [
+            state.approveAmount,
+            state.lastApprovedAmount,
+            getRevokeModalAmount,
+            openApproveModal,
+            vault?.providerId,
+        ],
+    );
+
+    const enterModifyApproval = useCallback(() => {
+        dispatch({ type: 'ENTER_MODIFY_MODE', amount: state.actionAmount });
+        methods.reset({ amountInput: state.actionAmount });
+    }, [state.actionAmount, methods]);
+
+    const handleApproveModalCancel = useCallback(() => {
+        const currentModalState = state.approveModalState;
+
+        handleApproveCancel();
+
+        if (state.shouldRevokeOnApproveCancel && currentModalState?.txType === 'approve') {
+            openRevokeModal(state.revokeTransactions, currentModalState.spender);
+
+            return;
+        }
+
+        dispatch({ type: 'CLEAR_APPROVAL_TRANSITION' });
+    }, [
+        state.approveModalState,
+        state.shouldRevokeOnApproveCancel,
+        state.revokeTransactions,
+        handleApproveCancel,
+        openRevokeModal,
+    ]);
+
+    const handleApproveSuccessTxid = useCallback(
+        async (txid: string) => {
+            dispatch({ type: 'CLEAR_APPROVAL_TRANSITION' });
+            await handleApproveSuccessTxidBase(txid);
+        },
+        [handleApproveSuccessTxidBase],
+    );
+
+    const submitRevoke = useCallback(async () => {
+        dispatch({ type: 'CLEAR_ERROR' });
+
+        try {
             if (!account || !vault) {
-                return null;
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
+
+                return;
             }
 
             const { response, verification } = await exitYield({
@@ -165,65 +227,42 @@ export const useYieldWithdraw = ({
             });
 
             if (verification === 'failure') {
-                throw new Error('Yield revoke verification failed.');
+                throw new Error();
             }
 
-            return response.data.transactions;
-        },
-        methods,
-        openApproveModal,
-        providerId: vault?.providerId,
-        resetApproveState,
-        setCurrentAmount: setWithdrawAmount,
-        setErrorMessage,
-    });
+            const { transactions } = response.data;
+            const spender =
+                getYieldRevokeModalParams(transactions)?.spender ??
+                getYieldSpenderFromTransactions(transactions) ??
+                state.approvedSpender;
 
-    const resetWithdrawFlow = useCallback(() => {
-        setWithdrawAmount('');
-        resetFlowState();
-        resetApprovalFlowState();
-    }, [resetApprovalFlowState, resetFlowState]);
-
-    useYieldFlowReset({
-        flowKey,
-        goToApproveStep,
-        methods,
-        onReset: resetWithdrawFlow,
-        resetApproveState,
-    });
-
-    useYieldPendingTransactionTracking({
-        account,
-        actionKind: 'withdraw',
-        onActionSuccess: amount => {
-            setCompletedAmount(amount);
-            goToCompleteStep();
-        },
-        onApproveSuccess: completeApproval,
-        onRevokeSuccess: handleRevokeSuccess,
-        pendingTransaction,
-        setErrorMessage,
-        setIsApprovePending,
-        setPendingTransaction,
-    });
+            dispatch({
+                type: 'SET_APPROVAL_RESPONSE',
+                approvedSpender: spender ?? null,
+                revokeTransactions: transactions,
+            });
+            openRevokeModal(transactions, spender);
+        } catch {
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
+        }
+    }, [account, vault, exitYield, state.approvedSpender, openRevokeModal]);
 
     const submitApprove = useCallback(async () => {
         if (!account || !vault) {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
             return;
         }
 
-        const requestAmount = getRequestAmount(approveAmount);
+        const requestAmount = getRequestAmount(state.approveAmount);
 
         if (!requestAmount) {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
             return;
         }
 
-        setIsSubmittingApprove(true);
-        setErrorMessage(undefined);
+        dispatch({ type: 'START_SUBMITTING_APPROVE' });
 
         try {
             const { response, verification } = await exitYield({
@@ -233,7 +272,7 @@ export const useYieldWithdraw = ({
             });
 
             if (verification === 'failure') {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
                 return;
             }
@@ -243,17 +282,18 @@ export const useYieldWithdraw = ({
             const revokeModalParams = getYieldRevokeModalParams(transactions);
             const spender = approvalModalParams?.spender ?? revokeModalParams?.spender ?? null;
 
-            setApprovalResponseState({
+            dispatch({
+                type: 'SET_APPROVAL_RESPONSE',
                 approvedSpender: spender,
                 revokeTransactions: transactions,
             });
 
             if (revokeModalParams) {
-                setRevokeRequired(true);
+                dispatch({ type: 'SET_REVOKE_REQUIRED' });
             }
 
             if (!approvalModalParams) {
-                completeApproval(approveAmount);
+                dispatch({ type: 'COMPLETE_APPROVAL', amount: state.approveAmount });
 
                 return;
             }
@@ -266,41 +306,28 @@ export const useYieldWithdraw = ({
                 txType: 'approve',
             });
         } catch {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
         } finally {
-            setIsSubmittingApprove(false);
+            dispatch({ type: 'FINISH_SUBMITTING_APPROVE' });
         }
-    }, [
-        account,
-        approveAmount,
-        completeApproval,
-        exitYield,
-        getRequestAmount,
-        openApproveModal,
-        setApprovalResponseState,
-        setErrorMessage,
-        setIsSubmittingApprove,
-        setRevokeRequired,
-        vault,
-    ]);
+    }, [account, vault, state.approveAmount, exitYield, getRequestAmount, openApproveModal]);
 
     const submitWithdraw = useCallback(async () => {
         if (!account || !vault) {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
             return;
         }
 
-        const requestAmount = getRequestAmount(withdrawAmount);
+        const requestAmount = getRequestAmount(state.actionAmount);
 
         if (!requestAmount) {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
             return;
         }
 
-        setIsSubmittingWithdraw(true);
-        setErrorMessage(undefined);
+        dispatch({ type: 'START_SUBMITTING_ACTION' });
 
         try {
             const { response, verification } = await exitYield({
@@ -310,7 +337,7 @@ export const useYieldWithdraw = ({
             });
 
             if (verification === 'failure') {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
                 return;
             }
@@ -319,7 +346,8 @@ export const useYieldWithdraw = ({
             const approvalModalParams = getYieldApprovalModalParams(transactions);
 
             if (approvalModalParams) {
-                setApprovalResponseState({
+                dispatch({
+                    type: 'SET_APPROVAL_RESPONSE',
                     approvedSpender: approvalModalParams.spender,
                     revokeTransactions: transactions,
                 });
@@ -338,7 +366,7 @@ export const useYieldWithdraw = ({
             const withdrawTransaction = getYieldWithdrawTransaction(transactions);
 
             if (!withdrawTransaction?.id) {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
                 return;
             }
@@ -348,51 +376,40 @@ export const useYieldWithdraw = ({
                 transaction: withdrawTransaction,
             });
 
-            await submitTxHash({
-                txId: withdrawTransaction.id,
-                txHash: result.txid,
-            });
+            await submitTxHash({ txId: withdrawTransaction.id, txHash: result.txid });
 
-            dispatch(
+            reduxDispatch(
                 notificationsActions.addToast({
                     type: 'tx-yield-withdraw',
-                    formattedAmount: `${withdrawAmount} ${token?.symbol}`,
+                    formattedAmount: `${state.actionAmount} ${token?.symbol}`,
                     descriptor: account.descriptor,
                     symbol: account.symbol,
                     txid: result.txid,
                 }),
             );
 
-            setCompletedReceiptAmount(requestAmount ?? withdrawAmount);
-            setCompletedAmount(withdrawAmount);
-            setPendingTransaction({
-                type: 'withdraw',
-                txid: result.txid,
-                amount: withdrawAmount,
+            dispatch({
+                type: 'SET_PENDING_TX',
+                tx: { type: 'withdraw', txid: result.txid, amount: state.actionAmount },
+                receiptAmount: requestAmount,
             });
         } catch {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
         } finally {
-            setIsSubmittingWithdraw(false);
+            dispatch({ type: 'FINISH_SUBMITTING_ACTION' });
         }
     }, [
         account,
-        dispatch,
-        enterModifyApproval,
-        exitYield,
-        getRequestAmount,
-        openApproveModal,
-        sendYieldTransaction,
-        setApprovalResponseState,
-        setCompletedAmount,
-        setCompletedReceiptAmount,
-        setErrorMessage,
-        setIsSubmittingWithdraw,
-        setPendingTransaction,
-        submitTxHash,
         token,
         vault,
-        withdrawAmount,
+        state.actionAmount,
+        exitYield,
+        enterModifyApproval,
+        openApproveModal,
+        getRequestAmount,
+        sendYieldTransaction,
+        submitTxHash,
+        reduxDispatch,
     ]);
 
     if (!token || !receiptToken || !vault) {
@@ -401,18 +418,18 @@ export const useYieldWithdraw = ({
 
     const maxAmount = suppliedAmount;
     const isApproveAmountTooHigh = isAmountGreaterThan({
-        amount: approveAmount,
+        amount: state.approveAmount,
         threshold: maxAmount,
     });
     const isWithdrawAmountTooHigh = isAmountGreaterThan({
-        amount: withdrawAmount,
+        amount: state.actionAmount,
         threshold: maxAmount,
     });
     const isApprovalInsufficient =
-        !isModifyMode &&
+        !state.isModifyMode &&
         isAmountGreaterThan({
-            amount: withdrawAmount,
-            threshold: approveAmount,
+            amount: state.actionAmount,
+            threshold: state.approveAmount,
         });
 
     return {
@@ -420,25 +437,24 @@ export const useYieldWithdraw = ({
         token,
         receiptToken,
         maxAmount,
-        approveAmount,
-        withdrawAmount,
-        completedAmount,
-        completedReceiptAmount,
-        errorMessage,
-        approveModalState,
-        pendingTransaction,
-        isModifyMode,
-        lastApprovedAmount,
-        revokeRequired,
+        approveAmount: state.approveAmount,
+        withdrawAmount: state.actionAmount,
+        completedAmount: state.completedAmount,
+        completedReceiptAmount: state.completedReceiptAmount,
+        errorMessage: state.error ?? undefined,
+        approveModalState: state.approveModalState,
+        pendingTransaction: state.pendingTransaction,
+        isModifyMode: state.isModifyMode,
+        lastApprovedAmount: state.lastApprovedAmount,
+        revokeRequired: state.revokeRequired,
         isApproveAmountTooHigh,
         isWithdrawAmountTooHigh,
         isApprovalInsufficient,
-        isSubmittingApprove: isSubmittingApprove || isApprovePending,
-        isSubmittingWithdraw,
-        setApproveAmount,
-        setWithdrawAmount,
-        setApproveMaxAmount: () => setApproveAmount(maxAmount),
-        setWithdrawMaxAmount: () => setWithdrawAmount(maxAmount),
+        isSubmittingApprove:
+            state.isSubmittingApprove || state.isApprovePending || state.approveModalState !== null,
+        isSubmittingWithdraw: state.isSubmittingAction,
+        setApproveAmount: amount => dispatch({ type: 'SET_APPROVE_AMOUNT', amount }),
+        setWithdrawAmount: amount => dispatch({ type: 'SET_ACTION_AMOUNT', amount }),
         submitApprove,
         submitWithdraw,
         submitRevoke,

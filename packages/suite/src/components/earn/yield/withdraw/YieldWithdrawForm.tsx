@@ -7,6 +7,7 @@ import { YieldActionStepWarning } from '../common/YieldActionStepWarning';
 import { YieldApproveModal } from '../common/YieldApproveModal';
 import { YieldApproveStep } from '../common/YieldApproveStep';
 import { YieldFlowComplete } from '../common/YieldFlowComplete';
+import { splitYieldPendingTransaction } from '../yieldFlowUtils';
 
 export const YieldWithdrawForm = () => {
     const {
@@ -30,9 +31,7 @@ export const YieldWithdrawForm = () => {
         isSubmittingApprove,
         isSubmittingWithdraw,
         setApproveAmount,
-        setApproveMaxAmount,
         setWithdrawAmount,
-        setWithdrawMaxAmount,
         submitApprove,
         submitWithdraw,
         submitRevoke,
@@ -49,13 +48,8 @@ export const YieldWithdrawForm = () => {
         complete: completeStepState,
     } = flow.stepStates;
 
-    const isApprovalPending =
-        pendingTransaction?.type === 'approve' ||
-        pendingTransaction?.type === 'revoke' ||
-        pendingTransaction?.type === 'revoke-only';
-    const isWithdrawPending = pendingTransaction?.type === 'withdraw';
-    const approvalPendingTransaction = isApprovalPending ? pendingTransaction : undefined;
-    const withdrawPendingTransaction = isWithdrawPending ? pendingTransaction : undefined;
+    const { approvalPendingTransaction, actionPendingTransaction: withdrawPendingTransaction } =
+        splitYieldPendingTransaction(pendingTransaction, 'withdraw');
 
     return (
         <>
@@ -131,7 +125,7 @@ export const YieldWithdrawForm = () => {
                                         }
                                         pendingApproveTransaction={approvalPendingTransaction}
                                         onAmountSelect={setApproveAmount}
-                                        onMaxClick={setApproveMaxAmount}
+                                        onMaxClick={() => setApproveAmount(maxAmount)}
                                         onApprove={submitApprove}
                                         onRevokeApproval={submitRevoke}
                                         onPendingTxClick={openPendingTransaction}
@@ -162,7 +156,7 @@ export const YieldWithdrawForm = () => {
                                             }
                                             pendingTransaction={withdrawPendingTransaction}
                                             onAmountSelect={setWithdrawAmount}
-                                            onMaxClick={setWithdrawMaxAmount}
+                                            onMaxClick={() => setWithdrawAmount(maxAmount)}
                                             onSubmit={submitWithdraw}
                                             onPendingTxClick={openPendingTransaction}
                                         />

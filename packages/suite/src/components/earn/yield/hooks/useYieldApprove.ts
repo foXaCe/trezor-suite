@@ -1,48 +1,29 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+import type { Dispatch } from 'react';
 
-import { type TranslationKey } from '@suite/intl';
 import { useSubmitTxHash } from '@suite-common/earn-api';
-import { toTokenCryptoId } from '@suite-common/trading';
 import type { Account } from '@suite-common/wallet-types';
 
-import type { YieldApproveModalState, YieldPendingTransactionState } from '../common/types';
+import type { YieldPendingTransactionState } from '../types';
+import type { YieldFlowAction, YieldFlowState } from '../yieldFlowReducer';
 
 type UseYieldApproveParams = {
     account: Account | undefined;
     contractAddress: string | undefined;
-    setPendingTransaction: (tx: YieldPendingTransactionState | null) => void;
-    setErrorMessage: (message: TranslationKey | undefined) => void;
-};
-
-export type UseYieldApproveResult = {
-    approveAmount: string;
-    setApproveAmount: (amount: string) => void;
-    approveModalState: YieldApproveModalState | null;
-    isApprovePending: boolean;
-    setIsApprovePending: (pending: boolean) => void;
-    openApproveModal: (params: {
-        amount: string;
-        spender: string;
-        transactionId?: string;
-        providerId?: string;
-        txType: Extract<YieldPendingTransactionState['type'], 'approve' | 'revoke' | 'revoke-only'>;
-    }) => boolean;
-    resetApproveState: (amount: string) => void;
-    handleApproveSuccessTxid: (txid: string) => Promise<void>;
-    handleApproveCancel: () => void;
+    state: Pick<
+        YieldFlowState,
+        'approveAmount' | 'approveModalState' | 'submitTxHashTransactionId'
+    >;
+    dispatch: Dispatch<YieldFlowAction>;
 };
 
 export const useYieldApprove = ({
     account,
     contractAddress,
-    setPendingTransaction,
-    setErrorMessage,
-}: UseYieldApproveParams): UseYieldApproveResult => {
+    state,
+    dispatch,
+}: UseYieldApproveParams) => {
     const { mutateAsync: submitTxHash } = useSubmitTxHash({});
-    const [approveAmount, setApproveAmount] = useState('0');
-    const [approveModalState, setApproveModalState] = useState<YieldApproveModalState | null>(null);
-    const [submitTxHashTransactionId, setSubmitTxHashTransactionId] = useState<string | null>(null);
-    const [isApprovePending, setIsApprovePending] = useState(false);
 
     const openApproveModal = useCallback(
         ({
@@ -50,100 +31,84 @@ export const useYieldApprove = ({
             spender,
             transactionId,
             providerId,
+            preapprovedAmount,
             txType,
         }: {
             amount: string;
             spender: string;
             transactionId?: string;
             providerId?: string;
+            preapprovedAmount?: string;
             txType: Extract<
                 YieldPendingTransactionState['type'],
                 'approve' | 'revoke' | 'revoke-only'
             >;
         }): boolean => {
             if (!account) {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
                 return false;
             }
 
             if (!contractAddress) {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
                 return false;
             }
 
-            setSubmitTxHashTransactionId(transactionId ?? null);
-            setApproveModalState({
-                amount,
-                cryptoId: toTokenCryptoId(account.symbol, contractAddress),
-                spender,
-                providerId,
-                txType,
+            dispatch({
+                type: 'OPEN_APPROVE_MODAL',
+                modalState: {
+                    amount,
+                    contractAddress,
+                    spender,
+                    providerId,
+                    preapprovedAmount,
+                    txType,
+                },
+                txHashTransactionId: transactionId ?? null,
             });
 
             return true;
         },
-        [account, contractAddress, setErrorMessage],
-    );
-
-    const resetApproveState = useCallback(
-        (amount: string) => {
-            setApproveAmount(amount);
-            setApproveModalState(null);
-            setPendingTransaction(null);
-            setSubmitTxHashTransactionId(null);
-            setErrorMessage(undefined);
-        },
-        [setPendingTransaction, setErrorMessage],
+        [account, contractAddress, dispatch],
     );
 
     const handleApproveSuccessTxid = useCallback(
         async (txid: string) => {
             try {
-                if (submitTxHashTransactionId) {
+                if (state.submitTxHashTransactionId) {
                     await submitTxHash({
-                        txId: submitTxHashTransactionId,
+                        txId: state.submitTxHashTransactionId,
                         txHash: txid,
                     });
                 }
 
-                setApproveModalState(null);
-                setSubmitTxHashTransactionId(null);
-                setPendingTransaction({
-                    type: approveModalState?.txType ?? 'approve',
-                    txid,
-                    amount: approveAmount,
+                dispatch({
+                    type: 'SET_PENDING_TX',
+                    tx: {
+                        type: state.approveModalState?.txType ?? 'approve',
+                        txid,
+                        amount: state.approveAmount,
+                    },
                 });
+                dispatch({ type: 'CLOSE_APPROVE_MODAL' });
             } catch {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
             }
         },
         [
-            approveAmount,
-            approveModalState,
-            setPendingTransaction,
-            setErrorMessage,
-            submitTxHashTransactionId,
+            state.submitTxHashTransactionId,
+            state.approveModalState,
+            state.approveAmount,
+            dispatch,
             submitTxHash,
         ],
     );
 
     const handleApproveCancel = useCallback(() => {
-        setApproveModalState(null);
-        setSubmitTxHashTransactionId(null);
-        setErrorMessage(undefined);
-    }, [setErrorMessage]);
+        dispatch({ type: 'CLOSE_APPROVE_MODAL' });
+    }, [dispatch]);
 
-    return {
-        approveAmount,
-        setApproveAmount,
-        approveModalState,
-        isApprovePending,
-        setIsApprovePending,
-        openApproveModal,
-        resetApproveState,
-        handleApproveSuccessTxid,
-        handleApproveCancel,
-    };
+    return { openApproveModal, handleApproveSuccessTxid, handleApproveCancel };
 };

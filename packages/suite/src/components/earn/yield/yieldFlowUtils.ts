@@ -9,7 +9,31 @@ import {
     getContractAddressForNetworkSymbol,
     getEvmApprovalTxData,
 } from '@suite-common/wallet-utils';
+import type { BulletListItemState } from '@trezor/components';
 import { BigNumber } from '@trezor/utils';
+
+import {
+    type UseYieldFlowStepsResult,
+    YIELD_FLOW_STEPS,
+    type YieldFlowStepId,
+    type YieldPendingTransactionState,
+} from './types';
+
+export const splitYieldPendingTransaction = (
+    pendingTransaction: YieldPendingTransactionState | null,
+    actionKind: 'supply' | 'withdraw',
+) => {
+    const isApprovalPending =
+        pendingTransaction?.type === 'approve' ||
+        pendingTransaction?.type === 'revoke' ||
+        pendingTransaction?.type === 'revoke-only';
+
+    return {
+        approvalPendingTransaction: isApprovalPending ? pendingTransaction : undefined,
+        actionPendingTransaction:
+            pendingTransaction?.type === actionKind ? pendingTransaction : undefined,
+    };
+};
 
 export const isAmountGreaterThan = ({
     amount,
@@ -215,3 +239,32 @@ export const getYieldApprovalModalParams = (transactions: TransactionDto[]) => {
 
     return getYieldModalParams(approvalTransaction);
 };
+
+export const getBulletListItemStates = (
+    currentStep: YieldFlowStepId,
+): Record<YieldFlowStepId, BulletListItemState> => {
+    const currentStepIndex = YIELD_FLOW_STEPS.indexOf(currentStep);
+
+    return Object.fromEntries(
+        YIELD_FLOW_STEPS.map((stepId, stepIndex) => {
+            let state: BulletListItemState = 'pending';
+
+            if (stepIndex < currentStepIndex) {
+                state = 'done';
+            } else if (stepIndex === currentStepIndex) {
+                state = 'active';
+            }
+
+            return [stepId, state];
+        }),
+    ) as Record<YieldFlowStepId, BulletListItemState>;
+};
+
+export const buildYieldFlowStepsResult = (
+    currentStep: YieldFlowStepId,
+    goToStep: (step: YieldFlowStepId) => void,
+): UseYieldFlowStepsResult => ({
+    currentStep,
+    stepStates: getBulletListItemStates(currentStep),
+    goToStep,
+});

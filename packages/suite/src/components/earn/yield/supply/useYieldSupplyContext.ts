@@ -5,13 +5,13 @@ import { type TranslationKey } from '@suite/intl';
 import type { Account } from '@suite-common/wallet-types';
 
 import type {
+    UseYieldFlowStepsResult,
     YieldApproveModalState,
     YieldFlowDisplayToken,
     YieldFlowFormValues,
     YieldFlowToken,
     YieldPendingTransactionState,
-} from '../common/types';
-import type { UseYieldFlowStepsResult } from '../hooks/useYieldFlowSteps';
+} from '../types';
 
 export type YieldSupplyContextValues = {
     account: Account;
@@ -36,8 +36,6 @@ export type YieldSupplyContextValues = {
     isSubmittingSupply: boolean;
     setApproveAmount: (amount: string) => void;
     setSupplyAmount: (amount: string) => void;
-    setApproveMaxAmount: () => void;
-    setSupplyMaxAmount: () => void;
     submitApprove: () => Promise<void>;
     submitSupply: () => Promise<void>;
     submitRevoke: () => Promise<void>;

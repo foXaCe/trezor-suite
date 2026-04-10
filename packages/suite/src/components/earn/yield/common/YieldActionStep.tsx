@@ -6,7 +6,7 @@ import { Button, Column } from '@trezor/components';
 
 import { YieldAmountCard } from './YieldAmountCard';
 import { YieldPendingTransaction } from './YieldPendingTransaction';
-import type { YieldFlowDisplayToken, YieldPendingTransactionState } from './types';
+import type { YieldFlowDisplayToken, YieldPendingTransactionState } from '../types';
 
 const actionStepTranslationMap = {
     supply: {

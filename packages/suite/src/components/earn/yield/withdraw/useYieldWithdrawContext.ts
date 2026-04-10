@@ -5,12 +5,12 @@ import { type TranslationKey } from '@suite/intl';
 import type { Account } from '@suite-common/wallet-types';
 
 import type {
+    UseYieldFlowStepsResult,
     YieldApproveModalState,
     YieldFlowDisplayToken,
     YieldFlowFormValues,
     YieldPendingTransactionState,
-} from '../common/types';
-import type { UseYieldFlowStepsResult } from '../hooks/useYieldFlowSteps';
+} from '../types';
 
 export type YieldWithdrawContextValues = {
     account: Account;
@@ -34,8 +34,6 @@ export type YieldWithdrawContextValues = {
     isSubmittingWithdraw: boolean;
     setApproveAmount: (amount: string) => void;
     setWithdrawAmount: (amount: string) => void;
-    setApproveMaxAmount: () => void;
-    setWithdrawMaxAmount: () => void;
     submitApprove: () => Promise<void>;
     submitWithdraw: () => Promise<void>;
     submitRevoke: () => Promise<void>;

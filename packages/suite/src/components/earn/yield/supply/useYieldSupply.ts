@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { openModal } from '@suite/modal';
@@ -10,22 +10,21 @@ import { type Account } from '@suite-common/wallet-types';
 import { useDispatch } from 'src/hooks/suite';
 
 import type { YieldSupplyContextValues } from './useYieldSupplyContext';
-import type { YieldFlowFormValues } from '../common/types';
+import { useResolvedYieldFlowData } from '../hooks/useResolvedYieldFlowData';
+import { useYieldApprove } from '../hooks/useYieldApprove';
+import { useYieldPendingTransactionTracking } from '../hooks/useYieldPendingTransactionTracking';
+import { useYieldTransactionSend } from '../hooks/useYieldTransactionSend';
+import type { YieldFlowFormValues, YieldFlowStepId } from '../types';
+import { INITIAL_YIELD_FLOW_STATE, yieldFlowReducer } from '../yieldFlowReducer';
 import {
+    buildYieldFlowStepsResult,
     getWithdrawRequestAmount,
     getYieldApprovalModalParams,
     getYieldRevokeModalParams,
+    getYieldSpenderFromTransactions,
     getYieldSupplyTransaction,
     isAmountGreaterThan,
-} from '../common/yieldFlowUtils';
-import { useResolvedYieldFlowData } from '../hooks/useResolvedYieldFlowData';
-import { useYieldApprovalFlow } from '../hooks/useYieldApprovalFlow';
-import { useYieldApprove } from '../hooks/useYieldApprove';
-import { useYieldFlowReset } from '../hooks/useYieldFlowReset';
-import { useYieldFlowState } from '../hooks/useYieldFlowState';
-import { useYieldFlowSteps } from '../hooks/useYieldFlowSteps';
-import { useYieldPendingTransactionTracking } from '../hooks/useYieldPendingTransactionTracking';
-import { useYieldTransactionSend } from '../hooks/useYieldTransactionSend';
+} from '../yieldFlowUtils';
 
 type UseYieldSupplyProps = {
     account: Account;
@@ -36,12 +35,11 @@ export const useYieldSupply = ({
     account,
     routeParams,
 }: UseYieldSupplyProps): YieldSupplyContextValues | null => {
-    const dispatch = useDispatch();
-    const flow = useYieldFlowSteps();
-    const { goToStep } = flow;
+    const reduxDispatch = useDispatch();
+    const [state, dispatch] = useReducer(yieldFlowReducer, INITIAL_YIELD_FLOW_STATE);
     const methods = useForm<YieldFlowFormValues>({
         defaultValues: {
-            amountInput: '0',
+            amountInput: '',
         },
     });
     const { mutateAsync: enterYield } = useEnterYieldOpportunity();
@@ -52,132 +50,46 @@ export const useYieldSupply = ({
         routeParams,
     });
 
-    const [supplyAmount, setSupplyAmount] = useState('');
     const {
-        completedAmount,
-        setCompletedAmount,
-        completedReceiptAmount,
-        setCompletedReceiptAmount,
-        pendingTransaction,
-        setPendingTransaction,
-        errorMessage,
-        setErrorMessage,
-        isSubmittingApprove,
-        setIsSubmittingApprove,
-        isSubmittingAction: isSubmittingSupply,
-        setIsSubmittingAction: setIsSubmittingSupply,
-        resetFlowState,
-    } = useYieldFlowState();
-
-    const {
-        approveAmount,
-        setApproveAmount,
-        approveModalState,
-        isApprovePending,
-        setIsApprovePending,
         openApproveModal,
-        resetApproveState,
         handleApproveSuccessTxid: handleApproveSuccessTxidBase,
-        handleApproveCancel: clearApproveModalState,
+        handleApproveCancel,
     } = useYieldApprove({
         account,
         contractAddress: token?.contractAddress ?? undefined,
-        setPendingTransaction,
-        setErrorMessage,
-    });
-    const goToApproveStep = useCallback(() => {
-        goToStep('approve');
-    }, [goToStep]);
-    const goToActionStep = useCallback(() => {
-        goToStep('action');
-    }, [goToStep]);
-    const goToCompleteStep = useCallback(() => {
-        goToStep('complete');
-    }, [goToStep]);
-
-    const {
-        completeApproval,
-        enterModifyApproval,
-        handleApproveModalCancel,
-        handleApproveSuccessTxid,
-        handleRevokeSuccess,
-        isModifyMode,
-        lastApprovedAmount,
-        resetApprovalFlowState,
-        revokeRequired,
-        setApprovalResponseState,
-        setRevokeRequired,
-        submitRevoke,
-    } = useYieldApprovalFlow({
-        approveAmount,
-        approveModalState,
-        clearApproveModalState,
-        currentAmount: supplyAmount,
-        goToActionStep,
-        goToApproveStep,
-        handleApproveSuccessTxidBase,
-        loadRevokeTransactions: async () => {
-            if (!account || !token || !vault) {
-                return null;
-            }
-
-            const { response, verification } = await enterYield({
-                yieldId: vault.id,
-                address: account.descriptor,
-                amount: '0',
-                decimals: token.decimals,
-            });
-
-            if (verification === 'failure') {
-                throw new Error('Yield revoke verification failed.');
-            }
-
-            return response.data.transactions;
-        },
-        methods,
-        openApproveModal,
-        providerId: vault?.providerId,
-        resetApproveState,
-        setCurrentAmount: setSupplyAmount,
-        setErrorMessage,
+        state,
+        dispatch,
     });
 
-    const resetSupplyFlow = useCallback(() => {
-        setSupplyAmount('');
-        resetFlowState();
-        resetApprovalFlowState();
-    }, [resetApprovalFlowState, resetFlowState]);
+    // Reset flow when navigating to a different vault
+    useEffect(() => {
+        if (!flowKey) {
+            return;
+        }
 
-    useYieldFlowReset({
-        flowKey,
-        goToApproveStep,
-        methods,
-        onReset: resetSupplyFlow,
-        resetApproveState,
-    });
+        dispatch({ type: 'RESET' });
+        methods.reset({ amountInput: '' });
+    }, [flowKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useYieldPendingTransactionTracking({
         account,
         actionKind: 'supply',
-        onActionSuccess: amount => {
-            setCompletedAmount(amount);
-            goToCompleteStep();
-        },
-        onApproveSuccess: completeApproval,
-        onRevokeSuccess: handleRevokeSuccess,
-        pendingTransaction,
-        setErrorMessage,
-        setIsApprovePending,
-        setPendingTransaction,
+        pendingTransaction: state.pendingTransaction,
+        dispatch,
     });
+
+    const goToStep = useCallback((step: YieldFlowStepId) => {
+        dispatch({ type: 'GO_TO_STEP', step });
+    }, []);
+
+    const flow = useMemo(
+        () => buildYieldFlowStepsResult(state.step, goToStep),
+        [state.step, goToStep],
+    );
 
     const openPendingTransaction = useCallback(
         (txid: string) => {
-            if (!account) {
-                return;
-            }
-
-            dispatch(
+            reduxDispatch(
                 openModal({
                     type: 'transaction-detail',
                     txid,
@@ -188,29 +100,130 @@ export const useYieldSupply = ({
                 }),
             );
         },
-        [account, dispatch],
+        [account, reduxDispatch],
     );
 
-    const submitApprove = useCallback(async () => {
-        if (!account || !token || !vault) {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+    const openRevokeModal = useCallback(
+        (
+            transactions: Parameters<typeof getYieldRevokeModalParams>[0] | null,
+            fallbackSpender?: string | null,
+        ) => {
+            const revokeModalParams = transactions ? getYieldRevokeModalParams(transactions) : null;
+            const spender =
+                revokeModalParams?.spender ??
+                (transactions ? getYieldSpenderFromTransactions(transactions) : null) ??
+                fallbackSpender;
+
+            dispatch({ type: 'CLEAR_APPROVAL_TRANSITION' });
+
+            if (!spender) {
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
+
+                return;
+            }
+
+            openApproveModal({
+                amount: state.approveAmount,
+                spender,
+                transactionId: revokeModalParams?.transactionId,
+                providerId: vault?.providerId,
+                preapprovedAmount: state.lastApprovedAmount || undefined,
+                txType: revokeModalParams ? 'revoke' : 'revoke-only',
+            });
+        },
+        [state.approveAmount, state.lastApprovedAmount, openApproveModal, vault?.providerId],
+    );
+
+    const enterModifyApproval = useCallback(() => {
+        dispatch({ type: 'ENTER_MODIFY_MODE', amount: state.actionAmount });
+        methods.reset({ amountInput: state.actionAmount });
+    }, [state.actionAmount, methods]);
+
+    const handleApproveModalCancel = useCallback(() => {
+        const currentModalState = state.approveModalState;
+
+        handleApproveCancel();
+
+        if (state.shouldRevokeOnApproveCancel && currentModalState?.txType === 'approve') {
+            openRevokeModal(state.revokeTransactions, currentModalState.spender);
 
             return;
         }
 
-        setIsSubmittingApprove(true);
-        setErrorMessage(undefined);
+        dispatch({ type: 'CLEAR_APPROVAL_TRANSITION' });
+    }, [
+        state.approveModalState,
+        state.shouldRevokeOnApproveCancel,
+        state.revokeTransactions,
+        handleApproveCancel,
+        openRevokeModal,
+    ]);
+
+    const handleApproveSuccessTxid = useCallback(
+        async (txid: string) => {
+            dispatch({ type: 'CLEAR_APPROVAL_TRANSITION' });
+            await handleApproveSuccessTxidBase(txid);
+        },
+        [handleApproveSuccessTxidBase],
+    );
+
+    const submitRevoke = useCallback(async () => {
+        dispatch({ type: 'CLEAR_ERROR' });
+
+        try {
+            if (!account || !token || !vault) {
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
+
+                return;
+            }
+
+            const { response, verification } = await enterYield({
+                yieldId: vault.id,
+                address: account.descriptor,
+                amount: '0',
+                decimals: token.decimals,
+            });
+
+            if (verification === 'failure') {
+                throw new Error();
+            }
+
+            const { transactions } = response.data;
+            const spender =
+                getYieldRevokeModalParams(transactions)?.spender ??
+                getYieldSpenderFromTransactions(transactions) ??
+                state.approvedSpender;
+
+            dispatch({
+                type: 'SET_APPROVAL_RESPONSE',
+                approvedSpender: spender ?? null,
+                revokeTransactions: transactions,
+            });
+            openRevokeModal(transactions, spender);
+        } catch {
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
+        }
+    }, [account, token, vault, enterYield, state.approvedSpender, openRevokeModal]);
+
+    const submitApprove = useCallback(async () => {
+        if (!account || !token || !vault) {
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
+
+            return;
+        }
+
+        dispatch({ type: 'START_SUBMITTING_APPROVE' });
 
         try {
             const { response, verification } = await enterYield({
                 yieldId: vault.id,
                 address: account.descriptor,
-                amount: approveAmount,
+                amount: state.approveAmount,
                 decimals: token.decimals,
             });
 
             if (verification === 'failure') {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
                 return;
             }
@@ -220,67 +233,55 @@ export const useYieldSupply = ({
             const revokeModalParams = getYieldRevokeModalParams(transactions);
             const spender = approvalModalParams?.spender ?? revokeModalParams?.spender ?? null;
 
-            setApprovalResponseState({
+            dispatch({
+                type: 'SET_APPROVAL_RESPONSE',
                 approvedSpender: spender,
                 revokeTransactions: transactions,
             });
 
             if (revokeModalParams) {
-                setRevokeRequired(true);
+                dispatch({ type: 'SET_REVOKE_REQUIRED' });
             }
 
             if (!approvalModalParams) {
-                completeApproval(approveAmount);
+                dispatch({ type: 'COMPLETE_APPROVAL', amount: state.approveAmount });
 
                 return;
             }
 
             openApproveModal({
-                amount: approveAmount,
+                amount: state.approveAmount,
                 spender: approvalModalParams.spender,
                 transactionId: approvalModalParams.transactionId,
                 providerId: vault.providerId,
                 txType: 'approve',
             });
         } catch {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
         } finally {
-            setIsSubmittingApprove(false);
+            dispatch({ type: 'FINISH_SUBMITTING_APPROVE' });
         }
-    }, [
-        account,
-        approveAmount,
-        completeApproval,
-        enterYield,
-        openApproveModal,
-        setApprovalResponseState,
-        setErrorMessage,
-        setIsSubmittingApprove,
-        setRevokeRequired,
-        token,
-        vault,
-    ]);
+    }, [account, token, vault, state.approveAmount, enterYield, openApproveModal]);
 
     const submitSupply = useCallback(async () => {
         if (!account || !token || !receiptToken || !vault) {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
             return;
         }
 
-        setIsSubmittingSupply(true);
-        setErrorMessage(undefined);
+        dispatch({ type: 'START_SUBMITTING_ACTION' });
 
         try {
             const { response, verification } = await enterYield({
                 yieldId: vault.id,
                 address: account.descriptor,
-                amount: supplyAmount,
+                amount: state.actionAmount,
                 decimals: token.decimals,
             });
 
             if (verification === 'failure') {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
                 return;
             }
@@ -289,13 +290,14 @@ export const useYieldSupply = ({
             const approvalModalParams = getYieldApprovalModalParams(transactions);
 
             if (approvalModalParams) {
-                setApprovalResponseState({
+                dispatch({
+                    type: 'SET_APPROVAL_RESPONSE',
                     approvedSpender: approvalModalParams.spender,
                     revokeTransactions: transactions,
                 });
                 enterModifyApproval();
                 openApproveModal({
-                    amount: supplyAmount,
+                    amount: state.actionAmount,
                     spender: approvalModalParams.spender,
                     transactionId: approvalModalParams.transactionId,
                     providerId: vault.providerId,
@@ -308,25 +310,19 @@ export const useYieldSupply = ({
             const supplyTransaction = getYieldSupplyTransaction(transactions);
 
             if (!supplyTransaction?.id) {
-                setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+                dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
 
                 return;
             }
 
-            const result = await sendYieldTransaction({
-                account,
-                transaction: supplyTransaction,
-            });
+            const result = await sendYieldTransaction({ account, transaction: supplyTransaction });
 
-            await submitTxHash({
-                txId: supplyTransaction.id,
-                txHash: result.txid,
-            });
+            await submitTxHash({ txId: supplyTransaction.id, txHash: result.txid });
 
-            dispatch(
+            reduxDispatch(
                 notificationsActions.addToast({
                     type: 'tx-yield-supply',
-                    formattedAmount: `${supplyAmount} ${token.symbol}`,
+                    formattedAmount: `${state.actionAmount} ${token.symbol}`,
                     descriptor: account.descriptor,
                     symbol: account.symbol,
                     txid: result.txid,
@@ -335,41 +331,34 @@ export const useYieldSupply = ({
 
             const receiptAmount = getWithdrawRequestAmount({
                 networkSymbol: account.symbol,
-                amount: supplyAmount,
+                amount: state.actionAmount,
                 token,
                 receiptToken,
                 pricePerShare: vault?.state?.pricePerShareState?.price,
             });
-            setCompletedReceiptAmount(receiptAmount ?? supplyAmount);
-            setCompletedAmount(supplyAmount);
-            setPendingTransaction({
-                type: 'supply',
-                txid: result.txid,
-                amount: supplyAmount,
+
+            dispatch({
+                type: 'SET_PENDING_TX',
+                tx: { type: 'supply', txid: result.txid, amount: state.actionAmount },
+                receiptAmount: receiptAmount ?? state.actionAmount,
             });
         } catch {
-            setErrorMessage('TR_EARN_YIELD_ERROR_GENERIC');
+            dispatch({ type: 'SET_ERROR', error: 'TR_EARN_YIELD_ERROR_GENERIC' });
         } finally {
-            setIsSubmittingSupply(false);
+            dispatch({ type: 'FINISH_SUBMITTING_ACTION' });
         }
     }, [
         account,
-        dispatch,
-        enterModifyApproval,
-        enterYield,
-        openApproveModal,
         receiptToken,
-        sendYieldTransaction,
-        setApprovalResponseState,
-        setCompletedAmount,
-        setCompletedReceiptAmount,
-        setErrorMessage,
-        setIsSubmittingSupply,
-        setPendingTransaction,
-        submitTxHash,
-        supplyAmount,
         token,
         vault,
+        state.actionAmount,
+        enterYield,
+        enterModifyApproval,
+        openApproveModal,
+        sendYieldTransaction,
+        submitTxHash,
+        reduxDispatch,
     ]);
 
     if (!token || !receiptToken || !vault) {
@@ -378,18 +367,18 @@ export const useYieldSupply = ({
 
     const maxAmount = token.balance;
     const isApproveAmountTooHigh = isAmountGreaterThan({
-        amount: approveAmount,
+        amount: state.approveAmount,
         threshold: maxAmount,
     });
     const isSupplyAmountTooHigh = isAmountGreaterThan({
-        amount: supplyAmount,
+        amount: state.actionAmount,
         threshold: maxAmount,
     });
     const isApprovalInsufficient =
-        !isModifyMode &&
+        !state.isModifyMode &&
         isAmountGreaterThan({
-            amount: supplyAmount,
-            threshold: approveAmount,
+            amount: state.actionAmount,
+            threshold: state.approveAmount,
         });
 
     return {
@@ -397,26 +386,25 @@ export const useYieldSupply = ({
         token,
         receiptToken,
         apy,
-        approveAmount,
-        supplyAmount,
-        completedAmount,
-        completedReceiptAmount,
+        approveAmount: state.approveAmount,
+        supplyAmount: state.actionAmount,
+        completedAmount: state.completedAmount,
+        completedReceiptAmount: state.completedReceiptAmount,
         maxAmount,
-        errorMessage,
-        approveModalState,
-        pendingTransaction,
-        isModifyMode,
-        lastApprovedAmount,
-        revokeRequired,
+        errorMessage: state.error ?? undefined,
+        approveModalState: state.approveModalState,
+        pendingTransaction: state.pendingTransaction,
+        isModifyMode: state.isModifyMode,
+        lastApprovedAmount: state.lastApprovedAmount,
+        revokeRequired: state.revokeRequired,
         isApproveAmountTooHigh,
         isSupplyAmountTooHigh,
         isApprovalInsufficient,
-        isSubmittingApprove: isSubmittingApprove || isApprovePending,
-        isSubmittingSupply,
-        setApproveAmount,
-        setSupplyAmount,
-        setApproveMaxAmount: () => setApproveAmount(maxAmount),
-        setSupplyMaxAmount: () => setSupplyAmount(maxAmount),
+        isSubmittingApprove:
+            state.isSubmittingApprove || state.isApprovePending || state.approveModalState !== null,
+        isSubmittingSupply: state.isSubmittingAction,
+        setApproveAmount: amount => dispatch({ type: 'SET_APPROVE_AMOUNT', amount }),
+        setSupplyAmount: amount => dispatch({ type: 'SET_ACTION_AMOUNT', amount }),
         submitApprove,
         submitSupply,
         submitRevoke,

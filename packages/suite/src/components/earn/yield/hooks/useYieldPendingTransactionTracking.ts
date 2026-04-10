@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
+import type { Dispatch } from 'react';
 
-import { type TranslationKey } from '@suite/intl';
 import {
     fetchAndUpdateAccountThunk,
     selectConvertedNetworkFeeInfo,
@@ -11,7 +11,8 @@ import { isPending } from '@suite-common/wallet-utils';
 
 import { useDispatch, useSelector } from 'src/hooks/suite';
 
-import type { YieldPendingTransactionState } from '../common/types';
+import type { YieldPendingTransactionState } from '../types';
+import type { YieldFlowAction } from '../yieldFlowReducer';
 
 const DEFAULT_PENDING_TX_POLL_INTERVAL_MS = 3_000;
 const MIN_PENDING_TX_POLL_INTERVAL_MS = 2_000;
@@ -29,27 +30,17 @@ const getPollIntervalMs = (blockTime: number | undefined): number => {
 type UseYieldPendingTransactionTrackingProps = {
     account: Account;
     actionKind: Extract<YieldPendingTransactionState['type'], 'supply' | 'withdraw'>;
-    onActionSuccess: (amount: string) => void;
-    onApproveSuccess: (amount: string) => void;
-    onRevokeSuccess: () => void;
     pendingTransaction: YieldPendingTransactionState | null;
-    setErrorMessage: (message: TranslationKey | undefined) => void;
-    setIsApprovePending: (pending: boolean) => void;
-    setPendingTransaction: (tx: YieldPendingTransactionState | null) => void;
+    dispatch: Dispatch<YieldFlowAction>;
 };
 
 export const useYieldPendingTransactionTracking = ({
     account,
     actionKind,
-    onActionSuccess,
-    onApproveSuccess,
-    onRevokeSuccess,
     pendingTransaction,
-    setErrorMessage,
-    setIsApprovePending,
-    setPendingTransaction,
+    dispatch,
 }: UseYieldPendingTransactionTrackingProps) => {
-    const dispatch = useDispatch();
+    const reduxDispatch = useDispatch();
     const trackedPendingTransaction = useSelector(state =>
         pendingTransaction
             ? selectTransactionByAccountKeyAndTxid(state, account.key, pendingTransaction.txid)
@@ -58,7 +49,6 @@ export const useYieldPendingTransactionTracking = ({
     const feeInfo = useSelector(state => selectConvertedNetworkFeeInfo(state, account.symbol));
     const pollIntervalMs = getPollIntervalMs(feeInfo?.blockTime);
 
-    // Keep polling even before the tx appears in wallet.transactions.
     const isCurrentlyPending =
         !!pendingTransaction &&
         (!trackedPendingTransaction || isPending(trackedPendingTransaction));
@@ -69,11 +59,11 @@ export const useYieldPendingTransactionTracking = ({
         }
 
         const interval = setInterval(() => {
-            dispatch(fetchAndUpdateAccountThunk({ accountKey: account.key, forceUpdate: true }));
+            reduxDispatch(fetchAndUpdateAccountThunk({ accountKey: account.key }));
         }, pollIntervalMs);
 
         return () => clearInterval(interval);
-    }, [account.key, dispatch, isCurrentlyPending, pollIntervalMs]);
+    }, [account.key, reduxDispatch, isCurrentlyPending, pollIntervalMs]);
 
     useEffect(() => {
         if (!pendingTransaction || !trackedPendingTransaction) {
@@ -85,46 +75,29 @@ export const useYieldPendingTransactionTracking = ({
         }
 
         if (trackedPendingTransaction.type === 'failed') {
-            setPendingTransaction(null);
-            setIsApprovePending(false);
-            setErrorMessage('TR_EARN_YIELD_ERROR_TRANSACTION_FAILED');
+            dispatch({ type: 'TRANSACTION_FAILED' });
 
             return;
         }
 
         if (pendingTransaction.type === 'revoke' || pendingTransaction.type === 'revoke-only') {
-            setPendingTransaction(null);
-            setIsApprovePending(false);
-            onRevokeSuccess();
+            dispatch({ type: 'REVOKE_SUCCESS' });
 
             return;
         }
 
         if (pendingTransaction.type === 'approve') {
-            setPendingTransaction(null);
-            setIsApprovePending(false);
-            onApproveSuccess(pendingTransaction.amount);
+            dispatch({ type: 'COMPLETE_APPROVAL', amount: pendingTransaction.amount });
 
             return;
         }
 
         if (pendingTransaction.type === actionKind) {
-            setPendingTransaction(null);
-            onActionSuccess(pendingTransaction.amount);
+            dispatch({ type: 'COMPLETE_ACTION', amount: pendingTransaction.amount });
 
             return;
         }
 
-        setPendingTransaction(null);
-    }, [
-        actionKind,
-        onActionSuccess,
-        onApproveSuccess,
-        onRevokeSuccess,
-        pendingTransaction,
-        setErrorMessage,
-        setIsApprovePending,
-        setPendingTransaction,
-        trackedPendingTransaction,
-    ]);
+        dispatch({ type: 'RESET' });
+    }, [actionKind, dispatch, pendingTransaction, trackedPendingTransaction]);
 };

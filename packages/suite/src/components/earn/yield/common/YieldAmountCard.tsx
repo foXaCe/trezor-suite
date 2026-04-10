@@ -10,7 +10,7 @@ import { NumberInput } from '@trezor/product-components';
 
 import { useSelector } from 'src/hooks/suite';
 
-import type { YieldFlowFormValues } from './types';
+import type { YieldFlowFormValues } from '../types';
 
 type YieldAmountCardSummaryProps = {
     value: string;

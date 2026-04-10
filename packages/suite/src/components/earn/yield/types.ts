@@ -1,6 +1,5 @@
-import type { CryptoId } from 'invity-api';
-
 import type { NetworkSymbol } from '@suite-common/wallet-config';
+import type { BulletListItemState } from '@trezor/components';
 
 export const YIELD_FLOW_STEPS = ['approve', 'action', 'complete'] as const;
 
@@ -29,9 +28,10 @@ export type YieldFlowCompleteValue = {
 
 export type YieldApproveModalState = {
     amount: string;
-    cryptoId: CryptoId;
+    contractAddress: string;
     spender: string;
     providerId?: string;
+    preapprovedAmount?: string;
     txType: Extract<YieldPendingTransactionState['type'], 'approve' | 'revoke' | 'revoke-only'>;
 };
 
@@ -39,4 +39,10 @@ export type YieldPendingTransactionState = {
     type: 'approve' | 'revoke' | 'revoke-only' | 'supply' | 'withdraw';
     txid: string;
     amount: string;
+};
+
+export type UseYieldFlowStepsResult = {
+    currentStep: YieldFlowStepId;
+    stepStates: Record<YieldFlowStepId, BulletListItemState>;
+    goToStep: (step: YieldFlowStepId) => void;
 };

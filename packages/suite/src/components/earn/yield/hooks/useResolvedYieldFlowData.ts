@@ -10,8 +10,8 @@ import { BigNumber } from '@trezor/utils';
 
 import { getApyPercent } from 'src/components/earn/utils/earnApyUtils';
 
-import type { YieldFlowDisplayToken, YieldFlowToken } from '../common/types';
-import { doTokensMatch } from '../common/yieldFlowUtils';
+import type { YieldFlowDisplayToken, YieldFlowToken } from '../types';
+import { doTokensMatch } from '../yieldFlowUtils';
 
 const hasTokenSymbol = (
     accountToken: NonNullable<Account['tokens']>[number],

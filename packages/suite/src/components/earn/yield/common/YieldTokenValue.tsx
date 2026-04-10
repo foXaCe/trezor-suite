@@ -44,7 +44,7 @@ export const YieldTokenValue = ({ token, amount }: YieldTokenValueProps) => {
                 <CoinLogo size={24} symbol={token.networkSymbol} type="tokenWithNetwork" />
             )}
             <Text typographyStyle="body-md-strong">
-                {localizeNumber(amount, locale)} {token.symbol}
+                {localizeNumber(amount, locale, 0, 2)} {token.symbol}
             </Text>
         </Row>
     );

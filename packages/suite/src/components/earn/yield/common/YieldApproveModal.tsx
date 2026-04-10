@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-import { type CryptoId, type ProviderMetadata } from 'invity-api';
-
 import { useGetYieldProvider } from '@suite-common/earn-api';
+import { toTokenCryptoId } from '@suite-common/trading';
 import { type Account } from '@suite-common/wallet-types';
 
 import { ApproveModal } from 'src/components/suite/modals/ReduxModal/UserContextModal/AllowanceModals/ApproveModal';
@@ -13,10 +12,11 @@ import { type EarnProviderId, earnProviderMetadata } from '../../providers/provi
 
 export type YieldApproveModalProps = {
     amount: string;
-    cryptoId: CryptoId;
+    contractAddress: string;
     account: Account;
     spender: string;
     providerId?: string;
+    preapprovedAmount?: string;
     txType: 'approve' | 'revoke' | 'revoke-only';
     onCancel: () => void;
     onSuccessTxid: (txid: string) => Promise<void> | void;
@@ -32,10 +32,11 @@ const getDefaultProviderName = (providerId?: string) => {
 
 export const YieldApproveModal = ({
     amount,
-    cryptoId,
+    contractAddress,
     account,
     spender,
     providerId,
+    preapprovedAmount,
     txType,
     onCancel,
     onSuccessTxid,
@@ -48,9 +49,10 @@ export const YieldApproveModal = ({
     const defaultProviderName = getDefaultProviderName(providerId);
     const isApproveTransaction = txType === 'approve';
 
+    const cryptoId = toTokenCryptoId(account.symbol, contractAddress);
     const providerQuery = useGetYieldProvider(providerId);
     const providerName = providerQuery.data?.data.name ?? defaultProviderName;
-    const provider: ProviderMetadata = {
+    const provider = {
         name: providerName,
         companyName: providerName,
         logo: providerQuery.data?.data.logoURI ?? '',
@@ -110,6 +112,7 @@ export const YieldApproveModal = ({
             account={account}
             provider={provider}
             spender={spender}
+            preapprovedAmount={preapprovedAmount}
             onCancel={onCancel}
         />
     );

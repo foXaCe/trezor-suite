@@ -3,7 +3,7 @@ import { getCoingeckoId } from '@suite-common/wallet-config';
 import { Card, IconButton, Row, Text } from '@trezor/components';
 import { AssetLogo, CoinLogo } from '@trezor/product-components';
 
-import type { YieldFlowDisplayToken } from './types';
+import type { YieldFlowDisplayToken } from '../types';
 
 type YieldApprovedAmountCardProps = {
     token: YieldFlowDisplayToken;

@@ -9,7 +9,7 @@ import { BigNumber } from '@trezor/utils';
 import { YieldAmountCard } from './YieldAmountCard';
 import { YieldApprovedAmountCard } from './YieldApprovedAmountCard';
 import { YieldPendingTransaction } from './YieldPendingTransaction';
-import type { YieldFlowDisplayToken, YieldPendingTransactionState } from './types';
+import type { YieldFlowDisplayToken, YieldPendingTransactionState } from '../types';
 
 const approveStepTranslationMap = {
     supply: {

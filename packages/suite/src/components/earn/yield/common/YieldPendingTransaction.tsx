@@ -6,7 +6,7 @@ import { Column, Icon, Link, Paragraph, Row } from '@trezor/components';
 
 import { Address } from 'src/components/suite/Address';
 
-import type { YieldPendingTransactionState } from './types';
+import type { YieldPendingTransactionState } from '../types';
 
 const loadingAnimation = keyframes`
     from {

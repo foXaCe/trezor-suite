@@ -7,7 +7,7 @@ import { FeedbackCard } from '@trezor/product-components';
 import { useDispatch } from 'src/hooks/suite';
 import { ApyValue } from 'src/views/wallet/staking/components/ApyValue';
 
-import type { YieldFlowCompleteValue } from './types';
+import type { YieldFlowCompleteValue } from '../types';
 import { YieldTokenValue } from './YieldTokenValue';
 
 const flowTypeContentMap = {
