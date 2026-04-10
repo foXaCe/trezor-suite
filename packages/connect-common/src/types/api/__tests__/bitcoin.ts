@@ -510,6 +510,7 @@ export const composeTransaction = async (api: TrezorConnect) => {
 
     if (precompose.success) {
         const tx = precompose.payload[0];
+        if (!tx) throw new Error('no tx');
         if (tx.type === 'error') {
             tx.error.toLowerCase();
         }
