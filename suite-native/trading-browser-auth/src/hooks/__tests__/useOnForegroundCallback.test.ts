@@ -35,7 +35,7 @@ describe('useOnForegroundCallback', () => {
 
     it('should call callback once when app state is active and shouldWatchForForeground is set to true', () => {
         const { result } = renderUseOnFocusCallback();
-        const changeHandler = appStateSpy.mock.calls[0][1];
+        const changeHandler = appStateSpy.mock.calls[0]?.[1];
 
         act(() => {
             // simulate app being in foreground
@@ -49,7 +49,7 @@ describe('useOnForegroundCallback', () => {
 
     it('should not call callback when app is on background and shouldWatchForForeground is set to true ', () => {
         const { result } = renderUseOnFocusCallback();
-        const changeHandler = appStateSpy.mock.calls[0][1];
+        const changeHandler = appStateSpy.mock.calls[0]?.[1];
 
         act(() => {
             // simulate app going to background
@@ -65,7 +65,7 @@ describe('useOnForegroundCallback', () => {
 
     it('should react to app state changes', () => {
         const { result } = renderUseOnFocusCallback();
-        const changeHandler = appStateSpy.mock.calls[0][1];
+        const changeHandler = appStateSpy.mock.calls[0]?.[1];
 
         act(() => {
             // simulate app going to background
@@ -84,7 +84,7 @@ describe('useOnForegroundCallback', () => {
     it('should catch errors in callback', async () => {
         const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
         const { result } = renderUseOnFocusCallback();
-        const changeHandler = appStateSpy.mock.calls[0][1];
+        const changeHandler = appStateSpy.mock.calls[0]?.[1];
         const error = new Error('Test error');
 
         mockCallback.mockRejectedValueOnce(error);

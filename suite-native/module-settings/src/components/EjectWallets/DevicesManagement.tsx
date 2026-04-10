@@ -16,9 +16,9 @@ export const DevicesManagement = () => {
         <VStack spacing="sp16">
             <AutoEjectSwitch />
             {deviceGroups.map(devices => {
-                const [firstDevice] = devices;
+                const firstDevice = devices[0];
 
-                if (!shouldDeviceBeRemembered({ device: firstDevice })) return null;
+                if (!firstDevice || !shouldDeviceBeRemembered({ device: firstDevice })) return null;
 
                 const deviceModel = firstDevice.features?.internal_model;
 

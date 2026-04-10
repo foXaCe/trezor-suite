@@ -83,7 +83,10 @@ export const AddCoinDiscoveryRunningScreen = ({
             return;
         }
 
-        goToAccountDetail({ account: normalAccounts[0] });
+        const firstNormalAccount = normalAccounts[0];
+        if (firstNormalAccount) {
+            goToAccountDetail({ account: firstNormalAccount });
+        }
     };
 
     useEffect(() => {

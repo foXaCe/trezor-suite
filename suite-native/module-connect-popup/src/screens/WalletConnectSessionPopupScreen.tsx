@@ -199,10 +199,13 @@ export const WalletConnectSessionPopupScreen = () => {
                             <Translation id="moduleConnectPopup.walletConnect.selectedAccount" />
                         </Text>
                         <Card noPadding>
-                            <AccountsListItem
-                                account={selectedDefaultAccount || accounts[0]}
-                                onPress={openModal}
-                            />
+                            {(() => {
+                                const account = selectedDefaultAccount ?? accounts[0];
+
+                                return account ? (
+                                    <AccountsListItem account={account} onPress={openModal} />
+                                ) : null;
+                            })()}
 
                             <BottomSheetModal
                                 ref={bottomSheetRef}
