@@ -6,6 +6,7 @@
  * @param value value to set
  */
 export function setDeepValue(obj: any, [prop, ...path]: string[], value: any) {
+    if (prop === undefined) return;
     if (!path.length) {
         obj[prop] = value;
     } else {
@@ -21,6 +22,7 @@ export function setDeepValue(obj: any, [prop, ...path]: string[], value: any) {
  * @returns value at the path
  */
 export function getDeepValue(obj: any, [prop, ...path]: (string | number)[]): any {
+    if (prop === undefined) return undefined;
     if (!path.length) {
         return obj[prop];
     } else {
