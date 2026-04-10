@@ -62,4 +62,4 @@ export const sellQuotes = [
         rate: 3940,
         tags: ['wantFiat'],
     },
-] as SellFiatTrade[];
+] as unknown as [SellFiatTrade, SellFiatTrade, SellFiatTrade];

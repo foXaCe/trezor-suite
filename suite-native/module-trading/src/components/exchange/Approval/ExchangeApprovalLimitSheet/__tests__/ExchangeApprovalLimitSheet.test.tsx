@@ -9,7 +9,7 @@ import { ExchangeApprovalLimitSheet } from '../ExchangeApprovalLimitSheet';
 const mockOnDismiss = jest.fn();
 const mockOnApprovalTypeSelect = jest.fn();
 
-const testQuote = exchangeQuotes[0] ?? ({} as ExchangeTrade);
+const testQuote = exchangeQuotes[0] as ExchangeTrade;
 
 const getPreloadedState = (): PreloadedState => ({
     wallet: {

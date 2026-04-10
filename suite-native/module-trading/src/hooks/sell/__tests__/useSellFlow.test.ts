@@ -66,8 +66,7 @@ jest.mock('../../general/useTradingTransaction', () => ({
 
 const btc1AccountKey = 'btc-account-1' as AccountKey; // Todo: create properly via `createAccountKey()`
 
-// Pre-typed fixture references to avoid noUncheckedIndexedAccess issues.
-const firstSellQuote: SellFiatTrade = sellQuotes[0] ?? ({} as SellFiatTrade);
+const firstSellQuote = sellQuotes[0];
 const firstBankAccount = verifiedBankAccount;
 
 describe('useSellFlow', () => {

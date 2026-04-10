@@ -991,13 +991,14 @@ const { unused } = _addrs;
 const used1 = _addrs.used[0];
 const used2 = _addrs.used[1];
 const _firstChange = _addrs.change[0];
+if (!_firstChange) throw new Error('Fixture missing change[0]');
 const {
     balance: _balance,
     sent: _sent,
     received: _received,
     transfers: _transfers,
     ..._change1Rest
-} = _firstChange ?? ({} as NonNullable<typeof _firstChange>);
+} = _firstChange;
 const change1 = _change1Rest;
 const change = _addrs.change.slice(1);
 const pending = _hist.transactions[2];
