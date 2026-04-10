@@ -46,8 +46,8 @@ export function validateAnalyticsEventName(value: string): ValidateEventNameErro
     const domain = parts[0];
     const eventSegments = parts.slice(1);
 
-    if (!ALLOWED_DOMAINS_SET.has(domain)) {
-        return { messageId: 'invalidDomain', data: { domain } };
+    if (!domain || !ALLOWED_DOMAINS_SET.has(domain)) {
+        return { messageId: 'invalidDomain', data: { domain: domain ?? '' } };
     }
 
     for (const segment of eventSegments) {

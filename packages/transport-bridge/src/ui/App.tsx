@@ -23,10 +23,10 @@ export const App = ({ children }: AppProps) => {
     const themeVariant: 'light' | 'dark' = useTheme();
     const messages: Record<string, any> = { default: defaultMessages, cs };
 
-    const language = window.navigator.language.split('-')[0];
+    const language = window.navigator.language.split('-')[0] ?? 'en';
     const navigatorLocaleIsSupported = Object.keys(messages).includes(language);
     const languageToUse = navigatorLocaleIsSupported ? language : 'en';
-    const messagesToUse = messages[languageToUse] || defaultMessages;
+    const messagesToUse = messages[languageToUse] ?? defaultMessages;
 
     return (
         <div>

@@ -85,9 +85,12 @@ export class WebExtensionPopup extends Popup {
 
                 return;
             }
-            chrome.tabs.query({ windowId: newWindow.id, active: true }, tabs =>
-                this.onPopupTabResolved(tabs[0]),
-            );
+            chrome.tabs.query({ windowId: newWindow.id, active: true }, tabs => {
+                const tab = tabs[0];
+                if (tab) {
+                    this.onPopupTabResolved(tab);
+                }
+            });
         });
     }
 
