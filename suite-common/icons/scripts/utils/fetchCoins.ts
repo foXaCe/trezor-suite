@@ -4,7 +4,7 @@ import { CoinData, CoinListData, UpdatedIconsList } from '../types';
 
 const coingeckoApiOptions = {
     method: 'GET',
-    headers: { 'x-cg-pro-api-key': process.env.COINGECKO_API_KEY! },
+    headers: { 'x-cg-pro-api-key': process.env.COINGECKO_API_KEY ?? '' },
 };
 
 export const getUpdatedIconsList = async (): Promise<UpdatedIconsList> => {

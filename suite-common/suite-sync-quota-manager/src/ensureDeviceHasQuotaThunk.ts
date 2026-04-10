@@ -81,12 +81,15 @@ export const ensureDeviceHasQuotaThunk =
         });
 
         if (registrationRequestResult.success) {
+            const certChain = registrationRequestResult.payload.certificate_chain;
+            const deviceCert = certChain[0] ?? '';
+            const caCert = certChain[1] ?? '';
             dispatch(
                 registerStorageThunk({
                     size: DEFAULT_DEVICE_SIZE_QUOTA,
                     certificateChain: {
-                        deviceCert: registrationRequestResult.payload.certificate_chain[0],
-                        caCert: registrationRequestResult.payload.certificate_chain[1],
+                        deviceCert,
+                        caCert,
                     },
                     challenge: sessionChallenge.payload.challenge,
                     proof: registrationRequestResult.payload.signature,

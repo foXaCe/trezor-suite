@@ -57,6 +57,9 @@ export const ensureOwnerHasAllocatedQuotaThunk =
     }: EnsureOwnerHasAllocatedQuotaParams) =>
     async (dispatch: Dispatch, getState: () => any): ReturnType<EnsureOwnerHasAllocatedQuota> => {
         const { walletDescriptor, deviceId } = parseDeviceStaticSessionId(deviceStaticSessionId);
+        if (!deviceId) {
+            return err(HttpError());
+        }
         const quotaManagerBaseUrl = selectQuotaManagerBaseUrl(getState());
 
         const hasOwnerStorage = await checkStorageByOwnerId({

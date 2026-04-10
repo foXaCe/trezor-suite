@@ -21,8 +21,9 @@ const groupTransactionIdsByAddress = (transactions: WalletAccountTransaction[]) 
                 addresses[address] = [];
             }
 
-            if (addresses[address].indexOf(txid) === -1) {
-                addresses[address].push(txid);
+            const addrList = addresses[address];
+            if (addrList && addrList.indexOf(txid) === -1) {
+                addrList.push(txid);
             }
         });
     };
@@ -49,7 +50,7 @@ const groupTransactionsByLabel = (accountLabels: SearchAccountLabels) => {
                 labels[label] = [];
             }
 
-            labels[label].push(txid);
+            labels[label]?.push(txid);
         });
     });
 
@@ -65,7 +66,7 @@ const groupAddressesByLabel = (accountLabels: SearchAccountLabels) => {
             labels[label] = [];
         }
 
-        labels[label].push(address);
+        labels[label]?.push(address);
     });
 
     return labels;
@@ -152,7 +153,7 @@ export const simpleSearchTransactions = (
     const txsForOutputLabels = groupTransactionsByLabel(accountLabels);
     const foundTxsForOutputLabel = typedObjectKeys(txsForOutputLabels).flatMap(label => {
         if (label.toLowerCase().includes(search.toLowerCase())) {
-            return txsForOutputLabels[label];
+            return txsForOutputLabels[label] ?? [];
         }
 
         return [];
@@ -163,7 +164,7 @@ export const simpleSearchTransactions = (
     const addressesForLabel = groupAddressesByLabel(accountLabels);
     const foundAddressesForLabel = typedObjectKeys(addressesForLabel).flatMap(label => {
         if (label.toLowerCase().includes(search.toLowerCase())) {
-            return addressesForLabel[label];
+            return addressesForLabel[label] ?? [];
         }
 
         return [];
@@ -176,7 +177,7 @@ export const simpleSearchTransactions = (
             address.toLowerCase().includes(search.toLowerCase()) ||
             foundAddressesForLabel.includes(address)
         ) {
-            return txsForAddresses[address];
+            return txsForAddresses[address] ?? [];
         }
 
         return [];

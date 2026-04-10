@@ -231,9 +231,12 @@ export const isDeviceCompatible = (deviceConditions: Device[], device?: TrezorDe
             (variantCondition.toLowerCase() === deviceFwType || variantCondition === '*') &&
             (firmwareRevisionCondition.toLowerCase() === deviceFwRevision.toLowerCase() ||
                 firmwareRevisionCondition === '*') &&
-            (semver.satisfies(deviceFwVersion, createVersionRange(firmwareCondition)!) ||
+            (semver.satisfies(deviceFwVersion, createVersionRange(firmwareCondition) ?? '') ||
                 firmwareCondition === '*') &&
-            (semver.satisfies(deviceBootloaderVersion, createVersionRange(bootloaderCondition)!) ||
+            (semver.satisfies(
+                deviceBootloaderVersion,
+                createVersionRange(bootloaderCondition) ?? '',
+            ) ||
                 bootloaderCondition === '*') &&
             isThpPropertiesCompatible(thpPropertiesCondition, device.thp?.properties)
         );
@@ -370,11 +373,12 @@ export const getValidExperimentIds = (config: MessageSystem | null, options: Opt
  * it defaults to 'en'.
  */
 export const resolveMessageContent = (localizedMessages: Localization, language: string) => {
-    if (localizedMessages[language]) {
-        return localizedMessages[language];
+    const exactMatch = localizedMessages[language];
+    if (exactMatch) {
+        return exactMatch;
     }
 
-    const fallbackLanguage = language.split('-')[0];
+    const fallbackLanguage = language.split('-')[0] ?? language;
 
     return localizedMessages[fallbackLanguage] ?? localizedMessages.en;
 };

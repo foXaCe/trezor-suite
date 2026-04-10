@@ -36,9 +36,9 @@ describe('testing experiment utils', () => {
                 { percentage: 50, variant: 'A' },
                 { percentage: 30, variant: 'B' },
                 { percentage: 20, variant: 'C' },
-            ];
+            ] as const;
 
-            const ranges = buildExperimentGroupRanges(groups);
+            const ranges = buildExperimentGroupRanges([...groups]);
 
             expect(ranges).toEqual([
                 { group: groups[0], range: { start: 0, end: 50 } },
@@ -54,11 +54,17 @@ describe('testing experiment utils', () => {
                 { percentage: 50, variant: 'A' },
                 { percentage: 30, variant: 'B' },
                 { percentage: 20, variant: 'C' },
-            ];
+            ] as const;
 
-            expect(getExperimentGroupByInclusion({ groups, inclusion: 25 })).toEqual(groups[0]);
-            expect(getExperimentGroupByInclusion({ groups, inclusion: 75 })).toEqual(groups[1]);
-            expect(getExperimentGroupByInclusion({ groups, inclusion: 95 })).toEqual(groups[2]);
+            expect(getExperimentGroupByInclusion({ groups: [...groups], inclusion: 25 })).toEqual(
+                groups[0],
+            );
+            expect(getExperimentGroupByInclusion({ groups: [...groups], inclusion: 75 })).toEqual(
+                groups[1],
+            );
+            expect(getExperimentGroupByInclusion({ groups: [...groups], inclusion: 95 })).toEqual(
+                groups[2],
+            );
         });
 
         it('should throw an error for inclusion values out of range', () => {
@@ -66,14 +72,14 @@ describe('testing experiment utils', () => {
                 { percentage: 50, variant: 'A' },
                 { percentage: 30, variant: 'B' },
                 { percentage: 20, variant: 'C' },
-            ];
+            ] as const;
 
-            expect(() => getExperimentGroupByInclusion({ groups, inclusion: -1 })).toThrow(
-                'inclusion must be in [0, 99]',
-            );
-            expect(() => getExperimentGroupByInclusion({ groups, inclusion: 100 })).toThrow(
-                'inclusion must be in [0, 99]',
-            );
+            expect(() =>
+                getExperimentGroupByInclusion({ groups: [...groups], inclusion: -1 }),
+            ).toThrow('inclusion must be in [0, 99]');
+            expect(() =>
+                getExperimentGroupByInclusion({ groups: [...groups], inclusion: 100 }),
+            ).toThrow('inclusion must be in [0, 99]');
         });
 
         it('test getExperimentGroupByInclusion whether instanceId is not in range of variants', () => {
@@ -104,14 +110,14 @@ describe('testing experiment utils', () => {
             let groupACount = 0;
             let groupBCount = 0;
 
+            const groupA = experimentTest.groups[0];
+            const groupB = experimentTest.groups[1];
+            if (!groupA || !groupB) throw new Error('Expected groups');
+
             mockRandomInt(true);
-            const arrayOfIdsAGroup = getArrayOfInstanceIds(
-                sampleSize * (experimentTest.groups[0].percentage / 100),
-            );
+            const arrayOfIdsAGroup = getArrayOfInstanceIds(sampleSize * (groupA.percentage / 100));
             mockRandomInt(false);
-            const arrayOfIdsBGroup = getArrayOfInstanceIds(
-                sampleSize * (experimentTest.groups[1].percentage / 100),
-            );
+            const arrayOfIdsBGroup = getArrayOfInstanceIds(sampleSize * (groupB.percentage / 100));
 
             const arrayOfIds = [...arrayOfIdsAGroup, ...arrayOfIdsBGroup];
 
@@ -133,8 +139,8 @@ describe('testing experiment utils', () => {
             const shareA = groupACount / sampleSize;
             const shareB = groupBCount / sampleSize;
 
-            expect(shareA).toEqual(experimentTest.groups[0].percentage / 100);
-            expect(shareB).toEqual(experimentTest.groups[1].percentage / 100);
+            expect(shareA).toEqual(groupA.percentage / 100);
+            expect(shareB).toEqual(groupB.percentage / 100);
         });
     });
 });

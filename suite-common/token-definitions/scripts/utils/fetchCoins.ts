@@ -27,8 +27,8 @@ export const getContractAddress = (assetPlatformId: string, platforms: CoinData[
                 /^([A-Za-z0-9]{1,12})[-:]([G][A-Z0-9]{55})(?:-\d+)?$/,
             );
             if (stellarMatch) {
-                const code = stellarMatch[1];
-                const issuer = stellarMatch[2];
+                const code = stellarMatch[1] ?? '';
+                const issuer = stellarMatch[2] ?? '';
 
                 return `${code}-${issuer}`; // Return as CODE-ISSUER format
             } else {
@@ -116,6 +116,10 @@ const verifyStellarToml = async (
 const getStellarHomeDomain = async (contractAddress: string): Promise<string | undefined> => {
     const [code, issuer] = contractAddress.split('-');
 
+    if (!code || !issuer) {
+        return undefined;
+    }
+
     const homeDomain = await fetchStellarHomeDomain(issuer);
     if (!homeDomain) {
         return undefined;
@@ -156,7 +160,7 @@ const fetchStellarTokenRating = async (contractAddress: string): Promise<number 
 
 const options = {
     method: 'GET',
-    headers: { 'x-cg-pro-api-key': process.env.COINGECKO_API_KEY! },
+    headers: { 'x-cg-pro-api-key': process.env.COINGECKO_API_KEY ?? '' },
 };
 
 export const fetchAllCoins = async (): Promise<CoinData[]> => {

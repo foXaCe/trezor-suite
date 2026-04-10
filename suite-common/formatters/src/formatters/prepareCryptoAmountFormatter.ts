@@ -65,8 +65,8 @@ const localizedNumber = ({
         maximumFractionDigits: maxDisplayedDecimals,
     });
 
-    const [_, unformattedDecimalsPart] = value.split('.');
-    const wasResultRounded = unformattedDecimalsPart?.length > maxDisplayedDecimals;
+    const unformattedDecimalsPart = value.split('.')[1];
+    const wasResultRounded = (unformattedDecimalsPart?.length ?? 0) > maxDisplayedDecimals;
 
     return { formattedValue, wasResultRounded };
 };

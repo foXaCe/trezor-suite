@@ -140,13 +140,19 @@ const validateModalAppParams = (hash: HashString, params?: Route['params']): Mod
     return {
         ...modalAppParamsDefaultValues,
         ...Object.fromEntries(
-            params?.map((param, index) => [
-                param,
-                parseParamValue(
-                    splitted[index],
-                    modalAppParamsDefaultValues[param as keyof ModalAppParams],
-                ),
-            ]) ?? [],
+            params?.map((param, index) => {
+                const value = splitted[index];
+
+                return [
+                    param,
+                    value !== undefined
+                        ? parseParamValue(
+                              value,
+                              modalAppParamsDefaultValues[param as keyof ModalAppParams],
+                          )
+                        : modalAppParamsDefaultValues[param as keyof ModalAppParams],
+                ];
+            }) ?? [],
         ),
     } as ModalAppParams;
 };
@@ -213,6 +219,6 @@ export const getRouteHash = (route?: Route, params?: RouteParams) =>
                 '',
                 ...route.params
                     .filter(p => Object.prototype.hasOwnProperty.call(params, p))
-                    .map(p => params[p]),
+                    .map(p => params[p] ?? ''),
             ].join('/'),
     );

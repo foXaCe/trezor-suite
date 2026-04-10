@@ -11,13 +11,16 @@ export const slip15ToBip329 = (inputData: AccountLabels, allSpendable = true): B
         for (const txid in inputData.outputLabels) {
             if (Object.prototype.hasOwnProperty.call(inputData.outputLabels, txid)) {
                 const outputs = inputData.outputLabels[txid];
+                if (!outputs) continue;
 
                 for (const vout in outputs) {
                     if (Object.prototype.hasOwnProperty.call(outputs, vout)) {
+                        const label = outputs[vout];
+                        if (label === undefined) continue;
                         bip329Labels.push({
                             type: 'output',
                             ref: `${txid}:${vout}`, // Output reference is 'txid:vout'
-                            label: outputs[vout],
+                            label,
                             spendable: allSpendable, // Right now Trezor Suite does not allow to set sependable so all are `true`.
                         });
                     }
@@ -30,10 +33,12 @@ export const slip15ToBip329 = (inputData: AccountLabels, allSpendable = true): B
     if (inputData.addressLabels) {
         for (const address in inputData.addressLabels) {
             if (Object.prototype.hasOwnProperty.call(inputData.addressLabels, address)) {
+                const label = inputData.addressLabels[address];
+                if (label === undefined) continue;
                 bip329Labels.push({
                     type: 'addr',
                     ref: address,
-                    label: inputData.addressLabels[address],
+                    label,
                 });
             }
         }
