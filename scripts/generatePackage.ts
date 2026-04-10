@@ -33,7 +33,7 @@ const scopes = {
     },
 } as const;
 
-const exitWithErrorMessage = (errorMessage: string) => {
+const exitWithErrorMessage = (errorMessage: string): never => {
     console.error(errorMessage);
     process.exit(1);
 };
