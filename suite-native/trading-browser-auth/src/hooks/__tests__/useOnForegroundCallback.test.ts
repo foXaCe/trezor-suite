@@ -39,7 +39,7 @@ describe('useOnForegroundCallback', () => {
 
         act(() => {
             // simulate app being in foreground
-            changeHandler('active');
+            changeHandler?.('active');
             result.current.setShouldWatchForForeground(true);
         });
 
@@ -53,8 +53,8 @@ describe('useOnForegroundCallback', () => {
 
         act(() => {
             // simulate app going to background
-            changeHandler('active');
-            changeHandler('background');
+            changeHandler?.('active');
+            changeHandler?.('background');
             // and start watching for foreground again
             result.current.setShouldWatchForForeground(true);
         });
@@ -69,12 +69,12 @@ describe('useOnForegroundCallback', () => {
 
         act(() => {
             // simulate app going to background
-            changeHandler('active');
-            changeHandler('background');
+            changeHandler?.('active');
+            changeHandler?.('background');
             // and start watching for foreground again
             result.current.setShouldWatchForForeground(true);
             // then app coming back to foreground
-            changeHandler('active');
+            changeHandler?.('active');
         });
 
         expect(mockCallback).toHaveBeenCalledTimes(1);
@@ -91,7 +91,7 @@ describe('useOnForegroundCallback', () => {
 
         await act(async () => {
             result.current.setShouldWatchForForeground(true);
-            await changeHandler('active');
+            await changeHandler?.('active');
         });
 
         expect(mockCallback).toHaveBeenCalledTimes(1);
