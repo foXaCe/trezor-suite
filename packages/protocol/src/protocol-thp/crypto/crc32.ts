@@ -54,6 +54,7 @@ export const crc32 = (buf: Buffer): Buffer => {
     const table = getCrcTable();
     let crc = -1;
     for (let i = 0; i < buf.length; i++) {
+        // @ts-expect-error noUncheckedIndexedAccess: low-level byte manipulation with known bounds
         crc = table[(crc ^ buf[i]) & 0xff] ^ (crc >>> 8);
     }
     const buffer = Buffer.alloc(4);

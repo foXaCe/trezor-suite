@@ -88,6 +88,7 @@ export const handleHandshakeInit = ({
     h = hashOfTwo(h, trezorEphemeralPubkey);
     // 5. Set ck, k = HKDF(protocol_name, X25519(host_ephemeral_privkey, trezor_ephemeral_pubkey)).
     point = curve25519(hostEphemeralKeys.privateKey, trezorEphemeralPubkey);
+    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     let [ck, k] = hkdf(getProtocolName(), point);
 
     // 6. Set trezor_masked_static_pubkey, success = AES-GCM-DECRYPT(key=k, IV=0^96 (bits, 12 bytes), ad=h, plaintext=encrypted_trezor_static_pubkey). Assert that success is True.
@@ -100,6 +101,7 @@ export const handleHandshakeInit = ({
     h = hashOfTwo(h, trezorEncryptedStaticPubkey);
     // 8. Set ck, k = HKDF(ck, X25519(host_ephemeral_privkey, trezor_masked_static_pubkey))
     point = curve25519(hostEphemeralKeys.privateKey, trezorMaskedStaticPubkey);
+    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     [ck, k] = hkdf(ck, point);
 
     // 9. Set tag_of_empty_string, success = AES-GCM-DECRYPT(key=k, IV=0^96 (bits, 12 bytes), ad=h, plaintext=empty_string). Assert that success is True.
@@ -138,6 +140,7 @@ export const handleHandshakeInit = ({
     h = hashOfTwo(h, hostEncryptedStaticPubkey);
     // 14. Set ck, k = HKDF(ck, X25519(temp_host_static_privkey, trezor_ephemeral_pubkey)).
     point = curve25519(hostStaticKeys.privateKey, trezorEphemeralPubkey);
+    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     [ck, k] = hkdf(ck, point);
     // 15. Set payload_binary = PROTOBUF-ENCODE(type=HandshakeCompletionReqNoisePayload, host_pairing_credential).
     const { message } = protobufEncoder('ThpHandshakeCompletionReqNoisePayload', {
@@ -151,6 +154,7 @@ export const handleHandshakeInit = ({
 
     // HH2 and HH3
     // 1. Set key_request, key_response = HKDF(ck, empty_string).
+    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
     const [hostKey, trezorKey] = hkdf(ck, Buffer.alloc(0));
 
     return {
