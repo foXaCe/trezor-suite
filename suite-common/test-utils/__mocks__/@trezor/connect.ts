@@ -97,7 +97,7 @@ methods.composeTransaction = jest.fn(async _params => {
 
 // Add custom methods
 const emitTestEvent = (event: string, data: any) => {
-    listeners[event].call(undefined, {
+    listeners[event]?.call(undefined, {
         event,
         ...data,
     });

@@ -101,7 +101,8 @@ const PLATFORM_USAGE_IMPORTS: Record<string, { events: string; useAnalytics: str
  */
 export const getUsageExampleSnippet = (platform: string, eventName: string): string => {
     const baseName = eventNameToFileBaseName(eventName);
-    const imports = PLATFORM_USAGE_IMPORTS[platform] ?? PLATFORM_USAGE_IMPORTS.shared;
+    const imports = PLATFORM_USAGE_IMPORTS[platform] ?? PLATFORM_USAGE_IMPORTS['shared'];
+    if (!imports) return '// unknown platform';
 
     return `import { events } from '${imports.events}';
 import { useAnalytics } from '${imports.useAnalytics}';

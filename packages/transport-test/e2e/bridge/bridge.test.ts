@@ -37,14 +37,16 @@ describe('bridge', () => {
             ],
         });
 
-        const { path } = enumerateResult.payload[0];
+        const firstDevice = enumerateResult.payload[0];
+        if (!firstDevice) throw new Error('No device found');
+        const { path } = firstDevice;
         // eslint-disable-next-line jest/no-standalone-expect
         expect(path.length).toEqual(pathLength);
 
         descriptors = enumerateResult.payload;
 
         const acquireResult = await bridge.acquire({
-            input: { path: descriptors[0].path, previous: session },
+            input: { path: firstDevice.path, previous: session },
         });
         assertSuccess(acquireResult);
         // eslint-disable-next-line jest/no-standalone-expect
@@ -149,7 +151,7 @@ describe('bridge', () => {
 
             // documenting model One odd behavior
             // old bridge does not return rich descriptor so I am using env.USE_HW here
-            if (!env.USE_HW || descriptors[0].type === 1) {
+            if (!env.USE_HW || descriptors[0]?.type === 1) {
                 // receive response
                 const receiveResponse1 = await bridge.receive({ session });
                 // we did 2x send, but no read. it means that now the next receive read the response from the first send
@@ -188,7 +190,9 @@ describe('bridge', () => {
     }
 
     test(`concurrent acquire`, async () => {
-        const { path } = descriptors[0];
+        const firstDesc = descriptors[0];
+        if (!firstDesc) throw new Error('No descriptor found');
+        const { path } = firstDesc;
         const results = await Promise.all([
             bridge.acquire({ input: { path, previous: session } }),
             bridge.acquire({ input: { path, previous: session } }),

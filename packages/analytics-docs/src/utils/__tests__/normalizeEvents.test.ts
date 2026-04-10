@@ -19,6 +19,7 @@ describe('normalizeEvents', () => {
         ] as any;
 
         const eventDoc = normalizeEvents(input)[input[0].name];
+        if (!eventDoc) throw new Error('eventDoc not found');
 
         expect(eventDoc.changelog.entries.map(e => e.version)).toEqual(['1.0.0']);
         expect(eventDoc.changelog.addedInVersion).toBe('1.0.0');
@@ -43,6 +44,7 @@ describe('normalizeEvents', () => {
         ] as any;
 
         const eventDoc = normalizeEvents(input)[input[0].name];
+        if (!eventDoc) throw new Error('eventDoc not found');
 
         expect(eventDoc.changelog.entries.map(e => e.version)).toEqual(['1.0.0']);
         expect(eventDoc.changelog.addedInVersion).toBe('1.0.0');

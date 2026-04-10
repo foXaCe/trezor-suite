@@ -5,6 +5,6 @@ import { type NativeStyleObject } from './types';
 const applyExtendPlugin = felaPluginExtend() as <T>(styleObject: T) => T;
 
 export const mergeNativeStyleObjects = (styleObjects: NativeStyleObject[]): NativeStyleObject =>
-    styleObjects.length === 1
+    styleObjects.length === 1 && styleObjects[0]
         ? applyExtendPlugin(styleObjects[0])
         : (Object.assign({}, ...styleObjects.map(applyExtendPlugin)) as NativeStyleObject);

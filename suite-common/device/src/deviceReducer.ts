@@ -362,12 +362,14 @@ const setDeviceState = (
         return;
     }
 
-    affectedDevice[0].state = state;
-    affectedDevice[0].useEmptyPassphrase = useEmptyPassphrase;
-    affectedDevice[0].walletNumber = deviceUtils.getNewWalletNumber(draft.devices, device);
-    delete affectedDevice[0].discovered;
+    const target = affectedDevice[0];
+    if (!target) return;
+    target.state = state;
+    target.useEmptyPassphrase = useEmptyPassphrase;
+    target.walletNumber = deviceUtils.getNewWalletNumber(draft.devices, device);
+    delete target.discovered;
 
-    affectedDevice[0].remember = shouldDeviceBeRemembered({ isAutoEjectEnabled, device });
+    target.remember = shouldDeviceBeRemembered({ isAutoEjectEnabled, device });
 };
 
 /**
@@ -603,9 +605,10 @@ const updatePersistentDeviceData = (draft: DeviceReducerState, device: Device | 
     const index = draft.persistentDeviceData.findIndex(
         persistentDeviceData => persistentDeviceData.device_id === device.id,
     );
-    if (index >= 0) {
+    const existing = index >= 0 ? draft.persistentDeviceData[index] : undefined;
+    if (existing) {
         draft.persistentDeviceData[index] = {
-            ...draft.persistentDeviceData[index],
+            ...existing,
             ...updatedPersistentData,
         };
     } else {

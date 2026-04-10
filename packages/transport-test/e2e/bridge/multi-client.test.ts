@@ -80,8 +80,10 @@ describe('bridge', () => {
         const bride1spy = jest.spyOn(bridge1.deviceEvents, 'emit');
         const bride2spy = jest.spyOn(bridge2.deviceEvents, 'emit');
 
+        const firstDesc = descriptors[0];
+        if (!firstDesc) throw new Error('No descriptor found');
         const session1 = await bridge1.acquire({
-            input: { previous: null, path: descriptors[0].path },
+            input: { previous: null, path: firstDesc.path },
         });
         expect(session1).toEqual({
             success: true,
@@ -92,7 +94,7 @@ describe('bridge', () => {
         await wait();
 
         const expectedDescriptor1 = getDescriptor({
-            path: descriptors[0].path,
+            path: firstDesc.path,
             session: Session('1'),
         });
 
@@ -110,12 +112,12 @@ describe('bridge', () => {
             return;
         }
 
-        await bridge1.release({ path: descriptors[0].path, session: session1.payload });
+        await bridge1.release({ path: firstDesc.path, session: session1.payload });
 
         await wait();
 
         const expectedDescriptor2 = getDescriptor({
-            path: descriptors[0].path,
+            path: firstDesc.path,
             session: null,
         });
 
@@ -130,7 +132,7 @@ describe('bridge', () => {
         });
 
         const session2 = await bridge2.acquire({
-            input: { previous: null, path: descriptors[0].path },
+            input: { previous: null, path: firstDesc.path },
         });
         expect(session2).toEqual({ success: true, payload: '2' });
     });
@@ -141,8 +143,10 @@ describe('bridge', () => {
         const bride1spy = jest.spyOn(bridge1.deviceEvents, 'emit');
         const bride2spy = jest.spyOn(bridge2.deviceEvents, 'emit');
 
+        const firstDesc2 = descriptors[0];
+        if (!firstDesc2) throw new Error('No descriptor found');
         const session1 = await bridge1.acquire({
-            input: { previous: null, path: descriptors[0].path },
+            input: { previous: null, path: firstDesc2.path },
         });
 
         expect(session1).toEqual({ success: true, payload: '1' });
@@ -154,13 +158,13 @@ describe('bridge', () => {
 
         // bridge 2 steals session
         const session2 = await bridge2.acquire({
-            input: { previous: session1.payload, path: descriptors[0].path },
+            input: { previous: session1.payload, path: firstDesc2.path },
         });
 
         expect(session2).toEqual({ success: true, payload: '2' });
 
         const expectedDescriptor = getDescriptor({
-            path: descriptors[0].path,
+            path: firstDesc2.path,
             session: Session('2'),
             sessionOwner: 'app B',
         });
@@ -183,7 +187,9 @@ describe('bridge', () => {
         test('client 1 (acquire - read), client 2 (acquire - send - read)', async () => {
             await enumerateAndListen();
 
-            const { path } = descriptors[0];
+            const firstDesc3 = descriptors[0];
+            if (!firstDesc3) throw new Error('No descriptor found');
+            const { path } = firstDesc3;
             const session1 = await bridge1.acquire({
                 input: { previous: null, path },
             });

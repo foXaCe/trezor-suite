@@ -42,10 +42,10 @@ export const unflatten = (obj: Record<string, any>) => {
 export const findClosestOfficiallySupportedLanguageLocale = (
     locale: string,
 ): SupportedLocaleCode => {
-    const [language, _region] = locale.split('-');
+    const [language] = locale.split('-');
 
     const matchingOfficialLanguageLocale = Object.entries(LANGUAGES).find(
-        ([key, { type }]) => type === 'official' && key.startsWith(language),
+        ([key, { type }]) => type === 'official' && language && key.startsWith(language),
     )?.[0] as SupportedLocaleCode | undefined;
 
     return matchingOfficialLanguageLocale ?? DEFAULT_LOCALE;
@@ -57,14 +57,16 @@ export const deleteNestedTranslationKey = (obj: Record<string, any>, path: strin
     const parents: Array<{ node: Record<string, any>; key: string }> = [];
 
     for (let i = 0; i < keys.length - 1; i++) {
-        const nextNode = currentNode[keys[i]];
-        parents.push({ node: currentNode, key: keys[i] });
+        const key = keys[i];
+        if (!key) return;
+        const nextNode = currentNode[key];
+        parents.push({ node: currentNode, key });
         currentNode = nextNode;
         if (!currentNode) return;
     }
 
     const lastKey = keys[keys.length - 1];
-    if (!(lastKey in currentNode)) return;
+    if (!lastKey || !(lastKey in currentNode)) return;
 
     delete currentNode[lastKey];
 
@@ -73,7 +75,9 @@ export const deleteNestedTranslationKey = (obj: Record<string, any>, path: strin
     }
 
     while (parents.length) {
-        const { node, key } = parents.pop()!;
+        const parent = parents.pop();
+        if (!parent) break;
+        const { node, key } = parent;
         delete node[key];
 
         if (Object.keys(node).length > 0) {
