@@ -46,9 +46,9 @@ const currentDir = import.meta.dirname;
 const rootDir = path.resolve(currentDir, '..');
 
 (async () => {
-    const newPackage = process.argv?.[2];
+    const newPackage = process.argv[2];
     if (!newPackage || typeof newPackage !== 'string' || !newPackage.includes('/')) {
-        exitWithErrorMessage(
+        return exitWithErrorMessage(
             `${chalk.bold.red('Please enter package scope and name -')} ${chalk.italic.red(
                 'yarn generate-package @scope/new-package-name',
             )}`,
@@ -58,7 +58,7 @@ const rootDir = path.resolve(currentDir, '..');
     const [packageScope = '', packageName = ''] = newPackage.split('/');
 
     if (!isValidScope(packageScope)) {
-        exitWithErrorMessage(
+        return exitWithErrorMessage(
             chalk.bold.red(
                 `Invalid scope ${packageScope}. Please use one of the supported scopes: ${Object.keys(
                     scopes,

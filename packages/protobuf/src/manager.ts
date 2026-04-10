@@ -161,7 +161,7 @@ export const ProtobufManager = () => {
         } else {
             Object.keys(modules).forEach(key => {
                 const def = modules[key];
-                if (def.kind && def.kind !== 'file') {
+                if (def?.kind && def.kind !== 'file') {
                     if (def.kind === 'message') {
                         messages[key] = def;
                     } else if (def.kind === 'extension') {

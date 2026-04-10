@@ -59,6 +59,7 @@ function messageToJSON(MessageParam: MessageType<Record<string, unknown>>, field
 
     Object.keys(fields).forEach(key => {
         const field = fields[key];
+        if (!field) return;
         // @ts-expect-error
         const value = message[key];
 

@@ -269,7 +269,7 @@ export class HttpServer<T extends EventMap> extends TypedEmitter<T & BaseEvents>
             segment => !segment.includes(':'),
         );
 
-        return [baseSegments, paramsSegments];
+        return [baseSegments, paramsSegments] as const;
     }
 
     private registerRoute(pathname: string, method: Route['method'], handler: AnyRequestHandler[]) {

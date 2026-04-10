@@ -47,6 +47,7 @@ function patch(Message: Type, payload: any) {
 
     Object.keys(Message.fields).forEach(key => {
         const field = Message.fields[key];
+        if (!field) return;
         const value = payload[key];
 
         // no value for this field

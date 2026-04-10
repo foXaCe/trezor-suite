@@ -44,8 +44,9 @@ export async function findProcessFromIncomingPort(
                     (!filterSelf || !line.includes(` ${process.pid} `)), // Filter out self
             );
             if (processLine) {
-                const name = processLine.split(/\s+/)[0].replace(/\\x\d{2}/g, ' ');
-                const pid = processLine.split(/\s+/)[1];
+                const parts = processLine.split(/\s+/);
+                const name = (parts[0] ?? '').replace(/\\x\d{2}/g, ' ');
+                const pid = parts[1] ?? '';
 
                 if (process.platform === 'darwin') {
                     const fullPathCommand = `ps -p ${pid} -o comm=`;
@@ -54,9 +55,9 @@ export async function findProcessFromIncomingPort(
                     const appPathRegex = /^(\/Users\/[^/]*)?\/Applications\/([^/]*)\.app\//;
                     const appPathMatch = fullPath.match(appPathRegex);
                     if (appPathMatch) {
-                        const appName = appPathMatch[2];
+                        const appName = appPathMatch[2] ?? name;
 
-                        return { name: appName, pid, fullPath: appPathMatch[0] };
+                        return { name: appName, pid, fullPath: appPathMatch[0] ?? fullPath };
                     } else {
                         // Binary in unusual location, show warning
                         return { name, pid, fullPath, warning: true };
@@ -64,7 +65,7 @@ export async function findProcessFromIncomingPort(
                 } else {
                     const fullPathCommand = `cat /proc/${pid}/cmdline`;
                     const fullPathRaw = await spawnAndCollectStdout(fullPathCommand);
-                    const fullPath = fullPathRaw.split('\0')[0].trim();
+                    const fullPath = (fullPathRaw.split('\0')[0] ?? '').trim();
                     // Binaries can be all over the place on Linux, so we don't check the path
 
                     return { name, pid, fullPath };
@@ -80,8 +81,8 @@ export async function findProcessFromIncomingPort(
             const record = lines
                 .map(line => {
                     const parts = line.trim().split(/\s+/);
-                    const pid = parts[parts.length - 1];
-                    const local = parts[1];
+                    const pid = parts[parts.length - 1] ?? '';
+                    const local = parts[1] ?? '';
 
                     return { pid, local };
                 })
