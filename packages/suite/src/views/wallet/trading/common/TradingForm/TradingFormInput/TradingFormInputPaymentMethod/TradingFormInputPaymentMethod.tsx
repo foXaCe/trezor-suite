@@ -74,7 +74,7 @@ export const TradingFormInputPaymentMethod = ({
         : undefined;
 
     const paymentMethodValue =
-        selectedOption?.value ?? paymentMethod?.value ?? paymentMethods[0]?.value;
+        selectedOption?.value ?? paymentMethod?.value ?? paymentMethods[0]?.value ?? '';
 
     const displayLabel = hasPaymentMethods
         ? (selectedOption?.label ?? paymentMethod?.label ?? paymentMethods[0]?.label ?? '')

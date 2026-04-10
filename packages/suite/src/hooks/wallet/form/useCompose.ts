@@ -184,7 +184,9 @@ export const useCompose = <TFieldValues extends FormState>({
                 setComposedLevels(levels);
             } else {
                 const currentLevel = composedLevels[current || 'normal'];
-                updateComposedValues(currentLevel);
+                if (currentLevel) {
+                    updateComposedValues(currentLevel);
+                }
             }
         },
         [composedLevels, updateComposedValues],
@@ -209,8 +211,9 @@ export const useCompose = <TFieldValues extends FormState>({
                     .reverse()
                     .find((key): key is FeeLevel['label'] => composedLevels[key]?.type !== 'error');
                 // switch to it
-                if (nearest) {
-                    composed = composedLevels[nearest];
+                const nearestLevel = nearest ? composedLevels[nearest] : undefined;
+                if (nearest && nearestLevel) {
+                    composed = nearestLevel;
                     setValue('selectedFee', nearest);
                     if (nearest === 'custom') {
                         // @ts-expect-error: type = error already filtered above

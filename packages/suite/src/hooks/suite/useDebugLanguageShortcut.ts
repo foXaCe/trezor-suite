@@ -34,7 +34,7 @@ export const useDebugLanguageShortcut = () => {
                 if (isLanguageAutodetect) {
                     dispatch(suiteSettingsActions.setAutodetect({ language: false }));
                 }
-                dispatch(suiteSettingsActions.setLanguage(nextLang?.value ?? 'en'));
+                dispatch(suiteSettingsActions.setLanguage(nextLang?.value ?? 'en-US'));
             }
 
             if (event.ctrlKey && event.key === KEYBOARD_CODE.FUNCTION_KEY_SEVEN) {
@@ -43,7 +43,7 @@ export const useDebugLanguageShortcut = () => {
                 if (isLanguageAutodetect) {
                     dispatch(suiteSettingsActions.setAutodetect({ language: false }));
                 }
-                dispatch(suiteSettingsActions.setLanguage(nextLang?.value ?? 'en'));
+                dispatch(suiteSettingsActions.setLanguage(nextLang?.value ?? 'en-US'));
             }
         },
         [language, dispatch, isLanguageAutodetect],

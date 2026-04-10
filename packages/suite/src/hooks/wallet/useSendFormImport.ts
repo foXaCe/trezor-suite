@@ -55,7 +55,7 @@ export const useSendFormImport = ({
             return;
         }
 
-        const currencies = result.map(it => it.currency.toLowerCase());
+        const currencies = result.map(it => (it.currency ?? '').toLowerCase());
         const uniqueCurrencies = [...new Set(currencies)];
 
         for (const currency of uniqueCurrencies) {
@@ -100,7 +100,7 @@ export const useSendFormImport = ({
             }
 
             // sanitize csv data
-            const itemCurrency = item.currency.toLowerCase() as BaseCurrencyCode;
+            const itemCurrency = (item.currency ?? '').toLowerCase() as BaseCurrencyCode;
 
             // currency is specified in csv
             if (itemCurrency) {

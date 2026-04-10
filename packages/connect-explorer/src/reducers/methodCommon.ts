@@ -85,7 +85,7 @@ export const getParam = (field: FieldBasic<any>, $params: Record<string, any> = 
         }
     } else if (field.type === 'select') {
         if ((field.value === null || field.value === undefined) && !field.optional) {
-            value = field.data ? field.data[0].value : '';
+            value = field.data?.[0]?.value ?? '';
         } else {
             value = field.value;
         }

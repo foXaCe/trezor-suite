@@ -116,13 +116,14 @@ export const TransactionListItem = ({
 
     const isTokenOnlyTransaction = transaction.amount === '0' && transaction.tokens.length !== 0;
 
-    if (isTokenOnlyTransaction)
+    const firstToken = transaction.tokens[0];
+    if (isTokenOnlyTransaction && firstToken)
         return (
             <TokenTransferListItem
                 transaction={transaction}
                 accountKey={accountKey}
                 txid={transaction.txid}
-                tokenTransfer={transaction.tokens[0]}
+                tokenTransfer={firstToken}
                 includedCoinsCount={transaction.tokens.length - 1}
                 isFirst={isFirst}
                 isLast={isLast}

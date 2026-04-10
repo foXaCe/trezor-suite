@@ -42,14 +42,20 @@ export const TransactionGroupedList = ({
             isPending={isPending}
             index={groupIndex}
         >
-            {groupJointTransactions(value).map((item, index) =>
-                item.type === 'joint-batch' ? (
-                    <CoinjoinBatchItem
-                        key={item.rounds[0]?.txid}
-                        transactions={item.rounds}
-                        isPending={isPending}
-                    />
-                ) : (
+            {groupJointTransactions(value).map((item, index) => {
+                if (item.type === 'joint-batch') {
+                    return (
+                        <CoinjoinBatchItem
+                            key={item.rounds[0]?.txid}
+                            transactions={item.rounds}
+                            isPending={isPending}
+                        />
+                    );
+                }
+
+                if (!item.tx) return null;
+
+                return (
                     <TransactionItem
                         key={item.tx.txid}
                         transaction={item.tx}
@@ -64,8 +70,8 @@ export const TransactionGroupedList = ({
                                 : item.tx.type === 'joint'
                         }
                     />
-                ),
-            )}
+                );
+            })}
         </TransactionsGroup>
     ));
 };

@@ -39,7 +39,10 @@ const findFieldsNested = (
 
     const nextField = schema.find(f => f.name === remainingPath[0]);
     if (nextField?.type === 'array' && typeof remainingPath[1] === 'number') {
-        return findFieldsNested(nextField.items[remainingPath[1]], field, currentDepth + 2);
+        const items = nextField.items[remainingPath[1]];
+        if (!items) return undefined;
+
+        return findFieldsNested(items, field, currentDepth + 2);
     } else if (nextField?.type === 'union') {
         return findFieldsNested(nextField.current, field, currentDepth + 1);
     }

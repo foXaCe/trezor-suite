@@ -107,7 +107,7 @@ export const TradingRedirect = () => {
                 send: (params[4] ?? '') as CryptoId,
                 receive: (params[5] ?? '') as CryptoId,
                 amount: params[6] ?? '',
-                orderId: params[7],
+                orderId: params[7] ?? '',
                 selectedFee: (params[feeIndex] ?? '') as FeeLevel['label'],
                 feePerByte: params[feeIndex + 1],
                 maxFeePerGas: params[feeIndex + 2],
