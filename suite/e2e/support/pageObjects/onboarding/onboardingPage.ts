@@ -39,8 +39,10 @@ export class OnboardingPage {
     readonly selectSeedConfirmButton: Locator;
     readonly continueAtYourOwnRiskButton: Locator;
     readonly deviceCompromisedModal: Locator;
+    readonly thpPairingModal: Locator;
     readonly pairingInputAtIndex = (index: number) =>
-        this.page.getByTestId('@modal/thp-paring').locator('input').nth(index);
+        this.thpPairingModal.locator('input').nth(index);
+    readonly walletBackupTypeCard: Locator;
 
     constructor(
         public page: Page,
@@ -78,6 +80,8 @@ export class OnboardingPage {
         );
         this.continueAtYourOwnRiskButton = this.page.getByTestId('@continue-to-suite');
         this.deviceCompromisedModal = this.page.getByTestId('@device-compromised');
+        this.walletBackupTypeCard = this.page.getByTestId('@onboarding/wallet-backup-type');
+        this.thpPairingModal = this.page.getByTestId('@modal/thp-paring');
     }
 
     @step()
@@ -104,6 +108,9 @@ export class OnboardingPage {
         for (let i = 0; i < code.length; i++) {
             await this.pairingInputAtIndex(i).fill(code[i]);
         }
+
+        await expect(this.thpPairingModal).toBeHidden();
+        await expect(this.devicePrompt.acquireDeviceButton).toBeHidden();
     }
 
     @step()

@@ -59,6 +59,7 @@ export const ResetDeviceStep = () => {
 
     return (
         <OnboardingCard
+            data-testid="@onboarding/wallet-backup-type"
             iconName="wallet"
             heading={
                 <Column gap={8} alignItems="center" justifyContent="center">
