@@ -426,7 +426,13 @@ export const signSolanaSendFormTransactionThunk = createThunk<
             });
         }
 
-        // @ts-expect-error: serializedTx is expected to be defined in a successful response
+        if (!response.payload.serializedTx) {
+            return rejectWithValue({
+                error: 'sign-transaction-failed',
+                message: 'Missing serializedTx in sign response.',
+            });
+        }
+
         return { serializedTx: response.payload.serializedTx };
     },
 );

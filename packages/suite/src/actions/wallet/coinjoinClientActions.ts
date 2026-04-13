@@ -672,9 +672,11 @@ const signCoinjoinTx =
                             tx.inputs.forEach((input, index) => {
                                 if (input.script_type !== 'EXTERNAL') {
                                     response.inputs.push({
-                                        // @ts-expect-error: noUncheckedIndexedAccess - utxos align 1-to-1 with non-EXTERNAL tx inputs
+                                        // @ts-expect-error: noUncheckedIndexedAccess - utxos are grouped per account from request.inputs,
+                                        // utxoIndex increments only for non-EXTERNAL inputs, so it stays in sync with tx.inputs ordering
                                         outpoint: utxos[utxoIndex].outpoint,
-                                        // @ts-expect-error: noUncheckedIndexedAccess - signatures align with input indices
+                                        // @ts-expect-error: noUncheckedIndexedAccess - TrezorConnect returns one signature per transaction input,
+                                        // so signatures[index] is guaranteed to exist for each forEach index
                                         signature: signTx.payload.signatures[index],
                                         index,
                                     });
@@ -776,9 +778,11 @@ export const initCoinjoinService =
                 const realAccount = selectAccountByKey(state, account.key);
                 if (!realAccount) return [];
 
-                // @ts-expect-error: realAccount.utxo is expected to be defined for active coinjoin accounts
+                // @ts-expect-error: noUncheckedIndexedAccess - realAccount.utxo is expected to be defined;
+                // coinjoin accounts are filtered to have 'prison' data (line above) and are fully loaded accounts with UTXOs
                 const utxos = realAccount.utxo.map(getUtxoOutpoint);
-                // @ts-expect-error: realAccount.addresses is expected to be defined for active coinjoin accounts
+                // @ts-expect-error: noUncheckedIndexedAccess - realAccount.addresses is expected to be defined;
+                // bitcoin accounts always have addresses (derived from xpub), this is enforced during account discovery
                 const usedChange = realAccount.addresses.change
                     .filter(a => a.transfers > 0)
                     .map(a => a.address);
