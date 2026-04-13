@@ -10,7 +10,7 @@ How to use this plan:
 
 ## Workstream A: Sessions Correctness (highest priority)
 
-- [ ] A1: Replace global lock queue semantics in sessions
+- [x] A1: Replace global lock queue semantics in sessions
     - Description: Fix `waitForUnlocked`/`clearLock` behavior so one requester cannot incorrectly release another requester.
     - Rationale: Current queue semantics can release the wrong waiter and create ownership races.
     - Files:
@@ -25,7 +25,7 @@ How to use this plan:
         1. Two simultaneous acquire calls on same path result in exactly one success and one `SESSION_WRONG_PREVIOUS`.
         2. No code path can resolve a lock it does not own.
 
-- [ ] A2: Make lock release exception-safe in release path
+- [x] A2: Make lock release exception-safe in release path
     - Description: Ensure release path cannot leave queue uncleared after descriptor races/disconnect.
     - Rationale: `releaseDone` can throw before unlocking, causing lock starvation until timeout.
     - Files:
