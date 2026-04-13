@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import { DEVICE } from '@trezor/connect-common';
 import type { DeviceUniquePath } from '@trezor/connect-common/src/types/device';
 import { arrayPartition, createDeferred } from '@trezor/utils';
@@ -13,7 +11,7 @@ export const createUiPromiseManager = () => {
 
     // Creates an instance of uiPromise.
     const create: UiPromiseCreator = (promiseEvent, device) => {
-        const requestId = uuidv4();
+        const requestId = crypto.randomUUID();
         const uiPromise: UiPromise<typeof promiseEvent> = {
             ...createDeferred(promiseEvent),
             device,
