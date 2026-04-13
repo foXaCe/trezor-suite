@@ -47,7 +47,6 @@ function patch(Message: Type, payload: any) {
 
     Object.keys(Message.fields).forEach(key => {
         const field = Message.fields[key];
-        if (!field) return;
         const value = payload[key];
 
         // no value for this field
@@ -55,17 +54,23 @@ function patch(Message: Type, payload: any) {
             return;
         }
         // primitive type
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (isPrimitiveField(field.type)) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (field.repeated) {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 patched[key] = value.map((v: any) => transform(field.type, v));
             } else {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 patched[key] = transform(field.type, value);
             }
 
             return;
         }
         // repeated
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (field.repeated) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const fieldType = Message.lookupTypeOrEnum(field.type);
             if (fieldType instanceof Enum) {
                 // NOTE: Enum doesn't require patching both string (keys) and number values are accepted
@@ -76,11 +81,13 @@ function patch(Message: Type, payload: any) {
         }
         // message type
         else if (typeof value === 'object' && value !== null) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const RefMessage = Message.lookupType(field.type);
             patched[key] = patch(RefMessage, value);
         }
         // enum type
         else if (typeof value === 'number') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const RefMessage = Message.lookupEnum(field.type);
             patched[key] = RefMessage.values[value];
         } else {

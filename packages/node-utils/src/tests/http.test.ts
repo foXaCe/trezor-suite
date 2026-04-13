@@ -471,9 +471,7 @@ describe('HttpServer', () => {
     });
 
     test('port negotiation, first available port is occupied, second is free', async () => {
-        const freePorts = await getFreePort(2);
-        const freePort1 = freePorts[0] ?? 0;
-        const freePort2 = freePorts[1] ?? 0;
+        const [freePort1, freePort2] = await getFreePort(2);
         // start server using 'ports' array. first port is empty and will be used
         server = new HttpServer<Events>({ logger: muteLogger, port: freePort1 });
         await server.start();
@@ -483,6 +481,7 @@ describe('HttpServer', () => {
 
         const server2 = new HttpServer<Events>({
             logger: muteLogger,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             ports: [freePort1, freePort2],
         });
 
@@ -495,9 +494,9 @@ describe('HttpServer', () => {
     });
 
     test('port negotiation - it is possible to start and stop server multiple times', async () => {
-        const freePorts = await getFreePort(1);
-        const freePort1 = freePorts[0] ?? 0;
+        const [freePort1] = await getFreePort(1);
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         server = new HttpServer<Events>({ logger: muteLogger, ports: [freePort1] });
         await server.start();
         expect(server.getServerAddress()).toMatchObject({

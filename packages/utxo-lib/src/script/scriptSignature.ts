@@ -11,7 +11,8 @@ export function toDER(x: Buffer) {
     while (x[i] === 0) ++i;
     if (i === x.length) return ZERO;
     x = x.subarray(i);
-    if ((x[0] ?? 0) & 0x80) return Buffer.concat([ZERO, x], 1 + x.length);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    if (x[0] & 0x80) return Buffer.concat([ZERO, x], 1 + x.length);
 
     return x;
 }

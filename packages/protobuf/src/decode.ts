@@ -59,13 +59,15 @@ function messageToJSON(MessageParam: MessageType<Record<string, unknown>>, field
 
     Object.keys(fields).forEach(key => {
         const field = fields[key];
-        if (!field) return;
         // @ts-expect-error
         const value = message[key];
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (field.repeated) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             res[key] = value.map((v: any) => transform(field, v));
         } else {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             res[key] = transform(field, value);
         }
     });

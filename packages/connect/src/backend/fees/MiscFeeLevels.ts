@@ -19,13 +19,13 @@ export class MiscFeeLevels {
 
     async load(blockchain: Blockchain, request: Parameters<typeof blockchain.estimateFee>[0]) {
         try {
-            const response = (await blockchain.estimateFee(request))[0];
-            if (!response) return this.levels;
+            const [response] = await blockchain.estimateFee(request);
 
             // validate `feePerUnit` from the backend
             // should be lower than `coinInfo.maxFee` and higher than `coinInfo.minFee`
             // xrp sends values from 1 to very high number occasionally
             // see: https://github.com/trezor/trezor-suite/blob/develop/packages/blockchain-link/src/workers/ripple/index.ts#L316
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const fee = new BigNumber(response.feePerUnit).toNumber();
 
             const feePerUnit = Math.min(
@@ -34,14 +34,12 @@ export class MiscFeeLevels {
             ).toString();
 
             // misc coins should have only one FeeLevel (normal)
-            const existingLevel = this.levels[0];
-            if (existingLevel) {
-                this.levels[0] = {
-                    ...existingLevel,
-                    ...response,
-                    feePerUnit,
-                };
-            }
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            this.levels[0] = {
+                ...this.levels[0],
+                ...response,
+                feePerUnit,
+            };
             this.wasFetchedSuccessfully = true;
         } catch {
             // silent

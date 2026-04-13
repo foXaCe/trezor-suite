@@ -22,11 +22,8 @@ const { OPS } = bscript;
 function stacksEqual(a: Buffer[], b: Buffer[]): boolean {
     if (a.length !== b.length) return false;
 
-    return a.every((x, i) => {
-        const bItem = b[i];
-
-        return bItem !== undefined && x.equals(bItem);
-    });
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    return a.every((x, i) => x.equals(b[i]));
 }
 
 // input: [redeemScriptSig ...] {redeemScript}
@@ -101,6 +98,7 @@ export function p2sh(a: Payment, opts?: PaymentOpts): Payment {
     lazy.prop(o, 'output', () => {
         if (!o.hash) return;
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return bscript.compile([OPS.OP_HASH160, o.hash, OPS.OP_EQUAL]);
     });
 

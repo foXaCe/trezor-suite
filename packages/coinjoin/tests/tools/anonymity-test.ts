@@ -7,8 +7,7 @@ import { getAccountInfo, getAccountInfoParams } from './discovery';
 import { getAnonymityScores } from '../../src/client/analyzeTransactions';
 import { getCoinjoinNetwork } from '../../src/utils/settingsUtils';
 
-const network = process.argv[2] ?? '';
-const descriptor = process.argv[3] ?? '';
+const [network, descriptor] = process.argv.slice(2);
 
 const CACHE_DIR = `${__dirname}/.cache`;
 const CACHE_ACCOUNT_INFO = `${CACHE_DIR}/accountInfo.json`;
@@ -84,6 +83,7 @@ const CACHE_PARAMS = `${CACHE_DIR}/anonymityScoreParams.json`;
     }
 
     if (!cached) {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const params = getAccountInfoParams(network, descriptor);
         const accountInfo = await getAccountInfo(params);
         transactions.push(...accountInfo.history.transactions);

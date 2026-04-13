@@ -67,18 +67,15 @@ export function getResult<
     }, new BN(result.fee));
 
     const max =
-        sendMaxOutputIndex >= 0 ? result.outputs[sendMaxOutputIndex]?.value.toString() : undefined;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        sendMaxOutputIndex >= 0 ? result.outputs[sendMaxOutputIndex].value.toString() : undefined;
     const bytes = transactionBytes(result.inputs, result.outputs);
     const feePerByte = result.fee / bytes;
 
     const { complete, incomplete } = splitByCompleteness(request.outputs);
 
     if (incomplete.length > 0) {
-        const inputs = result.inputs.flatMap(input => {
-            const utxo = request.utxos[input.i];
-
-            return utxo ? [utxo] : [];
-        });
+        const inputs = result.inputs.map(input => request.utxos[input.i]);
 
         return {
             type: 'nonfinal',
@@ -87,6 +84,7 @@ export function getResult<
             bytes,
             max,
             totalSpent: totalSpent.toString(),
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             inputs,
         };
     }

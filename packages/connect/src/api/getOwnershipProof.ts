@@ -75,19 +75,21 @@ export default class GetOwnershipProof extends AbstractMethod<
         };
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: MethodReturnType<typeof this.name> = [];
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
-            if (!batch) continue;
             if (this.preauthorized) {
                 await cmd.preauthorize(true);
             }
             const { message } = await cmd.typedCall('GetOwnershipProof', 'OwnershipProof', batch);
             responses.push({
                 ...message,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 path: batch.address_n,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 serializedPath: getSerializedPath(batch.address_n),
             });
 
@@ -103,15 +105,6 @@ export default class GetOwnershipProof extends AbstractMethod<
             }
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw new Error('GetOwnershipProof: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

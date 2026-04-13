@@ -4,7 +4,7 @@ import { curve25519, elligator2 } from '../../src/protocol-thp/crypto/curve25519
 describe('curve25519', () => {
     it('elligator2', () => {
         elligator2fixtures.forEach(([input, output]) => {
-            // @ts-expect-error noUncheckedIndexedAccess: test fixture data with known structure
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const point = Uint8Array.from(Buffer.from(input, 'hex'));
             const result = elligator2(point);
             expect(Buffer.from(result).toString('hex')).toEqual(output);

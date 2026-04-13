@@ -62,29 +62,29 @@ export default class SolanaGetPublicKey extends AbstractMethod<
     }
 
     get confirmation() {
-        const firstParam = this.params[0];
-        const accountIndex = firstParam?.address_n[2];
-
         return {
             view: 'export-xpub' as const,
             label:
-                this.params.length > 1 || !firstParam
+                this.params.length > 1
                     ? 'Export multiple Solana public keys'
                     : `Export Solana public key for account #${
-                          accountIndex !== undefined ? fromHardened(accountIndex) + 1 : '?'
+                          // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                          fromHardened(this.params[0].address_n[2]) + 1
                       }`,
         };
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: MethodReturnType<typeof this.name> = [];
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
-            if (!batch) continue;
             const { message } = await cmd.typedCall('SolanaGetPublicKey', 'SolanaPublicKey', batch);
             responses.push({
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 path: batch.address_n,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 serializedPath: getSerializedPath(batch.address_n),
                 publicKey: message.public_key,
                 publicKeyBase58: bs58.encode(Buffer.from(message.public_key, 'hex')),
@@ -102,15 +102,6 @@ export default class SolanaGetPublicKey extends AbstractMethod<
             }
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw new Error('SolanaGetPublicKey: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

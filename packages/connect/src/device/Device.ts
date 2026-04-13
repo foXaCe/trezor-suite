@@ -916,19 +916,9 @@ export class Device extends TypedEmitter<DeviceEvents> implements IDevice {
         const version = this.getVersion();
         if (!this.features || !version) return false;
         const modelVersion =
-            typeof versions === 'string'
-                ? versions
-                : (() => {
-                      const v = versions[this.features.major_version - 1] ?? versions[0];
-                      if (v === undefined) {
-                          throw new Error(
-                              `No version string found for major_version ${this.features.major_version}`,
-                          );
-                      }
+            typeof versions === 'string' ? versions : versions[this.features.major_version - 1];
 
-                      return v;
-                  })();
-
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return versionUtils.isNewerOrEqual(version, modelVersion);
     }
 

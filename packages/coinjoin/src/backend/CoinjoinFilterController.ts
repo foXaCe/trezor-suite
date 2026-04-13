@@ -31,13 +31,11 @@ export class CoinjoinFilterController implements FilterControllerShape {
         { abortSignal, onProgressInfo }: FilterControllerContext = {},
     ) {
         const batchSize = params?.batchSize ?? this.batchSize;
-        const checkpointList = params?.checkpoints?.length ? params.checkpoints : [this.baseBlock];
-        const latestCheckpoint = checkpointList[0];
-        if (!latestCheckpoint) {
-            return;
-        }
-        const olderCheckpoints = checkpointList.slice(1);
+        const [latestCheckpoint, ...olderCheckpoints] = params?.checkpoints?.length
+            ? params.checkpoints
+            : [this.baseBlock];
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const fetchFilterBatch = async ({ blockHeight, blockHash }: typeof latestCheckpoint) => ({
             height: blockHeight,
             hash: blockHash,
@@ -49,6 +47,7 @@ export class CoinjoinFilterController implements FilterControllerShape {
         onProgressInfo?.({
             stage: 'block',
             activity: 'fetch',
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             batchFrom: latestCheckpoint.blockHeight,
         });
 
@@ -72,16 +71,17 @@ export class CoinjoinFilterController implements FilterControllerShape {
             const progressCooldown = createCooldown(PROGRESS_INFO_COOLDOWN);
             do {
                 const { filters, M, P, zeroedKey } = batch.response;
-                const last = filters[filters.length - 1];
-                if (!last) continue;
+                const [last] = filters.slice(-1);
 
                 // In case of new block mined during the discovery, its height
                 // is used as `to` instead of `bestHeight` from the beginning
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 const to = Math.max(bestHeight, last.blockHeight);
 
                 onProgressInfo?.({
                     stage: 'block',
                     activity: 'scan-fetch',
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     batchFrom: last.blockHeight,
                 });
 
@@ -89,6 +89,7 @@ export class CoinjoinFilterController implements FilterControllerShape {
                     onProgressInfo?.({
                         stage: 'block',
                         activity: 'scan',
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         batchFrom: last.blockHeight,
                     });
                 });
@@ -105,7 +106,9 @@ export class CoinjoinFilterController implements FilterControllerShape {
                 onProgressInfo?.({
                     stage: 'block',
                     activity: 'fetch',
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     batchFrom: last.blockHeight,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     progress: { from, to, current: last.blockHeight },
                 });
 

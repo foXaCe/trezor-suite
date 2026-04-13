@@ -38,10 +38,8 @@ const getOutputAmounts = async (params: GetOutputAmountsParams) => {
                 input.accountKey === accountKey && compareOutpoint(input.outpoint, i.Coin.Outpoint),
         );
         if (internal) {
-            const firstCredential = internal.confirmedAmountCredentials?.[0];
-            if (firstCredential) {
-                InternalAmounts.push(firstCredential.Value);
-            }
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            InternalAmounts.push(internal.confirmedAmountCredentials![0].Value);
         } else {
             const size = getExternalOutputSize(i.Coin.TxOut.ScriptPubKey);
             const miningFee = Math.floor((size * roundParameters.MiningFeeRate) / 1000);
@@ -179,39 +177,31 @@ const credentialIssuance = async (params: CredentialIssuanceParams) => {
         { signal, baseUrl: middlewareUrl },
     );
 
-    const getCredPair = (
-        creds: middleware.Credentials[],
-        zeroCreds: middleware.Credentials[],
-        idx: number,
-    ) => {
-        const cred = creds[idx];
-        const zeroCred = zeroCreds[idx];
-        if (!cred || !zeroCred) throw new Error(`Missing credential at index ${idx}`);
-
-        return [cred, zeroCred];
-    };
-
     // return pairs of new credentials
     // requested Credentials
     const output = {
-        amountCredentials: getCredPair(amountCredentialsOut, zeroAmountCredentialsOut, 0),
-        vsizeCredentials: getCredPair(vsizeCredentialsOut, zeroVsizeCredentialsOut, 0),
+        amountCredentials: [amountCredentialsOut[0], zeroAmountCredentialsOut[0]],
+        vsizeCredentials: [vsizeCredentialsOut[0], zeroVsizeCredentialsOut[0]],
     };
 
     // or change output should be returned to pool
     // change Credentials
     const change = {
-        amountCredentials: getCredPair(amountCredentialsOut, zeroAmountCredentialsOut, 1),
-        vsizeCredentials: getCredPair(vsizeCredentialsOut, zeroVsizeCredentialsOut, 1),
+        amountCredentials: [amountCredentialsOut[1], zeroAmountCredentialsOut[1]],
+        vsizeCredentials: [vsizeCredentialsOut[1], zeroVsizeCredentialsOut[1]],
     };
 
     logger.info(
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         `Output amount credentials: ${output.amountCredentials.map(c => c.Value).join(',')}`,
     );
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     logger.info(`Output vsize credentials: ${output.vsizeCredentials.map(c => c.Value).join(',')}`);
     logger.info(
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         `Change amount credentials: ${change.amountCredentials.map(c => c.Value).join(',')}`,
     );
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     logger.info(`Change vsize credentials: ${change.vsizeCredentials.map(c => c.Value).join(',')}`);
 
     return {
@@ -260,13 +250,8 @@ const findCredentialsForTarget = (
         })
         .find(pair => pair.length === 2);
 
-    if (candidate) {
-        const first = candidate[0];
-        const second = candidate[1];
-        if (first && second) return [first, second];
-    }
-
-    return undefined;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    return candidate ? [candidate[0], candidate[1]] : undefined;
 };
 
 export interface Bob {
@@ -324,13 +309,13 @@ const createOutputsCredentials = async (params: CreateOutputsCredentials): Promi
         });
 
         // create Bob
-        const newBob: Bob = {
+        const result = params.result.concat({
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             accountKey: params.accountKey,
             amount: amountPair.amount,
             amountCredentials: joined.output.amountCredentials,
             vsizeCredentials: joined.output.vsizeCredentials,
-        };
-        const result = [...params.result, newBob];
+        });
 
         // remove amount from list
         const amountIndex = amounts.findIndex(a => a === amountPair.amount);
@@ -342,9 +327,11 @@ const createOutputsCredentials = async (params: CreateOutputsCredentials): Promi
         // - add **change** Credentials back to available stack
         const updatedAmountCredentials = amountCredentials
             .filter(cre => !amountPair.credentials?.includes(cre))
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             .concat(joined.change.amountCredentials);
         const updatedVsizeCredentials = vsizeCredentials
             .filter(cre => !vsizePair.includes(cre))
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             .concat(joined.change.vsizeCredentials);
 
         if (updatedAmounts.length === 0) {
@@ -400,9 +387,11 @@ const createOutputsCredentials = async (params: CreateOutputsCredentials): Promi
     // - add **output** Credentials to available stack
     const updatedAmountCredentials = amountCredentials
         .filter(cre => !amountToJoin.includes(cre))
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         .concat(joined.output.amountCredentials);
     const updatedVsizeCredentials = vsizeCredentials
         .filter(cre => !vsizeToJoin.includes(cre))
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         .concat(joined.output.vsizeCredentials);
 
     // try again with updated Credentials
@@ -443,10 +432,9 @@ export const outputDecomposition = async (
     // calculate amounts
     const outputAmounts = await Promise.all(
         Object.values(groupInputsByAccount).map(inputs => {
-            const firstInput = inputs[0];
-            if (!firstInput) throw new Error('No inputs in group');
-            const { accountKey, inputSize, outputSize } = firstInput; // all inputs belongs to the same account (key, size)
-            const allVsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials ?? []);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const { accountKey, inputSize, outputSize } = inputs[0]; // all inputs belongs to the same account (key, size)
+            const allVsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials!);
             // limit available vsize if it's bigger than available change addresses
             // prevent from creating amounts which cannot be assigned to address
             const availableAddresses =
@@ -472,21 +460,20 @@ export const outputDecomposition = async (
     // join inputs Credentials for each account separately
     const joinedCredentials = await Promise.all(
         Object.keys(groupInputsByAccount).map((accountKey, index) => {
-            const amounts = outputAmounts[index];
-            if (!amounts) throw new Error(`Missing amounts at index ${index}`);
+            if (!outputAmounts[index]) throw new Error(`Missing amounts at index ${index}`);
 
-            logger.info(`Create outputs: ${amounts.join(',')}`);
+            logger.info(`Create outputs: ${outputAmounts[index].join(',')}`);
             const inputs = groupInputsByAccount[accountKey];
-            if (!inputs) throw new Error(`Missing inputs for account ${accountKey}`);
-            const amountCredentials = inputs.flatMap(i => i.confirmedAmountCredentials ?? []);
-            const vsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials ?? []);
-            const firstInput = inputs[0];
-            if (!firstInput) throw new Error('No inputs in group');
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const amountCredentials = inputs.flatMap(i => i.confirmedAmountCredentials!);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const vsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials!);
             const result = createOutputsCredentials({
                 round,
                 accountKey,
-                outputSize: firstInput.outputSize, // all inputs are using same script type (size),
-                amounts,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                outputSize: inputs[0].outputSize, // all inputs are using same script type (size),
+                amounts: outputAmounts[index],
                 amountCredentials,
                 vsizeCredentials,
                 options,
@@ -499,12 +486,12 @@ export const outputDecomposition = async (
 
     // combine everything into DecomposedOutputs objects and return the result to outputRegistration
     return Object.keys(groupInputsByAccount).map((accountKey, index) => {
-        const outputs = joinedCredentials[index];
-        if (!outputs) throw new Error(`Missing joined credentials at index ${index}`);
+        if (!joinedCredentials[index])
+            throw new Error(`Missing joined credentials at index ${index}`);
 
         return {
             accountKey,
-            outputs,
+            outputs: joinedCredentials[index],
         };
     });
 };

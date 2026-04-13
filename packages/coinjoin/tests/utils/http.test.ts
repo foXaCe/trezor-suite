@@ -9,8 +9,9 @@ describe('resetIdentityCircuit', () => {
         const oldPass = 'abcd';
         const id = resetIdentityCircuit(`username:${oldPass}`);
         expect(id).toMatch(/username:[a-zA-Z0-9]+/);
-        const pass = id.split(':')[1] ?? '';
+        const [, pass] = id.split(':');
         expect(pass).not.toEqual(oldPass);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         expect(pass.length).toEqual(16);
     });
 });

@@ -84,10 +84,10 @@ describe('outputRegistration', () => {
 
             expect(response.length).toBe(f.result.length);
             response.forEach((r, i) => {
-                const expected = f.result[i];
-                if (!expected) return;
-                expect(r.outputs.length).toBe(expected.outputs.length);
-                expect(r).toMatchObject(expected);
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                expect(r.outputs.length).toBe(f.result[i].outputs.length);
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                expect(r).toMatchObject(f.result[i]);
             });
             expect(availableVsize).toEqual(f.availableVsize);
             expect(spy).toHaveBeenCalledTimes(f.credentialIssuanceCalls);

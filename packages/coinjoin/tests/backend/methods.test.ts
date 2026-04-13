@@ -97,9 +97,8 @@ describe(`CoinjoinBackend methods`, () => {
 
         // Only four blocks are known,
         // tx 44444444444444444444444444444444 is in mempool
-        client.setFixture(FIXTURES.BLOCKS.slice(0, 4) as typeof FIXTURES.BLOCKS, [
-            FIXTURES.TX_4_PENDING,
-        ]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        client.setFixture(FIXTURES.BLOCKS.slice(0, 4), [FIXTURES.TX_4_PENDING]);
 
         const context = getContext(progress => {
             txs = txs.concat(progress.transactions);
@@ -162,10 +161,8 @@ describe(`CoinjoinBackend methods`, () => {
     });
 
     it('scanAccount 1-block reorg', async () => {
-        const blocksSlice = FIXTURES.BLOCKS.slice(-2);
-        const PRELAST_BLOCK = blocksSlice[0];
-        const LAST_BLOCK = blocksSlice[1];
-        if (!PRELAST_BLOCK || !LAST_BLOCK) throw new Error('Missing test blocks');
+        const [PRELAST_BLOCK, LAST_BLOCK] = FIXTURES.BLOCKS.slice(-2);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const PRELAST_CP = { blockHeight: PRELAST_BLOCK.height, blockHash: PRELAST_BLOCK.hash };
         const REORG_BLOCK = {
             ...LAST_BLOCK,
@@ -179,7 +176,9 @@ describe(`CoinjoinBackend methods`, () => {
         );
 
         // First returned checkpoint corresponds to the last block
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         expect(cp1.blockHeight).toBe(LAST_BLOCK.height);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         expect(cp1.blockHash).toBe(LAST_BLOCK.hash);
 
         const progresses: (typeof PRELAST_CP)[] = [];
@@ -191,12 +190,15 @@ describe(`CoinjoinBackend methods`, () => {
         );
 
         // Second returned checkpoint should be exactly the same as the first one
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         expect(cp2.blockHeight).toBe(LAST_BLOCK.height);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         expect(cp2.blockHash).toBe(LAST_BLOCK.hash);
         // No progress should be emitted as nothing changed
         expect(progresses).toHaveLength(0);
 
         // REORG -> last block's hash changed
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         client.setFixture([...FIXTURES.BLOCKS.slice(0, -1), REORG_BLOCK]);
 
         // Third scan, from last known checkpoint, should signalize last block reorg
@@ -206,6 +208,7 @@ describe(`CoinjoinBackend methods`, () => {
         );
 
         // Third returned checkpoint corresponds to the reorged last block
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         expect(cp3.blockHeight).toBe(REORG_BLOCK.height);
         expect(cp3.blockHash).toBe(REORG_BLOCK.hash);
         // Progress with reorged block should be emitted
@@ -214,9 +217,8 @@ describe(`CoinjoinBackend methods`, () => {
     });
 
     it('scanAccount derive pending', async () => {
-        const block0 = FIXTURES.BLOCKS[0];
-        if (!block0) throw new Error('Missing block fixture');
-        client.setFixture([{ ...block0, txs: [] }]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        client.setFixture([{ ...FIXTURES.BLOCKS[0], txs: [] }]);
 
         const scan1 = await scanAccount(
             { descriptor: FIXTURES.SEGWIT_XPUB, checkpoints: [EMPTY_CHECKPOINT] },
@@ -233,7 +235,8 @@ describe(`CoinjoinBackend methods`, () => {
         expect(scan1.checkpoint.receiveCount).toBe(20);
         expect(info1.addresses.unused.length).toBe(20);
 
-        client.setFixture([{ ...block0, txs: [] }], [FIXTURES.TX_4_PENDING]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        client.setFixture([{ ...FIXTURES.BLOCKS[0], txs: [] }], [FIXTURES.TX_4_PENDING]);
 
         const scan2 = await scanAccount(
             { descriptor: FIXTURES.SEGWIT_XPUB, checkpoints: [scan1.checkpoint] },

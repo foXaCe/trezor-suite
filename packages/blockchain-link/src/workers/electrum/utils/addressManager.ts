@@ -30,7 +30,7 @@ export const createAddressManager = (getNetwork: () => Network | undefined) => {
             subscribedAddrs,
         );
 
-        return toAdd.map(addr => subscribedAddrs[addr]).filter((sh): sh is string => !!sh);
+        return toAdd.map(addr => subscribedAddrs[addr]);
     };
 
     const removeAddresses = (addresses?: string[]) => {

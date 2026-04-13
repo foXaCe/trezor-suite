@@ -71,9 +71,9 @@ const transportApiMock = (fixtures: ResponseFixture[]) => {
         },
         read: () => {
             const index = fixtures.findIndex(f => f.id === request);
-            const found = fixtures[index];
-            if (index >= 0 && found) {
-                const { data } = found;
+            if (index >= 0) {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                const { data } = fixtures[index];
                 fixtures.splice(index, 1);
 
                 return response(data);
@@ -107,19 +107,14 @@ const buildProtobufMessage = (messages: any, override: any = {}) => {
     if (!latest) {
         throw new Error('Missing latest bundled release.');
     }
-    const fw_major = latest.version[0];
-    const fw_minor = latest.version[1];
-    const fw_patch = latest.version[2];
+    const [fw_major, fw_minor, fw_patch] = latest.version;
     const version = {
         major_version: fw_major,
         minor_version: fw_minor,
         patch_version: fw_patch,
     };
     if (override.data?.bootloader_mode) {
-        const blVersion = latest.bootloader_version ?? [major_version, 0, 0];
-        const bl_major = blVersion[0];
-        const bl_minor = blVersion[1];
-        const bl_patch = blVersion[2];
+        const [bl_major, bl_minor, bl_patch] = latest.bootloader_version || [major_version, 0, 0];
         version.major_version = bl_major;
         version.minor_version = bl_minor;
         version.patch_version = bl_patch;
@@ -221,12 +216,7 @@ const setupTest = () => {
     const context = {
         deviceList,
         postMessage,
-        selectDevice: () => {
-            const device = deviceList.getAllDevices()[0];
-            if (!device) throw new Error('No device found');
-
-            return device;
-        },
+        selectDevice: () => deviceList.getAllDevices()[0],
         registerEvents: () => {},
         log: new Log('Test', false),
         abortSignal: new AbortController().signal,
@@ -267,9 +257,10 @@ describe('onCallFirmwareUpdate', () => {
                     // }
                 }
 
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 const version = /.*-(.*)?.bin$/
                     .exec(url)?.[1]
-                    ?.split('.')
+                    .split('.')
                     .map(i => Number(i));
 
                 return httpRequestMock(version);
@@ -318,6 +309,7 @@ describe('onCallFirmwareUpdate', () => {
         const binary = await httpRequestMock([2, 8, 3]);
         const result = await runFirmwareUpdate({
             params: { binary },
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             context,
         });
 
@@ -349,6 +341,7 @@ describe('onCallFirmwareUpdate', () => {
 
         const result = await runFirmwareUpdate({
             params: {},
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             context,
         });
 
@@ -373,6 +366,7 @@ describe('onCallFirmwareUpdate', () => {
 
         const result = await runFirmwareUpdate({
             params: {},
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             context,
         });
 
@@ -407,6 +401,7 @@ describe('onCallFirmwareUpdate', () => {
 
         const result = await runFirmwareUpdate({
             params: {},
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             context,
         });
 
@@ -440,6 +435,7 @@ describe('onCallFirmwareUpdate', () => {
         const binary = await httpRequestMock();
         const result = await runFirmwareUpdate({
             params: { binary },
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             context,
         });
 
@@ -465,6 +461,7 @@ describe('onCallFirmwareUpdate', () => {
         const binary = await httpRequestMock();
         const result = await runFirmwareUpdate({
             params: { binary },
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             context,
         });
 
@@ -495,6 +492,7 @@ describe('onCallFirmwareUpdate', () => {
 
         const result = await runFirmwareUpdate({
             params: {},
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             context,
         });
 
@@ -540,6 +538,7 @@ describe('onCallFirmwareUpdate', () => {
 
         const result = await runFirmwareUpdate({
             params: {},
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             context,
         });
 

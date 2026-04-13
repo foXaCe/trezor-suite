@@ -15,30 +15,23 @@ function outputComparator(a: CoinSelectOutputFinal, b: CoinSelectOutputFinal) {
     );
 }
 
+// @ts-expect-error: indexing with noUncheckedIndexedAccess
 export const bip69SortingStrategy: SortingStrategy = ({ result, request, convertedInputs }) => {
     const defaultPermutation: number[] = [];
     const convertedOutputs = result.outputs.map((output, index) => {
         defaultPermutation.push(index);
-        const requestOutput = request.outputs[index];
-        if (requestOutput) {
-            return convertOutput(output, requestOutput);
+        if (request.outputs[index]) {
+            return convertOutput(output, request.outputs[index]);
         }
 
         return convertOutput(output, { type: 'change', ...request.changeAddress });
     });
 
-    const permutation = defaultPermutation.sort((a, b) => {
-        const outputA = result.outputs[a];
-        const outputB = result.outputs[b];
-        if (!outputA || !outputB) return 0;
-
-        return outputComparator(outputA, outputB);
-    });
-    const sortedOutputs = permutation.flatMap(index => {
-        const output = convertedOutputs[index];
-
-        return output ? [output] : [];
-    });
+    const permutation = defaultPermutation.sort((a, b) =>
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        outputComparator(result.outputs[a], result.outputs[b]),
+    );
+    const sortedOutputs = permutation.map(index => convertedOutputs[index]);
 
     return {
         inputs: convertedInputs.sort(inputComparator),

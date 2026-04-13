@@ -100,11 +100,10 @@ export const debugLinkDecision = async () => {
         throw new Error(enumerate.error.code);
     }
     const descriptor = enumerate.payload[0];
-    if (!descriptor) {
-        throw new Error('No device found');
-    }
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const input = { ...descriptor, previous: descriptor.session };
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const acquire = await debugTransport.acquire({ input });
     if (!acquire.success) {
         throw new Error(acquire.error.code);
@@ -117,7 +116,8 @@ export const debugLinkDecision = async () => {
         session,
     });
 
-    await debugTransport.release({ ...descriptor, session });
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    await debugTransport.release({ ...enumerate.payload[0], session });
     await debugTransport.enumerate();
 };
 

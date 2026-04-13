@@ -78,12 +78,10 @@ export default class CardanoGetAddress extends AbstractMethod<'cardanoGetAddress
     }
 
     get info() {
-        const firstParam = this.params[0];
-        if (this.params.length === 1 && firstParam) {
-            const accountIndex = firstParam.proto.address_parameters.address_n[2];
-
+        if (this.params.length === 1) {
             return `Export Cardano address for account #${
-                accountIndex !== undefined ? fromHardened(accountIndex) + 1 : '?'
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                fromHardened(this.params[0].proto.address_parameters.address_n[2]) + 1
             }`;
         }
 
@@ -92,13 +90,14 @@ export default class CardanoGetAddress extends AbstractMethod<'cardanoGetAddress
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
-            const currentParam = this.params[this.progress];
-            if (!currentParam) return;
-
             return {
                 type: 'address' as const,
-                serializedPath: getSerializedPath(currentParam.proto.address_parameters.address_n),
-                address: currentParam.address || 'not-set',
+                serializedPath: getSerializedPath(
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    this.params[this.progress].proto.address_parameters.address_n,
+                ),
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                address: this.params[this.progress].address || 'not-set',
             };
         }
     }
@@ -119,41 +118,54 @@ export default class CardanoGetAddress extends AbstractMethod<'cardanoGetAddress
         return response.message;
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: MethodReturnType<typeof this.name> = [];
 
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
-            if (!batch) continue;
 
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             batch.proto.address_parameters = modifyAddressParametersForBackwardsCompatibility(
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 batch.proto.address_parameters,
             );
 
             // silently get address and compare with requested address
             // or display as default inside popup
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (batch.proto.show_display) {
                 const silent = await this._call({
                     ...batch,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     proto: { ...batch.proto, show_display: false },
                 });
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 if (typeof batch.address === 'string') {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     if (batch.address !== silent.address) {
                         throw ERRORS.TypedError('Method_AddressNotMatch');
                     }
                 } else {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     batch.address = silent.address;
                 }
             }
 
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const response = await this._call(batch);
 
             responses.push({
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 addressParameters: addressParametersFromProto(batch.proto.address_parameters),
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 protocolMagic: batch.proto.protocol_magic,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 networkId: batch.proto.network_id,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 serializedPath: getSerializedPath(batch.proto.address_parameters.address_n),
                 serializedStakingPath: getSerializedPath(
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     batch.proto.address_parameters.address_n_staking,
                 ),
                 address: response.address,
@@ -174,15 +186,6 @@ export default class CardanoGetAddress extends AbstractMethod<'cardanoGetAddress
             this.progress++;
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw ERRORS.TypedError('Runtime', 'CardanoGetAddress: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

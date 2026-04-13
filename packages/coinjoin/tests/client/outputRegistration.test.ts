@@ -42,7 +42,8 @@ describe('outputRegistration', () => {
             [],
             server?.requestOptions,
         );
-        expect(response.inputs[0]?.error?.message).toMatch(/Missing confirmed credentials/);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(response.inputs[0].error?.message).toMatch(/Missing confirmed credentials/);
     });
 
     it('errors on insufficient amount of available change addresses', async () => {
@@ -108,6 +109,7 @@ describe('outputRegistration', () => {
             server?.requestOptions,
         );
 
-        expect(response.inputs[0]?.error?.message).toMatch(/No change address available/);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(response.inputs[0].error?.message).toMatch(/No change address available/);
     });
 });

@@ -114,11 +114,12 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
     }
 
     get confirmation() {
-        const firstParam = this.params[0];
-        if (this.params.length === 1 && firstParam && !firstParam.path && !firstParam.descriptor) {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        if (this.params.length === 1 && !this.params[0].path && !this.params[0].descriptor) {
             return {
                 view: 'export-account-info' as const,
-                label: `Export info for ${firstParam.coinInfo.label} account of your selection`,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                label: `Export info for ${this.params[0].coinInfo.label} account of your selection`,
                 customConfirmButton: {
                     label: 'Proceed to account selection',
                     className: 'not-empty-css',
@@ -129,22 +130,21 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                 [coin: string]: { coinInfo: CoinInfo; values: DerivationPath[] };
             } = {};
             this.params.forEach(b => {
-                const existing = keys[b.coinInfo.label];
-                if (!existing) {
+                if (!keys[b.coinInfo.label]) {
                     keys[b.coinInfo.label] = {
                         coinInfo: b.coinInfo,
-                        values: [b.descriptor || b.address_n],
+                        values: [],
                     };
-                } else {
-                    existing.values.push(b.descriptor || b.address_n);
                 }
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                keys[b.coinInfo.label].values.push(b.descriptor || b.address_n);
             });
 
             // prepare html for popup
             const str: string[] = [];
             Object.keys(keys).forEach((k, _i, _a) => {
                 const details = keys[k];
-                if (!details) return;
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 details.values.forEach(acc => {
                     // if (i === 0) str += this.params.length > 1 ? ': ' : ' ';
                     // if (i > 0) str += ', ';
@@ -153,6 +153,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                     if (typeof acc === 'string') {
                         str.push(acc);
                     } else {
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         str.push(getAccountLabel(acc, details.coinInfo));
                     }
                 });
@@ -176,12 +177,11 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
         // find invalid ranges
         const invalid = [];
         for (let i = 0; i < this.params.length; i++) {
-            const batch = this.params[i];
-            if (!batch) continue;
             // set FW range for current batch
             this.firmwareRange = getFirmwareRange(
                 this.name,
-                batch.coinInfo,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                this.params[i].coinInfo,
                 DEFAULT_FIRMWARE_RANGE,
             );
             const exception = super.checkFirmwareRange();
@@ -189,7 +189,8 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                 invalid.push({
                     index: i,
                     exception,
-                    coin: batch.coin,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    coin: this.params[i].coin,
                 });
             }
         }
@@ -201,9 +202,10 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
     async run(context: MethodContext) {
         // address_n and descriptor are not set. use discovery
-        const firstParam = this.params[0];
-        if (this.params.length === 1 && firstParam && !firstParam.path && !firstParam.descriptor) {
-            return this.discover(firstParam, context);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        if (this.params.length === 1 && !this.params[0].path && !this.params[0].descriptor) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            return this.discover(this.params[0], context);
         }
 
         const responses: MethodReturnType<typeof this.name> = [];
@@ -223,8 +225,9 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
         for (let i = 0; i < this.params.length; i++) {
             const request = this.params[i];
-            if (!request) continue;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const { address_n } = request;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             let { descriptor } = request;
             let legacyXpub: string | undefined;
             let descriptorChecksum: string | undefined;
@@ -236,6 +239,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                 try {
                     const accountDescriptor = await this.getDevice()
                         .getCommands()
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         .getAccountDescriptor(request.coinInfo, address_n, request.derivationType);
                     if (accountDescriptor) {
                         descriptor = accountDescriptor.descriptor;
@@ -263,8 +267,10 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
                 // initialize backend
                 const blockchain = await initBlockchain(
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     request.coinInfo,
                     context.sendCoreMessage,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     request.identity,
                 );
 
@@ -273,16 +279,27 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                 // get account info from backend
                 const info = await blockchain.getAccountInfo({
                     descriptor,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     details: request.details,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     tokens: request.tokens,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     page: request.page,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     pageSize: request.pageSize,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     pageCursor: request.pageCursor,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     from: request.from,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     to: request.to,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     contractFilter: request.contractFilter,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     gap: request.gap,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     marker: request.marker,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     tokenAccountsPubKeys: request.tokenAccountsPubKeys,
                 });
 
@@ -290,8 +307,11 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
                 let utxo: AccountUtxo[] | undefined;
                 if (
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     isUtxoBased(request.coinInfo) &&
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     typeof request.details === 'string' &&
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     request.details !== 'basic'
                 ) {
                     utxo = await blockchain.getAccountUtxo(descriptor);
@@ -301,6 +321,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
                 // add account to responses
                 const account: AccountInfo = {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     path: request.path,
                     ...info,
                     descriptor, // override descriptor (otherwise eth checksum is lost)
@@ -324,16 +345,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
         }
         if (this.disposed) return new Promise<typeof responses>(() => []);
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse == null) {
-            throw ERRORS.TypedError('Runtime', 'GetAccountInfo: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0]!;
     }
 
     private async discover(request: Request, context: MethodContext) {
@@ -385,9 +397,6 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
         discovery.stop();
 
         const account = discovery.accounts[uiResp.payload];
-        if (!account) {
-            throw ERRORS.TypedError('Runtime', 'GetAccountInfo: account not found');
-        }
 
         if (!discovery.completed) {
             await resolveAfter(501); // temporary solution, TODO: immediately resolve will cause "device call in progress"
@@ -395,6 +404,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
         // get account info from backend
         const info = await blockchain.getAccountInfo({
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             descriptor: account.descriptor,
             details: request.details,
             tokens: request.tokens,
@@ -414,10 +424,12 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
             typeof request.details === 'string' &&
             request.details !== 'basic'
         ) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             utxo = await blockchain.getAccountUtxo(account.descriptor);
         }
 
         return {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             path: getSerializedPath(account.address_n),
             ...info,
             utxo,

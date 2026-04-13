@@ -77,10 +77,12 @@ describe('Transaction', () => {
                     }
                 });
                 tx.outs.forEach((output, i) => {
-                    const expectedOut = f.raw.outs[i];
-                    expect(output.value).toEqual(expectedOut?.value);
-                    expect(output.script.toString('hex')).toEqual(expectedOut?.script);
-                    expect(output.decredVersion).toEqual(expectedOut?.version);
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    expect(output.value).toEqual(f.raw.outs[i].value);
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    expect(output.script.toString('hex')).toEqual(f.raw.outs[i].script);
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    expect(output.decredVersion).toEqual(f.raw.outs[i].version);
                 });
 
                 expect(tx.toHex()).toEqual(f.hex);
@@ -336,19 +338,40 @@ describe('Transaction', () => {
                 if (f.raw.nShieldedSpend) {
                     const shieldedSpend = specificData.vShieldedSpend;
                     for (let i = 0; i < f.raw.nShieldedSpend; ++i) {
-                        const spend = shieldedSpend[i];
-                        const expected = f.raw.vShieldedSpend[i];
-                        if (!spend || !expected) continue;
-                        expect(spend.cv.toString('hex')).toEqual(expected.cv);
-                        expect(spend.anchor.toString('hex')).toEqual(expected.anchor);
-                        expect(spend.nullifier.toString('hex')).toEqual(expected.nullifier);
-                        expect(spend.rk.toString('hex')).toEqual(expected.rk);
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        expect(shieldedSpend[i].cv.toString('hex')).toEqual(
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                            f.raw.vShieldedSpend[i].cv,
+                        );
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        expect(shieldedSpend[i].anchor.toString('hex')).toEqual(
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                            f.raw.vShieldedSpend[i].anchor,
+                        );
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        expect(shieldedSpend[i].nullifier.toString('hex')).toEqual(
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                            f.raw.vShieldedSpend[i].nullifier,
+                        );
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        expect(shieldedSpend[i].rk.toString('hex')).toEqual(
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                            f.raw.vShieldedSpend[i].rk,
+                        );
                         expect(
-                            spend.zkproof.sA.toString('hex') +
-                                spend.zkproof.sB.toString('hex') +
-                                spend.zkproof.sC.toString('hex'),
-                        ).toEqual(expected.zkproof);
-                        expect(spend.spendAuthSig.toString('hex')).toEqual(expected.spendAuthSig);
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                            shieldedSpend[i].zkproof.sA.toString('hex') +
+                                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                                shieldedSpend[i].zkproof.sB.toString('hex') +
+                                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                                shieldedSpend[i].zkproof.sC.toString('hex'),
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        ).toEqual(f.raw.vShieldedSpend[i].zkproof);
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        expect(shieldedSpend[i].spendAuthSig.toString('hex')).toEqual(
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                            f.raw.vShieldedSpend[i].spendAuthSig,
+                        );
                     }
                 }
             });

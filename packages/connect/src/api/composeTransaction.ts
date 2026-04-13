@@ -178,23 +178,25 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
         const blockchain = await this.getBlockchain(sendCoreMessage);
         await composer.init(blockchain);
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return feeLevels.map(level => {
             composer.composeCustomFee(level.feePerUnit);
-            const composedTx = composer.composed.custom;
-            if (!composedTx) {
-                return { type: 'error' as const, error: 'ADDRESSES-NOT-SET' as const };
-            }
-            const tx = { ...composedTx }; // needs to spread otherwise flow has a problem with ComposeResult vs PrecomposedTransaction (max could be undefined)
+            const tx = { ...composer.composed.custom }; // needs to spread otherwise flow has a problem with ComposeResult vs PrecomposedTransaction (max could be undefined)
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (tx.type === 'final') {
                 return {
                     ...tx,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     inputs: tx.inputs.map(inp => inputToTrezor(inp, this.params.sequence)),
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     outputs: tx.outputs.map(outputToTrezor),
                 };
             }
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (tx.type === 'nonfinal') {
                 return {
                     ...tx,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     inputs: tx.inputs.map(inp => inputToTrezor(inp, this.params.sequence)),
                 };
             }
@@ -216,6 +218,7 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
         const { account, utxo } = await this.selectAccount(context);
 
         // wait for fee selection
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const response = await this.selectFee(account, utxo, context);
         // check for interruption
         if (!this.discovery) {
@@ -250,9 +253,7 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
             );
             const uiResp = await dfd.promise;
             const account = discovery.accounts[uiResp.payload];
-            if (!account) {
-                throw ERRORS.TypedError('Runtime', 'ComposeTransaction: Account not found');
-            }
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const utxo = await blockchain.getAccountUtxo(account.descriptor);
 
             return {
@@ -316,10 +317,9 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
         }
 
         const account = discovery.accounts[uiResp.payload];
-        if (!account) {
-            throw ERRORS.TypedError('Runtime', 'ComposeTransaction: Account not found');
-        }
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         this.params.coinInfo = fixCoinInfoNetwork(this.params.coinInfo, account.address_n);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const utxo = await blockchain.getAccountUtxo(account.descriptor);
 
         return {
@@ -392,17 +392,9 @@ export default class ComposeTransaction extends AbstractMethod<'composeTransacti
                 // wait for user action
                 return this._selectFeeUiResponse(composer, context);
 
-            case 'send': {
-                const selectedTx = composer.composed[resp.payload.value];
-                if (!selectedTx) {
-                    throw ERRORS.TypedError(
-                        'Runtime',
-                        'ComposeTransaction: Selected fee level not composed',
-                    );
-                }
-
-                return this._sign(selectedTx, context.sendCoreMessage);
-            }
+            case 'send':
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                return this._sign(composer.composed[resp.payload.value], context.sendCoreMessage);
 
             default:
                 return 'change-account';

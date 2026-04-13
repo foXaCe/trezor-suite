@@ -140,17 +140,12 @@ export const getTransactions = async (
     const getSpent = (txid: string, n: number) => !unspentOutputs[txid]?.includes(n);
     */
     const getSpent = () => false;
-    const getTx = (txid: string) => origTxs[txid] ?? prevTxs[txid];
-    const getVout = (txid: string, vout: number) => {
-        const tx = getTx(txid);
-        if (!tx) throw new Error(`Transaction not found: ${txid}`);
-        const out = tx.vout[vout];
-        if (!out) throw new Error(`Vout ${vout} not found in transaction: ${txid}`);
-
-        return out;
-    };
+    const getTx = (txid: string) => origTxs[txid] || prevTxs[txid];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const getVout = (txid: string, vout: number) => getTx(txid).vout[vout];
 
     const currentHeight = client.getInfo()?.block?.height || 0;
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     return Object.values(origTxs).map(formatTransaction(getVout, getSpent, currentHeight));
 };

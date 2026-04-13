@@ -64,9 +64,10 @@ describe('Stellar', () => {
         const result = await blockchain.getAccountInfo({
             descriptor,
         });
-        const nativeBalance = accountRawResp.balances[accountRawResp.balances.length - 1];
-        if (!nativeBalance) throw new Error('Missing balance');
-        const expectedBalance = toStroops(nativeBalance.balance);
+        const expectedBalance = toStroops(
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            accountRawResp.balances[accountRawResp.balances.length - 1].balance,
+        );
         const expectedReverse = '20000000';
         const expectedAvailableBalance = expectedBalance.minus(expectedReverse).toString();
         expect(result).toEqual({
@@ -134,9 +135,8 @@ describe('Stellar', () => {
             .includeFailed(true)
             .call();
 
-        const lastRecord = txRawResp.records[txRawResp.records.length - 1];
-        if (!lastRecord) throw new Error('Missing record');
-        const expectedCursor = lastRecord.paging_token;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const expectedCursor = txRawResp.records[txRawResp.records.length - 1].paging_token;
         const expectedTxs = txRawResp.records.map(record =>
             utils.transformTransaction(record, descriptor, {}),
         );
@@ -146,9 +146,10 @@ describe('Stellar', () => {
             details: 'txs',
             pageSize,
         });
-        const nativeBalance2 = accountRawResp.balances[accountRawResp.balances.length - 1];
-        if (!nativeBalance2) throw new Error('Missing balance');
-        const expectedBalance = toStroops(nativeBalance2.balance);
+        const expectedBalance = toStroops(
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            accountRawResp.balances[accountRawResp.balances.length - 1].balance,
+        );
         const expectedReverse = '20000000';
         const expectedAvailableBalance = expectedBalance.minus(expectedReverse).toString();
         expect(result).toEqual({

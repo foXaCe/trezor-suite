@@ -1,12 +1,7 @@
 import * as ops from 'bitcoin-ops';
 
 // extend with Decred OP codes
-const OPS: { [key: string]: number } & typeof ops & {
-        OP_SSTX: number;
-        OP_SSTXCHANGE: number;
-        OP_SSGEN: number;
-        OP_SSRTX: number;
-    } = {
+const OPS: Record<string, number> = {
     ...ops,
     OP_SSTX: 0xba,
     OP_SSTXCHANGE: 0xbd,
@@ -16,10 +11,8 @@ const OPS: { [key: string]: number } & typeof ops & {
 
 const REVERSE_OPS: string[] = [];
 Object.keys(OPS).forEach(code => {
-    const value = OPS[code];
-    if (value !== undefined) {
-        REVERSE_OPS[value] = code;
-    }
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    REVERSE_OPS[OPS[code]] = code;
 });
 
 export { OPS, REVERSE_OPS };

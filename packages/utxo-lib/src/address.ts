@@ -21,6 +21,7 @@ export interface Bech32Result {
 }
 
 export function fromBase58Check(address: string, network = BITCOIN_NETWORK): Base58CheckResult {
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     return bs58check.decodeAddress(address, network);
 }
 
@@ -34,11 +35,13 @@ export function fromBech32(address: string): Bech32Result {
     }
 
     if (result) {
-        version = result.words[0] ?? 0;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        [version] = result.words;
         if (version !== 0) throw new TypeError(`${address} uses wrong encoding`);
     } else {
         result = bech32m.decode(address);
-        version = result.words[0] ?? 0;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        [version] = result.words;
         if (version === 0) throw new TypeError(`${address} uses wrong encoding`);
     }
 
@@ -70,7 +73,8 @@ function toFutureSegwitAddress(output: Buffer, network = BITCOIN_NETWORK) {
     if (data.length < FUTURE_SEGWIT_MIN_SIZE || data.length > FUTURE_SEGWIT_MAX_SIZE)
         throw new TypeError('Invalid program length for segwit address');
 
-    const version = (output[0] ?? 0) - FUTURE_SEGWIT_VERSION_DIFF;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const version = output[0] - FUTURE_SEGWIT_VERSION_DIFF;
 
     if (version < FUTURE_SEGWIT_MIN_VERSION || version > FUTURE_SEGWIT_MAX_VERSION)
         throw new TypeError('Invalid version for segwit address');

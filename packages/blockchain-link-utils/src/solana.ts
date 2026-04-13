@@ -162,12 +162,13 @@ export const transformTokenInfo = (
             address: tokenAccount.pubkey,
             standard: tokenProgramsInfo[program].tokenStandard,
         };
-        const existing = acc[token.contract];
-        if (existing != null) {
-            existing.balance = new BigNumber(existing.balance || '0')
+        if (acc[token.contract] != null) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            acc[token.contract].balance = new BigNumber(acc[token.contract].balance || '0')
                 .plus(token.balance || '0')
                 .toString();
-            existing.accounts?.push({
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            acc[token.contract].accounts!.push({
                 publicKey: token.address,
                 balance: token.balance || '0',
             });
@@ -437,22 +438,16 @@ export const getDetails = (
         )
         .filter(({ address }) => !(txType === 'self' && address === accountAddress));
 
-    const getVin = ({ address, amount }: { address: string; amount?: BigNumber }, i: number) => {
-        const signature = transaction.transaction.signatures[0];
-        if (!signature) {
-            throw new Error('Solana transaction is missing a signature');
-        }
-
-        return {
-            txid: signature.toString(),
-            version: transaction.version?.toString(),
-            isAddress: true,
-            isAccountOwned: address === accountAddress,
-            n: i,
-            value: amount?.abs().toString(),
-            addresses: [address],
-        };
-    };
+    const getVin = ({ address, amount }: { address: string; amount?: BigNumber }, i: number) => ({
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        txid: transaction.transaction.signatures[0].toString(),
+        version: transaction.version?.toString(),
+        isAddress: true,
+        isAccountOwned: address === accountAddress,
+        n: i,
+        value: amount?.abs().toString(),
+        addresses: [address],
+    });
 
     const vin = senders.map((sender, i) => getVin(sender, i));
     const vout = receivers.map((receiver, i) => getVin(receiver, i));
@@ -748,14 +743,8 @@ export const transformTransaction = (
 
     return {
         type: txType,
-        txid: (() => {
-            const sig = tx.transaction.signatures[0];
-            if (!sig) {
-                throw new Error('Solana transaction is missing a signature');
-            }
-
-            return sig.toString();
-        })(),
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        txid: tx.transaction.signatures[0].toString(),
         blockTime: tx.blockTime == null ? undefined : Number(tx.blockTime),
         blockHeight: tx.slot == null ? undefined : Number(tx.slot),
         amount,

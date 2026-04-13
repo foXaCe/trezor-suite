@@ -26,6 +26,7 @@ function isOPInt(value: number) {
     return (
         isNumber(value) &&
         (value === OPS.OP_0 ||
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             (value >= OPS.OP_1 && value <= OPS.OP_16) ||
             value === OPS.OP_1NEGATE)
     );
@@ -42,9 +43,9 @@ export function isPushOnly(value: Stack) {
 function asMinimalOP(buffer: Buffer) {
     if (buffer.length === 0) return OPS.OP_0;
     if (buffer.length !== 1) return;
-    const byte = buffer[0] ?? 0;
-    if (byte >= 1 && byte <= 16) return OP_INT_BASE + byte;
-    if (byte === 0x81) return OPS.OP_1NEGATE;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    if (buffer[0] >= 1 && buffer[0] <= 16) return OP_INT_BASE + buffer[0];
+    if (buffer[0] === 0x81) return OPS.OP_1NEGATE;
 }
 
 export function compile(chunks: Buffer | Stack) {
@@ -109,9 +110,10 @@ export function decompile(buffer: Buffer | Stack) {
     let i = 0;
 
     while (i < buffer.length) {
-        const opcode = buffer[i] ?? 0;
+        const opcode = buffer[i];
 
         // data chunk
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (opcode > OPS.OP_0 && opcode <= OPS.OP_PUSHDATA4) {
             const d = pushdata.decode(buffer, i);
 
@@ -135,6 +137,7 @@ export function decompile(buffer: Buffer | Stack) {
 
             // opcode
         } else {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             chunks.push(opcode);
 
             i += 1;
@@ -155,12 +158,11 @@ export function toASM(chunks: Buffer | Stack) {
             if (isBuffer(chunk)) {
                 const op = asMinimalOP(chunk);
                 if (op === undefined) return chunk.toString('hex');
-
-                return REVERSE_OPS[op] ?? '';
+                chunk = op;
             }
 
             // opcode!
-            return REVERSE_OPS[chunk] ?? '';
+            return REVERSE_OPS[chunk];
         })
         .join(' ');
 }
@@ -171,8 +173,7 @@ export function fromASM(asm: string) {
     return compile(
         asm.split(' ').map(chunkStr => {
             // opcode?
-            const opValue = OPS[chunkStr];
-            if (opValue !== undefined) return opValue;
+            if (OPS[chunkStr] !== undefined) return OPS[chunkStr];
             assertType(HexSchema, chunkStr);
 
             // data!
@@ -189,6 +190,7 @@ export function toStack(chunks0: Buffer | Stack) {
         if (isBuffer(op)) return op;
         if (op === OPS.OP_0) return Buffer.allocUnsafe(0);
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return scriptNumber.encode(op - OP_INT_BASE);
     });
 }
@@ -206,7 +208,8 @@ export function isDefinedHashType(hashType: number) {
 
 export function isCanonicalScriptSignature(buffer: Buffer) {
     if (!isBuffer(buffer)) return false;
-    if (!isDefinedHashType(buffer[buffer.length - 1] ?? 0)) return false;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    if (!isDefinedHashType(buffer[buffer.length - 1])) return false;
 
     return bip66.check(buffer.subarray(0, -1));
 }

@@ -11,10 +11,11 @@ if (args.length !== 1) {
     throw new Error('semver arg is missing');
 }
 
-const semver = args[0];
+const [semver] = args;
 
 const allowedSemvers = ['patch', 'prepatch', 'minor', 'preminor', 'prerelease'];
-if (!semver || !allowedSemvers.includes(semver)) {
+// @ts-expect-error: indexing with noUncheckedIndexedAccess
+if (!allowedSemvers.includes(semver)) {
     throw new Error(
         `semver arg "${semver} is invalid. Must be one of [${allowedSemvers.join(', ')}]`,
     );
@@ -32,6 +33,7 @@ const connectPaths = [
 
 const cmd = ['bump', semver];
 
+// @ts-expect-error: indexing with noUncheckedIndexedAccess
 const res = child_process.spawnSync('yarn', [...cmd, ...connectPaths], {
     encoding: 'utf-8',
     cwd: REPO_ROOT,

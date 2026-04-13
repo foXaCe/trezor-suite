@@ -6,10 +6,8 @@ import { getReleaseInfo } from '../firmwareInfo';
 
 const { getDeviceFeatures, releasesT1B1, releasesT2T1 } = global.JestMocks;
 
-const latestT1B1 = releasesT1B1[0];
-if (!latestT1B1) throw new Error('missing T1B1 release');
-const latestT2T1 = releasesT2T1[0];
-if (!latestT2T1) throw new Error('missing T2T1 release');
+const [latestT1B1] = releasesT1B1;
+const [latestT2T1] = releasesT2T1;
 
 const fixtures = [
     {
@@ -40,6 +38,7 @@ const fixtures = [
             intermediary: undefined,
             isRequired: false,
             isNewer: true,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT2T1.translations,
         },
     },
@@ -79,6 +78,7 @@ const fixtures = [
             },
             isRequired: true,
             isNewer: true,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT1B1.translations,
         },
     },
@@ -89,11 +89,17 @@ const fixtures = [
             bootloader_mode: true,
             firmware_present: true,
             internal_model: DeviceModelInternal.T1B1,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             fw_major: latestT1B1.version[0],
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             fw_minor: latestT1B1.version[1],
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             fw_patch: latestT1B1.version[2],
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             major_version: latestT1B1.bootloader_version?.[0],
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             minor_version: latestT1B1.bootloader_version?.[1],
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             patch_version: latestT1B1.bootloader_version?.[2],
         }),
         release: latestT1B1,
@@ -114,6 +120,7 @@ const fixtures = [
             intermediary: undefined,
             isRequired: null,
             isNewer: false,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT1B1.translations,
         },
     },
@@ -158,6 +165,7 @@ const fixtures = [
             },
             isRequired: null,
             isNewer: true,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT1B1.translations,
         },
     },

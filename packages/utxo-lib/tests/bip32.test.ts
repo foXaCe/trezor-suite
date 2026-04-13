@@ -111,8 +111,10 @@ describe('fromBase58 throws', () => {
 
 it('works for Private -> public (neutered)', () => {
     const f = fixtures.valid[1];
-    const c = f?.children[0] as any;
-    const master = BIP32.fromBase58(f?.base58Priv ?? '');
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const c = f.children[0] as any;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const master = BIP32.fromBase58(f.base58Priv);
     const child = master.derive(c.m).neutered();
 
     expect(child.toBase58()).toEqual(c.base58);
@@ -120,8 +122,10 @@ it('works for Private -> public (neutered)', () => {
 
 it('works for Private -> public (neutered, hardened)', () => {
     const f = fixtures.valid[0];
-    const c = f?.children[0] as any;
-    const master = BIP32.fromBase58(f?.base58Priv ?? '');
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const c = f.children[0] as any;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const master = BIP32.fromBase58(f.base58Priv);
     const child = master.deriveHardened(c.m).neutered();
 
     expect(c.base58).toEqual(child.toBase58());
@@ -129,8 +133,10 @@ it('works for Private -> public (neutered, hardened)', () => {
 
 it('works for Public -> public', () => {
     const f = fixtures.valid[1];
-    const c = f?.children[0] as any;
-    const master = BIP32.fromBase58(f?.base58 ?? '');
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const c = f.children[0] as any;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const master = BIP32.fromBase58(f.base58);
     const child = master.derive(c.m);
 
     expect(c.base58).toEqual(child.toBase58());
@@ -138,8 +144,10 @@ it('works for Public -> public', () => {
 
 it('throws on Public -> public (hardened)', () => {
     const f = fixtures.valid[1];
-    const c = f?.children[0] as any;
-    const master = BIP32.fromBase58(f?.base58 ?? '');
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const c = f.children[0] as any;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const master = BIP32.fromBase58(f.base58);
     expect(() => {
         master.deriveHardened(c.m);
     }).toThrow(/Missing private key for hardened child key/);
@@ -147,7 +155,8 @@ it('throws on Public -> public (hardened)', () => {
 
 it('throws on wrong types', () => {
     const f = fixtures.valid[0];
-    const master = BIP32.fromBase58(f?.base58 ?? '');
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const master = BIP32.fromBase58(f.base58);
 
     fixtures.invalid.derive.forEach(fx => {
         expect(() => {

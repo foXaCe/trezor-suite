@@ -39,9 +39,9 @@ export const decode = (message: number[]) => {
     if (
         message.length < MESSAGE_LENGTH ||
         !Object.values(Version).includes(version) ||
-        // @ts-expect-error noUncheckedIndexedAccess: destructured from message with length check
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         !Object.values(TrezorPushNotificationType).includes(type) ||
-        // @ts-expect-error noUncheckedIndexedAccess: destructured from message with length check
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         !Object.values(TrezorPushNotificationMode).includes(mode)
     ) {
         return { success: false, error: PROTOCOL_MALFORMED } as const;

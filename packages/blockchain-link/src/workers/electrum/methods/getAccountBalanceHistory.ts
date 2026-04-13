@@ -32,22 +32,24 @@ const aggregateTransactions = (txs: (Transaction & { blockTime: number })[], gro
     const result: Res['payload'] = [];
     let i = 0;
     while (i < txs.length) {
-        const currentTx = txs[i];
-        if (!currentTx) break;
-        const time = Math.floor(currentTx.blockTime / groupBy) * groupBy;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const time = Math.floor(txs[i].blockTime / groupBy) * groupBy;
         let j = i;
         let received = 0;
         let sent = 0;
         let sentToSelf = 0;
-        while (j < txs.length) {
-            const tx = txs[j];
-            if (!tx || tx.blockTime >= time + groupBy) break;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        while (j < txs.length && txs[j].blockTime < time + groupBy) {
             const {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 type,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 amount,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 fee,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 details: { vin, vout, totalInput, totalOutput },
-            } = tx;
+            } = txs[j];
             if (type === 'recv') received += Number.parseInt(amount, 10);
             else if (type === 'sent')
                 sent += Number.parseInt(amount, 10) + Number.parseInt(fee, 10);
@@ -57,14 +59,12 @@ const aggregateTransactions = (txs: (Transaction & { blockTime: number })[], gro
                 received += Number.parseInt(totalOutput, 10);
             } else if (type === 'joint') {
                 const myTotalInput = new BigNumber(
-                    vin
-                        .filter((vin: { isAccountOwned?: boolean }) => vin.isAccountOwned)
-                        .reduce(sumVinVout, 0),
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    vin.filter(vin => vin.isAccountOwned).reduce(sumVinVout, 0),
                 ).toNumber();
                 const myTotalOutput = new BigNumber(
-                    vout
-                        .filter((vout: { isAccountOwned?: boolean }) => vout.isAccountOwned)
-                        .reduce(sumVinVout, 0),
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    vout.filter(vout => vout.isAccountOwned).reduce(sumVinVout, 0),
                 ).toNumber();
                 sent += myTotalInput;
                 received += myTotalOutput;

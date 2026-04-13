@@ -84,14 +84,13 @@ function validateAndParseUtxos(
 
     const result: CoinSelectInput[] = [];
     for (let i = 0; i < utxos.length; i++) {
-        const utxo = utxos[i];
-        if (!utxo) continue;
         try {
-            const csInput = transformInput(i, utxo, txType);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const csInput = transformInput(i, utxos[i], txType);
             csInput.weight = inputWeight(csInput);
             result.push(csInput);
         } catch (error) {
-            return incorrectUtxoError(i, error instanceof Error ? error.message : String(error));
+            return incorrectUtxoError(i, error.message);
         }
     }
 
@@ -165,7 +164,7 @@ function validateAndParseOutputs(
     const result: CoinSelectOutput[] = [];
     for (let i = 0; i < outputs.length; i++) {
         const output = outputs[i];
-        if (!output) continue;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (output.type === 'send-max-noaddress' || output.type === 'send-max') {
             if (sendMaxOutputIndex >= 0) {
                 return incorrectOutputError(i, 'Multiple send-max');
@@ -174,11 +173,12 @@ function validateAndParseOutputs(
         }
 
         try {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const csOutput = transformOutput(output, txType, network);
             csOutput.weight = outputWeight(csOutput);
             result.push(csOutput);
         } catch (error) {
-            return incorrectOutputError(i, error instanceof Error ? error.message : String(error));
+            return incorrectOutputError(i, error.message);
         }
     }
 
@@ -199,7 +199,7 @@ function validateAndParseChangeOutput(
         return {
             type: 'error',
             error: 'INCORRECT-OUTPUT',
-            message: error instanceof Error ? error.message : String(error),
+            message: error.message,
         };
     }
 }

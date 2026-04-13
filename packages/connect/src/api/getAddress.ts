@@ -94,9 +94,9 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
 
     get info() {
         // set info
-        const firstParam = this.params[0];
-        if (this.params.length === 1 && firstParam) {
-            return getLabel('Export #NETWORK address', firstParam.coinInfo);
+        if (this.params.length === 1) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            return getLabel('Export #NETWORK address', this.params[0].coinInfo);
         }
         const requestedNetworks = this.params.map(b => b.coinInfo);
         const uniqNetworks = getUniqueNetworks(requestedNetworks);
@@ -109,13 +109,12 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
-            const currentParam = this.params[this.progress];
-            if (!currentParam) return;
-
             return {
                 type: 'address' as const,
-                serializedPath: getSerializedPath(currentParam.proto.address_n),
-                address: currentParam.address || 'not-set',
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                address: this.params[this.progress].address || 'not-set',
             };
         }
     }
@@ -145,28 +144,35 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
         };
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: MethodReturnType<typeof this.name> = [];
 
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
-            if (!batch) continue;
             // silently get address and compare with requested address
             // or display as default inside popup
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (batch.proto.show_display) {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 const silent = await this._call({
                     ...batch,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     proto: { ...batch.proto, show_display: false },
                 });
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 if (typeof batch.address === 'string') {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     if (batch.address !== silent.address) {
                         throw ERRORS.TypedError('Method_AddressNotMatch');
                     }
                 } else {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     batch.address = silent.address;
                 }
             }
 
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const response = await this._call(batch);
             responses.push(response);
 
@@ -184,15 +190,6 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
             this.progress++;
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw ERRORS.TypedError('Runtime', 'GetAddress: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

@@ -11,11 +11,8 @@ const { OPS } = bscript;
 function stacksEqual(a: Buffer[], b: Buffer[]): boolean {
     if (a.length !== b.length) return false;
 
-    return a.every((x, i) => {
-        const bItem = b[i];
-
-        return bItem !== undefined && x.equals(bItem);
-    });
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    return a.every((x, i) => x.equals(b[i]));
 }
 
 // output: OP_RETURN ...

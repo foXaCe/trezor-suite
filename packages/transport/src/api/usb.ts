@@ -469,9 +469,10 @@ export class UsbApi extends AbstractApi {
                 return path;
             };
 
-            const [hidDevices = [], nonHidDevices = []] = this.filterDevices(devices);
+            const [hidDevices, nonHidDevices] = this.filterDevices(devices);
 
             const loadedDevices = await Promise.all(
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 nonHidDevices.map(async device => {
                     this.logger?.debug(`usb: creating device ${this.formatDeviceForLog(device)}`);
 
@@ -493,6 +494,7 @@ export class UsbApi extends AbstractApi {
 
             return [
                 ...loadedDevices,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 ...hidDevices.map(d => ({
                     path: getPathFromUsbDevice(d),
                     device: d,

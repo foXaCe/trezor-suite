@@ -89,20 +89,11 @@ export class CoinjoinBackendClient implements CoinjoinBackendClientShape {
             api =>
                 api
                     .getBlockFiltersBatch(bestKnownBlockHash, pageSize)
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     .then<BlockFilterResponse>(({ blockFiltersBatch, ...rest }) => {
                         if (!blockFiltersBatch.length) return { status: 'up-to-date' };
                         const filters = blockFiltersBatch.map(item => {
-                            const parts = item.split(':');
-                            const blockHeight = parts[0];
-                            const blockHash = parts[1];
-                            const filter = parts[2];
-                            if (
-                                blockHeight === undefined ||
-                                blockHash === undefined ||
-                                filter === undefined
-                            ) {
-                                throw new Error(`Invalid block filter format: "${item}"`);
-                            }
+                            const [blockHeight, blockHash, filter] = item.split(':');
 
                             return { blockHeight: Number(blockHeight), blockHash, filter };
                         });
@@ -210,12 +201,11 @@ export class CoinjoinBackendClient implements CoinjoinBackendClientShape {
         return scheduleAction(
             async () => {
                 const urlIndex = this.blockbookRequestId++ % this.blockbookUrls.length;
-                const clearnet = this.blockbookUrls[urlIndex] ?? this.blockbookUrls[0];
-                if (!clearnet) {
-                    throw new Error('No blockbook URLs configured');
-                }
+                const clearnet = this.blockbookUrls[urlIndex];
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 const url = (preferOnion && urlToOnion(clearnet, this.onionDomains)) || clearnet;
                 const api = await this.websockets
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     .getOrCreate({ identity, ...options, url })
                     .catch(error => {
                         const errorType = identifyWsError(error);

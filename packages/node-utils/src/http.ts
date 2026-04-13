@@ -269,15 +269,17 @@ export class HttpServer<T extends EventMap> extends TypedEmitter<T & BaseEvents>
             segment => !segment.includes(':'),
         );
 
-        return [baseSegments, paramsSegments] as const;
+        return [baseSegments, paramsSegments];
     }
 
     private registerRoute(pathname: string, method: Route['method'], handler: AnyRequestHandler[]) {
         const [baseSegments, paramsSegments] = this.splitSegments(pathname);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const basePathname = baseSegments.join('/');
         this.routes.push({
             method,
             pathname: `/${basePathname}`,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             params: paramsSegments,
             handler,
             isActive: true,

@@ -47,13 +47,12 @@ export const trezorPushNotificationHandler = async ({ device, message }: TpnWork
 
     if (!decodedResult.success) return;
 
-    const decodedRaw = decodedResult.payload;
-    const { type, mode } = decodedRaw;
-    if (type === undefined || mode === undefined) return;
+    const decoded = decodedResult.payload;
 
-    const decoded = { type, mode };
-
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     device.lifecycle.emit(DEVICE.TREZOR_PUSH_NOTIFICATION, decoded);
+
+    const { type, mode } = decoded;
 
     const modeChanged =
         // normal > bootloader
@@ -91,7 +90,8 @@ export const trezorPushNotificationHandler = async ({ device, message }: TpnWork
             device.lifecycle.emit(DEVICE.CHANGED);
             break;
         case TrezorPushNotificationType.UNLOCK:
-            await setupDeviceMode(device, mode);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            await setupDeviceMode(device, decoded.mode);
             break;
         case TrezorPushNotificationType.SOFTLOCK:
             device.setBusy('pin-locked');

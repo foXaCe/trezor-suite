@@ -61,12 +61,7 @@ export const getScriptTypeFromScriptPubKey = (scriptPubKey: string): AllowedScri
 export function prefixScriptPubKey(scriptPubKey: string, useHex?: boolean): string;
 export function prefixScriptPubKey(scriptPubKey: string, useHex: false): Buffer;
 export function prefixScriptPubKey(scriptPubKey: string, useHex = true) {
-    const parts = scriptPubKey.split(' ');
-    const OP = parts[0];
-    const hash = parts[1];
-    if (OP === undefined || hash === undefined) {
-        throw new Error(`Invalid scriptPubKey format: "${scriptPubKey}"`);
-    }
+    const [OP, hash] = scriptPubKey.split(' ');
     const script = bscript.fromASM(`OP_${OP} ${hash}`);
 
     return useHex ? script.toString('hex') : script;
@@ -117,10 +112,10 @@ const compareByteArray = (left: Buffer, right: Buffer) => {
 
     const min = Math.min(left.length, right.length);
     for (let i = 0; i < min; i++) {
-        const l = left[i] ?? 0;
-        const r = right[i] ?? 0;
-        if (l < r) return -1;
-        if (l > r) return 1;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        if (left[i] < right[i]) return -1;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        if (left[i] > right[i]) return 1;
     }
 
     return left.length - right.length;

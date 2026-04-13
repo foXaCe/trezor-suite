@@ -68,7 +68,7 @@ describe.skip('TorControlPort', () => {
                     const authenticateRequest = message
                         .trim()
                         .match(/^AUTHENTICATE ([a-fA-F0-9]+)$/m);
-                    const providedAuthSignature = authenticateRequest?.[1];
+                    const providedAuthSignature = authenticateRequest && authenticateRequest[1];
 
                     const authString = `${cookieString}${clientNonce}${serverNonce}`;
                     const authSignature = createHmacSignature(authString, authenticationKey);
@@ -79,7 +79,8 @@ describe.skip('TorControlPort', () => {
                             sock.write('250 OK');
                             break;
                         case !!authchallengeRequest:
-                            clientNonce = authchallengeRequest?.[1] ?? '';
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                            clientNonce = authchallengeRequest ? authchallengeRequest[1] : '';
                             sock.write(
                                 `250 AUTHCHALLENGE SERVERHASH=${serverHash} SERVERNONCE=${serverNonce}`,
                             );

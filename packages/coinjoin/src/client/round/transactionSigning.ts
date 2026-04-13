@@ -112,7 +112,7 @@ const updateRawLiquidityClue = async (
                 .map(o => o.amount);
 
             return middleware.updateLiquidityClue(
-                account.rawLiquidityClue ?? null,
+                account.rawLiquidityClue,
                 round.roundParameters.MaxSuggestedAmount,
                 externalAmounts,
                 { baseUrl: options.middlewareUrl },
@@ -121,9 +121,10 @@ const updateRawLiquidityClue = async (
     );
 
     return accounts.map((account, index) => {
-        const rawLiquidityClue = result[index] ?? null;
+        const rawLiquidityClue = result[index];
         // NOTE: immediately update new value in Account
         // it's intentionally not updated by `updateAccount` to prevent race conditions
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         account.updateRawLiquidityClue(rawLiquidityClue);
 
         return {
@@ -227,6 +228,7 @@ export const transactionSigning = async (
                 options,
             );
             round.transactionData = transactionData;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             round.liquidityClues = liquidityClues;
 
             return round;

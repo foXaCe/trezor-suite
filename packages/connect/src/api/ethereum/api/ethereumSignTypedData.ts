@@ -237,8 +237,7 @@ export default class EthereumSignTypedData extends AbstractMethod<'ethereumSignT
             let memberData;
             let memberTypeName: string;
 
-            const rootIndex = member_path[0];
-            const nestedMemberPath = member_path.slice(1);
+            const [rootIndex, ...nestedMemberPath] = member_path;
             switch (rootIndex) {
                 case 0:
                     memberData = domain;
@@ -255,24 +254,15 @@ export default class EthereumSignTypedData extends AbstractMethod<'ethereumSignT
             // It can be asking for a nested structure (the member path being [X, Y, Z, ...])
             for (const index of nestedMemberPath) {
                 if (Array.isArray(memberData)) {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     memberTypeName = parseArrayType(memberTypeName).entryTypeName;
                     memberData = memberData[index];
                 } else if (typeof memberData === 'object' && memberData !== null) {
-                    const typeDefinitions = types[memberTypeName];
-                    if (!typeDefinitions) {
-                        throw ERRORS.TypedError(
-                            'Runtime',
-                            `Type ${memberTypeName} was not defined in types object`,
-                        );
-                    }
-                    const memberTypeDefinition = typeDefinitions[index];
-                    if (!memberTypeDefinition) {
-                        throw ERRORS.TypedError(
-                            'Runtime',
-                            `Member at index ${index} not found in type ${memberTypeName}`,
-                        );
-                    }
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    const memberTypeDefinition = types[memberTypeName][index];
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     memberTypeName = memberTypeDefinition.type;
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     memberData = memberData[memberTypeDefinition.name as keyof typeof memberData];
                 }
                 if (memberData === null || memberData === undefined) {

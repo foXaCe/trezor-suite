@@ -276,10 +276,8 @@ export const thpPairing = async (device: IDevice) => {
     }
 
     // use first pairing method from the list
-    const selected_pairing_method = thpState.handshakeCredentials.pairingMethods[0];
-    if (selected_pairing_method === undefined) {
-        throw ERRORS.TypedError('Device_ThpPairingMethodsException');
-    }
+    const [selected_pairing_method] = thpState.handshakeCredentials.pairingMethods;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     thpState.setPairingMethod(selected_pairing_method);
 
     // State HP0
@@ -291,6 +289,7 @@ export const thpPairing = async (device: IDevice) => {
     });
 
     // State HP1
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const selectMethod = await thpCall(device, 'ThpSelectMethod', { selected_pairing_method });
 
     // selected_pairing_method === ThpPairingMethod.SkipPairing

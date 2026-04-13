@@ -63,10 +63,14 @@ export function p2pkh(a: Payment, opts?: PaymentOpts): Payment {
         if (!o.hash) return;
 
         return bscript.compile([
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             OPS.OP_DUP,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             OPS.OP_HASH160,
             o.hash,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             OPS.OP_EQUALVERIFY,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             OPS.OP_CHECKSIG,
         ]);
     });

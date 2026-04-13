@@ -98,14 +98,15 @@ const getXpubInfo = (xpub: string, network: Network) => {
 };
 
 const getDescriptorInfo = (paymentType: PaymentType, descriptor: string, network: Network) => {
-    const match =
+    const [_match, _script, path, xpub, _checksum] =
         descriptor.match(
             /^([a-z]+\()+\[([a-z0-9]{8}(?:\/[0-9]+'?){3,})\]([xyztuv]pub[a-zA-Z0-9]*)\/<0;1>\/\*\)+(#[a-z0-9]{8})?$/,
         ) || throwError(`Descriptor cannot be parsed: ${descriptor}`);
-    const path = match[2] ?? '';
-    const xpub = match[3] ?? '';
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const [_fingerprint, ...levels] = path.split('/');
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const version = getVersion(xpub);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const node = getBip32Node(xpub, version, network);
 
     return {

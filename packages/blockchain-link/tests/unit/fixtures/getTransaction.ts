@@ -79,7 +79,8 @@ const blockfrostFixture = {
 const blockfrostTx = {
     type: 'unknown',
     txid: 'deadbeef',
-    amount: blockfrostFixture.output_amount[0]!.quantity,
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    amount: blockfrostFixture.output_amount[0].quantity,
     blockHash: blockfrostFixture.block,
     blockHeight: blockfrostFixture.block_height,
     fee: blockfrostFixture.fees,

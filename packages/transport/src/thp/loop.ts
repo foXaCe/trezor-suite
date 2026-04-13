@@ -70,17 +70,14 @@ export const thpLoop = async ({
                     return sendResult;
                 }
 
-                const firstChunk = chunks[0];
-                if (!firstChunk) {
-                    return thpStateError('Missing first chunk');
-                }
-
                 if (!sendOnly) {
-                    const expectedResponses = protocolThp.getExpectedResponses(firstChunk);
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    const expectedResponses = protocolThp.getExpectedResponses(chunks[0]);
                     thpState.setExpectedResponses(expectedResponses);
                 }
 
-                const isAckExpected = !skipAck && protocolThp.isAckExpected(firstChunk);
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                const isAckExpected = !skipAck && protocolThp.isAckExpected(chunks[0]);
                 if (isAckExpected) {
                     phase = ThpLoopState.READ_ACK;
                 } else if (sendOnly) {

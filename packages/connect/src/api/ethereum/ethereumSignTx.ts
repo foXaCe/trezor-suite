@@ -17,7 +17,7 @@ import type { MessagesSchema } from '@trezor/protobuf';
 import type { TypedCall } from '../../device/DeviceCommands';
 import { addHexPrefix, deepTransform } from '../../utils/formatUtils';
 
-const splitString = (str?: string, len?: number): [string, string] => {
+const splitString = (str?: string, len?: number) => {
     if (str == null) {
         return ['', ''];
     }
@@ -59,8 +59,10 @@ const processTxRequest = async (
     }
 
     const [first, rest] = splitString(data, request.data_length * 2);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const response = await typedCall('EthereumTxAck', 'EthereumTxRequest', { data_chunk: first });
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     return processTxRequest(typedCall, response.message, rest, chain_id);
 };
 

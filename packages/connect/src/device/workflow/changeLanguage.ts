@@ -22,8 +22,8 @@ const uploadTranslationData = async (device: IDevice, payload: ArrayBuffer | nul
         .typedCall('ChangeLanguage', ['DataChunkRequest', 'Success'], { data_length: length });
 
     while (response.type !== 'Success') {
-        const start = response.message.data_offset ?? 0;
-        const end = (response.message.data_offset ?? 0) + (response.message.data_length ?? 0);
+        const start = response.message.data_offset!;
+        const end = response.message.data_offset! + response.message.data_length!;
         const chunk = payload.slice(start, end);
 
         response = await device
@@ -63,12 +63,7 @@ export const changeLanguage = async ({ device, language, binary }: Context) => {
         throw ERRORS.TypedError('Runtime', 'changeLanguage: release not found');
     }
     const languageBinPath = device.currentRelease.translations[language];
-    if (!languageBinPath) {
-        throw ERRORS.TypedError(
-            'Runtime',
-            `changeLanguage: translation path not found for ${language}`,
-        );
-    }
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const downloadedBinary = await getLanguage(languageBinPath);
 
     if (!downloadedBinary) {

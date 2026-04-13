@@ -25,11 +25,10 @@ export const getBitcoinNetwork = (pathOrName: DerivationPath) => {
                 n.label.toLowerCase() === name,
         ) as Readonly<BitcoinNetworkInfo>;
     }
-    const pathElement = pathOrName[1];
-    if (pathElement === undefined) return undefined;
-    const slip44 = fromHardened(pathElement);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const slip44 = fromHardened(pathOrName[1]);
 
-    return bitcoinNetworks.find(n => n.slip44 === slip44);
+    return bitcoinNetworks.find(n => n.slip44 === slip44) as Readonly<BitcoinNetworkInfo>;
 };
 
 export const getEthereumNetwork = (pathOrNetworkSymbol: DerivationPath) => {
@@ -41,11 +40,10 @@ export const getEthereumNetwork = (pathOrNetworkSymbol: DerivationPath) => {
         ) as Readonly<EthereumNetworkInfo>;
     }
 
-    const pathElement = pathOrNetworkSymbol[1];
-    if (pathElement === undefined) return undefined;
-    const slip44 = fromHardened(pathElement);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const slip44 = fromHardened(pathOrNetworkSymbol[1]);
 
-    return ethereumNetworks.find(n => n.slip44 === slip44);
+    return ethereumNetworks.find(n => n.slip44 === slip44) as Readonly<EthereumNetworkInfo>;
 };
 
 export const getMiscNetwork = (pathOrName: DerivationPath) => {
@@ -56,11 +54,10 @@ export const getMiscNetwork = (pathOrName: DerivationPath) => {
             n => n.name.toLowerCase() === name || n.shortcut.toLowerCase() === name,
         ) as Readonly<MiscNetworkInfo>;
     }
-    const pathElement = pathOrName[1];
-    if (pathElement === undefined) return undefined;
-    const slip44 = fromHardened(pathElement);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const slip44 = fromHardened(pathOrName[1]);
 
-    return miscNetworks.find(n => n.slip44 === slip44);
+    return miscNetworks.find(n => n.slip44 === slip44) as Readonly<MiscNetworkInfo>;
 };
 
 /*
@@ -98,13 +95,12 @@ export const getBech32Network = (coin: BitcoinNetworkInfo) => {
 // fix coinInfo network values from path (segwit/legacy)
 export const fixCoinInfoNetwork = (ci: BitcoinNetworkInfo, path: number[]) => {
     const coinInfo = cloneObject(ci);
-    const purpose = path[0];
-    if (purpose === toHardened(84)) {
+    if (path[0] === toHardened(84)) {
         const bech32Network = getBech32Network(coinInfo);
         if (bech32Network) {
             coinInfo.network = bech32Network;
         }
-    } else if (purpose === toHardened(49)) {
+    } else if (path[0] === toHardened(49)) {
         const segwitNetwork = getSegwitNetwork(coinInfo);
         if (segwitNetwork) {
             coinInfo.network = segwitNetwork;
@@ -120,9 +116,8 @@ export const getCoinInfo = (currency: string) =>
     getBitcoinNetwork(currency) || getEthereumNetwork(currency) || getMiscNetwork(currency);
 
 export const getCoinName = (path: number[]) => {
-    const pathElement = path[1];
-    if (pathElement === undefined) return 'Unknown coin';
-    const slip44 = fromHardened(pathElement);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const slip44 = fromHardened(path[1]);
     const network = ethereumNetworks.find(n => n.slip44 === slip44);
 
     return network ? network.name : 'Unknown coin';

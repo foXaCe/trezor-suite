@@ -93,24 +93,23 @@ export default class GetPublicKey extends AbstractMethod<'getPublicKey', Params[
     }
 
     get confirmation() {
-        const firstParam = this.params[0];
-
         return {
             view: 'export-xpub' as const,
             label:
-                this.params.length > 1 || !firstParam
+                this.params.length > 1
                     ? 'Export multiple public keys'
-                    : getPublicKeyLabel(firstParam.proto.address_n, firstParam.coinInfo),
+                    : // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                      getPublicKeyLabel(this.params[0].proto.address_n, this.params[0].coinInfo),
         };
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: MethodReturnType<typeof this.name> = [];
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
-            const batch = this.params[i];
-            if (!batch) continue;
-            const { coinInfo, unlockPath, proto } = batch;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const { coinInfo, unlockPath, proto } = this.params[i];
             // if coinInfo is not provided, use fallback (see above in init method)
             const coinInfoFallback = coinInfo ?? getBitcoinNetwork('btc')!;
             const response = await cmd.getHDNode(proto, { coinInfo: coinInfoFallback, unlockPath });
@@ -128,15 +127,6 @@ export default class GetPublicKey extends AbstractMethod<'getPublicKey', Params[
             }
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw new Error('GetPublicKey: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

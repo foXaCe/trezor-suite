@@ -49,7 +49,7 @@ export const verifyAuthenticityProof = async ({
     });
 
     // 1. parse all x509 certificates received from AuthenticityProof
-    const parsedCerts = certificates.map((c, i) => {
+    const [deviceCert, caCert] = certificates.map((c, i) => {
         const cert = parseCertificate(new Uint8Array(Buffer.from(c, 'hex')));
         if (i === 0) {
             // deviceCert is always at index 0
@@ -59,12 +59,9 @@ export const verifyAuthenticityProof = async ({
 
         return cert;
     });
-    const deviceCert = parsedCerts[0];
-    const caCert = parsedCerts[1];
-    if (!deviceCert || !caCert) {
-        throw new Error('Missing required certificates');
-    }
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const deviceCertAlgName = deviceCert.signatureAlgorithm.algorithmName;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const caCertAlgName = caCert.signatureAlgorithm.algorithmName;
     if (deviceCertAlgName !== caCertAlgName) {
         throw new Error('Mismatched signature algorithms in device and CA certificates');
@@ -72,6 +69,7 @@ export const verifyAuthenticityProof = async ({
     const verifySignatureFn = getVerifyFn(deviceCertAlgName);
 
     // 2. validate that CA certificate was created using one of rootPubkeys
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const caPubKey = Buffer.from(caCert.tbsCertificate.subjectPublicKeyInfo.bits.bytes).toString(
         'hex',
     );
@@ -80,7 +78,9 @@ export const verifyAuthenticityProof = async ({
         allRootPubKeys.map(rootPubKey =>
             verifySignatureFn(
                 Buffer.from(rootPubKey, 'hex'),
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 caCert.tbsCertificate.asn1.raw,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 caCert.signatureValue.bits.bytes,
             ),
         ),
@@ -89,6 +89,7 @@ export const verifyAuthenticityProof = async ({
     const rootPubKeyIndex = isCertSignedByRootPubkey.findIndex(valid => !!valid);
     //TS evaluates string[][number] as string, but it can also be undefined (when index is -1)
     const rootPubKeyMatch: string | undefined = allRootPubKeys[rootPubKeyIndex];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const caCertValidityFrom = caCert.tbsCertificate.validity.from.getTime();
 
     if (caCertValidityFrom > new Date().getTime()) {
@@ -104,12 +105,15 @@ export const verifyAuthenticityProof = async ({
     }
 
     // 3. validate DEVICE certificate subject (Trezor features internal_model)
-    const subject = deviceCert.tbsCertificate.subject[0];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const [subject] = deviceCert.tbsCertificate.subject;
     // subject algorithm (OID) https://www.alvestrand.no/objectid/2.5.4.3.html
-    if (!subject?.parameters || subject.algorithmOid !== '2.5.4.3') {
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    if (!subject.parameters || subject.algorithmOid !== '2.5.4.3') {
         throw new Error('Missing certificate subject');
     }
     // slice 4 bytes from the subject (internal model)
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const subjectValue = Buffer.from(subject.parameters.asn1.contents.subarray(0, 4)).toString();
     if (subjectValue !== deviceModel) {
         return {
@@ -122,13 +126,17 @@ export const verifyAuthenticityProof = async ({
 
     // 4. validate that DEVICE certificate was created using pubKey from CA certificate
     const isDeviceCertValid = await verifySignatureFn(
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         Buffer.from(caCert.tbsCertificate.subjectPublicKeyInfo.bits.bytes),
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         deviceCert.tbsCertificate.asn1.raw,
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         deviceCert.signatureValue.bits.bytes,
     );
 
     // 5. validate that the signature from AuthenticityProof was created using prefixed challenge
     const isSignatureValid = await verifySignatureFn(
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         Buffer.from(deviceCert.tbsCertificate.subjectPublicKeyInfo.bits.bytes),
         data,
         Buffer.from(signature, 'hex'),

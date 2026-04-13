@@ -100,15 +100,15 @@ export class TransportManager extends TypedEmitter<TransportManagerEvents> {
     }
 
     private async selectTransport(
-        transports: Transport[],
+        [transport, ...rest]: Transport[],
         signal: AbortSignal,
     ): Promise<Transport> {
         if (signal.aborted) throw new Error(signal.reason);
-        const transport = transports[0];
-        if (!transport) throw new Error('No transports available');
-        const rest = transports.slice(1);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (transport === this.activeTransport) return transport;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const result = await transport.init({ signal });
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (result.success) return transport;
         else if (rest.length) return this.selectTransport(rest, signal);
         else throw new Error(result.error.code);
@@ -117,8 +117,7 @@ export class TransportManager extends TypedEmitter<TransportManagerEvents> {
     private scheduleUpgradeCheck(pendingTransportEvent: boolean) {
         clearTimeout(this.upgradeTimeout);
         this.upgradeTimeout = setTimeout(async () => {
-            const preferredTransport = this.transports[0];
-            if (!this.activeTransport || this.activeTransport === preferredTransport) return;
+            if (!this.activeTransport || this.activeTransport === this.transports[0]) return;
             for (const t of this.transports) {
                 if (t === this.activeTransport) break;
                 if (await t.ping()) {
@@ -179,7 +178,7 @@ export class TransportManager extends TypedEmitter<TransportManagerEvents> {
                 }
             }
 
-            if (transport && transports[0] && transport !== transports[0]) {
+            if (transport && transport !== transports[0]) {
                 // new transport started successfully or present transport kept, and it's not the most preferred one, (re)plan check
                 this.scheduleUpgradeCheck(pendingTransportEvent);
             }

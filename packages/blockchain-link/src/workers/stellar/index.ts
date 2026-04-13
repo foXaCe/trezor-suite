@@ -23,18 +23,18 @@ const fetchLatestLedger = async (api: Horizon.Server) => {
         throw new CustomError('worker_invalid_horizon_response');
     }
 
-    const record = latestLedgerInfo.records[0];
-    if (!record) throw new CustomError('worker_invalid_horizon_response');
-
-    return record;
+    return latestLedgerInfo.records[0];
 };
 
 const getInfo = async (request: Request<MessageTypes.GetInfo>, isTestnet: boolean) => {
     const api = await request.connect();
     const horizonServerInfo = await api.root();
     const {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         sequence: blockHeight,
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         hash: blockHash,
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         base_reserve_in_stroops: baseReserveInStroops,
     } = await fetchLatestLedger(api);
 
@@ -201,6 +201,7 @@ const subscribeBlock = async ({ state, connect, post }: Context) => {
     const api = await connect();
 
     const fetchBlock = async () => {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const { sequence: blockHeight, hash: blockHash } = await fetchLatestLedger(api);
         post({
             id: -1,

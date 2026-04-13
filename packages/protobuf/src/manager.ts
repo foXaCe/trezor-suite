@@ -161,12 +161,19 @@ export const ProtobufManager = () => {
         } else {
             Object.keys(modules).forEach(key => {
                 const def = modules[key];
-                if (def?.kind && def.kind !== 'file') {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                if (def.kind && def.kind !== 'file') {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     if (def.kind === 'message') {
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         messages[key] = def;
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     } else if (def.kind === 'extension') {
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         extensions[key] = def;
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     } else if (def.kind === 'enum') {
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         enums[def.name] = def;
                     }
                 }

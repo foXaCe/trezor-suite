@@ -9,12 +9,8 @@ const ADDRESSES = deriveAddressesOriginal(...PARAMS);
 const TAPROOT_ADDRESS = 'bcrt1pswrqtykue8r89t9u4rprjs0gt4qzkdfuursfnvqaa3f2yql07zmq2fdmpx';
 
 const NON_TAPROOT_TX = {
-    vin: [
-        { addresses: SEGWIT_RECEIVE_ADDRESSES.slice(1, 3) as string[] },
-        {},
-        { addresses: [] as string[] },
-    ],
-    vout: [{ addresses: [SEGWIT_RECEIVE_ADDRESSES[0] as string] }],
+    vin: [{ addresses: SEGWIT_RECEIVE_ADDRESSES.slice(1, 3) }, {}, { addresses: [] }],
+    vout: [{ addresses: [SEGWIT_RECEIVE_ADDRESSES[0]] }],
 };
 
 const TAPROOT_TX = {
@@ -57,20 +53,24 @@ describe('backendUtils', () => {
 
     describe('isTaprootTx', () => {
         it('taproot tx', () => {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             expect(isTaprootTx(TAPROOT_TX, networks.regtest)).toBe(true);
         });
 
         it('non-taproot tx', () => {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             expect(isTaprootTx(NON_TAPROOT_TX, networks.regtest)).toBe(false);
         });
     });
 
     describe('doesTxContainAddress', () => {
         it('containing', () => {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             expect(doesTxContainAddress(TAPROOT_ADDRESS)(TAPROOT_TX)).toBe(true);
         });
 
         it('not containing', () => {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             expect(doesTxContainAddress(TAPROOT_ADDRESS)(NON_TAPROOT_TX)).toBe(false);
         });
     });

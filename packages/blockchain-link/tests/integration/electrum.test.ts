@@ -20,7 +20,8 @@ describe('Electrum', () => {
 
     worker.onmessage = ({ data }: { data: Response }) => {
         if (resolvers[data.id]) {
-            resolvers[data.id]?.(data);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            resolvers[data.id](data);
         }
     };
 

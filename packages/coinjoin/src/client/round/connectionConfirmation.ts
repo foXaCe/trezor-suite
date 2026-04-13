@@ -206,7 +206,8 @@ export const connectionConfirmation = async (
     ).then(result =>
         result.forEach((r, i) => {
             if (r.status !== 'fulfilled') {
-                inputs[i]?.setError(r.reason);
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                inputs[i].setError(r.reason);
             }
         }),
     );

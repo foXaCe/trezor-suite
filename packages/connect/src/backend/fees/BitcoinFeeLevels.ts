@@ -34,10 +34,8 @@ export class BitcoinFeeLevels extends MiscFeeLevels {
                 if (isNaN(feePerB) || feePerB < 0) return;
 
                 const trimmedFeePerUnit = Math.min(maxFee, Math.max(minFee, feePerB));
-                const level = this.levels[index];
-                if (level) {
-                    level.feePerUnit = trimmedFeePerUnit.toString();
-                }
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                this.levels[index].feePerUnit = trimmedFeePerUnit.toString();
             });
             this.wasFetchedSuccessfully = true;
         } catch {

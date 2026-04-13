@@ -160,15 +160,14 @@ export abstract class AbstractApi extends TypedEmitter<{
         if (!this.lock[path]) {
             this.lock[path] = { read: false, write: false };
         }
-        const currentLock = this.lock[path];
         // check already existing lock
-        if ((currentLock.read && lock.read) || (currentLock.write && lock.write)) {
+        if ((this.lock[path].read && lock.read) || (this.lock[path].write && lock.write)) {
             return error({ code: ERRORS.OTHER_CALL_IN_PROGRESS });
         }
         // add to the current lock
         this.lock[path] = {
-            read: currentLock.read || lock.read,
-            write: currentLock.write || lock.write,
+            read: this.lock[path].read || lock.read,
+            write: this.lock[path].write || lock.write,
         };
 
         return success(undefined);
@@ -197,10 +196,11 @@ export abstract class AbstractApi extends TypedEmitter<{
 
             return this.unknownError(err);
         } finally {
-            const currentLock = this.lock[path] ?? { read: false, write: false };
             this.lock[path] = {
-                read: lock.read ? false : currentLock.read,
-                write: lock.write ? false : currentLock.write,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                read: lock.read ? false : this.lock[path].read,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                write: lock.write ? false : this.lock[path].write,
             };
         }
     };

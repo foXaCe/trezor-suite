@@ -15,11 +15,8 @@ const OP_INT_BASE = OPS.OP_RESERVED; // OP_1 - 1
 function stacksEqual(a: Buffer[], b: Buffer[]): boolean {
     if (a.length !== b.length) return false;
 
-    return a.every((x, i) => {
-        const bItem = b[i];
-
-        return bItem !== undefined && x.equals(bItem);
-    });
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    return a.every((x, i) => x.equals(b[i]));
 }
 
 // input: OP_0 [signatures ...]
@@ -64,8 +61,10 @@ export function p2ms(a: Payment, opts?: PaymentOpts): Payment {
         if (decoded) return;
         decoded = true;
         chunks = bscript.decompile(output) as Stack;
-        o.m = ((chunks[0] ?? 0) as number) - OP_INT_BASE;
-        o.n = ((chunks[chunks.length - 2] ?? 0) as number) - OP_INT_BASE;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        o.m = (chunks[0] as number) - OP_INT_BASE;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        o.n = (chunks[chunks.length - 2] as number) - OP_INT_BASE;
         o.pubkeys = chunks.slice(1, -2) as Buffer[];
     }
 
@@ -75,9 +74,12 @@ export function p2ms(a: Payment, opts?: PaymentOpts): Payment {
         if (!a.pubkeys) return;
 
         return bscript.compile(
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             ([] as Stack).concat(
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 OP_INT_BASE + a.m,
                 a.pubkeys,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 OP_INT_BASE + o.n,
                 OPS.OP_CHECKMULTISIG,
             ),
@@ -125,10 +127,8 @@ export function p2ms(a: Payment, opts?: PaymentOpts): Payment {
     if (opts.validate) {
         if (a.output) {
             decode(a.output);
-            if (chunks[0] === undefined || !isNumber(chunks[0]))
-                throw new TypeError('Output is invalid');
-            if (chunks[chunks.length - 2] === undefined || !isNumber(chunks[chunks.length - 2]))
-                throw new TypeError('Output is invalid');
+            if (!isNumber(chunks[0])) throw new TypeError('Output is invalid');
+            if (!isNumber(chunks[chunks.length - 2])) throw new TypeError('Output is invalid');
             if (chunks[chunks.length - 1] !== OPS.OP_CHECKMULTISIG)
                 throw new TypeError('Output is invalid');
 

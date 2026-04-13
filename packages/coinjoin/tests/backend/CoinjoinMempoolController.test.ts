@@ -10,7 +10,7 @@ import {
 import { MockMempoolClient } from '../mocks/MockMempoolClient';
 
 const TXS = BLOCKS.flatMap(block => block.txs); // There is 6 of them
-const ADDRESS = SEGWIT_RECEIVE_ADDRESSES[1] as string;
+const ADDRESS = SEGWIT_RECEIVE_ADDRESSES[1];
 const TXS_MATCH = [TXS[1], TXS[3]];
 
 describe('CoinjoinMempoolController', () => {
@@ -44,35 +44,34 @@ describe('CoinjoinMempoolController', () => {
     });
 
     it('Progressing', async () => {
-        for (const tx of [TXS[0], TXS[1]]) {
-            if (tx) client.fireTx(tx);
-        }
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        [TXS[0], TXS[1]].forEach(client.fireTx.bind(client));
         expect(mempool.getTransactions()).toEqual([]);
 
         await mempool.start();
-        for (const tx of [TXS[2], TXS[3]]) {
-            if (tx) client.fireTx(tx);
-        }
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        [TXS[2], TXS[3]].forEach(client.fireTx.bind(client));
         expect(mempool.getTransactions()).toEqual([TXS[2], TXS[3]]);
 
-        client.setMempoolTxs(
-            [TXS[1], TXS[2], TXS[3]].filter((t): t is NonNullable<typeof t> => !!t),
-        );
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        client.setMempoolTxs([TXS[1], TXS[2], TXS[3]]);
         await mempool.update(true);
         expect(mempool.getTransactions()).toEqual([TXS[2], TXS[3]]);
 
-        if (TXS[4]) client.fireTx(TXS[4]);
-        client.setMempoolTxs(
-            [TXS[3], TXS[4], TXS[5]].filter((t): t is NonNullable<typeof t> => !!t),
-        );
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        [TXS[4]].forEach(client.fireTx.bind(client));
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        client.setMempoolTxs([TXS[3], TXS[4], TXS[5]]);
         await mempool.update(true);
         expect(mempool.getTransactions()).toEqual([TXS[3], TXS[4]]);
 
-        if (TXS[5]) client.fireTx(TXS[5]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        [TXS[5]].forEach(client.fireTx.bind(client));
         await mempool.update(true);
         expect(mempool.getTransactions()).toEqual([TXS[3], TXS[4], TXS[5]]);
 
-        client.setMempoolTxs([TXS[0], TXS[1]].filter((t): t is NonNullable<typeof t> => !!t));
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        client.setMempoolTxs([TXS[0], TXS[1]]);
         await mempool.update(true);
         expect(mempool.getTransactions()).toEqual([]);
     });
@@ -82,8 +81,7 @@ describe('CoinjoinMempoolController', () => {
             client,
             network: networks.regtest,
             filter: address =>
-                address === (SEGWIT_RECEIVE_ADDRESSES[1] as string) ||
-                address === (SEGWIT_CHANGE_ADDRESSES[0] as string),
+                address === SEGWIT_RECEIVE_ADDRESSES[1] || address === SEGWIT_CHANGE_ADDRESSES[0],
         });
         client.setMempoolTxs(TXS);
         await mempool.init();
@@ -95,31 +93,30 @@ describe('CoinjoinMempoolController', () => {
         await mempool.init();
         expect(mempool.getTransactions()).toEqual(TXS);
 
-        mempool.removeTransactions([
-            (TXS[0] as (typeof TXS)[number]).txid,
-            (TXS[2] as (typeof TXS)[number]).txid,
-            'unknown',
-            (TXS[4] as (typeof TXS)[number]).txid,
-        ]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        mempool.removeTransactions([TXS[0].txid, TXS[2].txid, 'unknown', TXS[4].txid]);
         expect(mempool.getTransactions()).toEqual([TXS[1], TXS[3], TXS[5]]);
     });
 
     it('Replace-by-fee', async () => {
         const outpointCollision = { txid: 'foo', vout: 3 };
         const a1 = TXS[1];
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        a1.vin[0] = { ...a1.vin[0], ...outpointCollision };
         const b = TXS[2];
         const a2 = TXS[4];
-        if (!a1 || !b || !a2 || !a1.vin[0] || !a2.vin[1])
-            throw new Error('Missing test fixture data');
-        a1.vin[0] = { ...a1.vin[0], ...outpointCollision };
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         a2.vin[1] = { ...a2.vin[1], ...outpointCollision };
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         client.setMempoolTxs([a1]);
         await mempool.start();
         await mempool.init();
         expect(mempool.getTransactions()).toEqual([a1]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         client.fireTx(b);
         expect(mempool.getTransactions()).toEqual([a1, b]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         client.fireTx(a2);
         expect(mempool.getTransactions()).toEqual([b, a2]);
     });

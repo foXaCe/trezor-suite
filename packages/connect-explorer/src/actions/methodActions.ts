@@ -131,17 +131,12 @@ export const onCodeChange = (value: string) => (dispatch: Dispatch, getState: Ge
             if (field.type === 'array') {
                 // ensure the array has the correct number of items
                 if (value) {
-                    const firstBatch = field.batch[0];
                     for (let i = field.items.length; i < value.length; i++) {
-                        if (firstBatch) {
-                            dispatch(onBatchAdd(field, firstBatch.fields));
-                        }
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        dispatch(onBatchAdd(field, field.batch[0].fields));
                     }
                     for (let i = field.items.length; i > value.length; i--) {
-                        const item = field.items[i - 1];
-                        if (item) {
-                            dispatch(onBatchRemove(field, item));
-                        }
+                        dispatch(onBatchRemove(field, field.items[i - 1]));
                     }
                 }
 

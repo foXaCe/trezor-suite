@@ -103,14 +103,8 @@ export default class TronSignTransaction extends AbstractMethod<'tronSignTransac
 
         const path = validatePath(payload.path, 3);
 
-        const firstContract = payload.contract[0];
-        if (!firstContract) {
-            throw ERRORS.TypedError(
-                'Method_InvalidParameter',
-                'Missing contract in Tron transaction',
-            );
-        }
-        const contract = transformContract(firstContract);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const contract = transformContract(payload.contract[0]);
 
         const params = {
             tx: {

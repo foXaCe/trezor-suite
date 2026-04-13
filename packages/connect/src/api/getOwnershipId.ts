@@ -70,16 +70,18 @@ export default class GetOwnershipId extends AbstractMethod<
         };
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: MethodReturnType<typeof this.name> = [];
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
-            if (!batch) continue;
             const { message } = await cmd.typedCall('GetOwnershipId', 'OwnershipId', batch);
             responses.push({
                 ...message,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 path: batch.address_n,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 serializedPath: getSerializedPath(batch.address_n),
             });
 
@@ -95,15 +97,6 @@ export default class GetOwnershipId extends AbstractMethod<
             }
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw new Error('GetOwnershipId: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

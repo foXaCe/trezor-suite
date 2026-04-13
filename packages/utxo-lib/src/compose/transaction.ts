@@ -22,11 +22,8 @@ export function createTransaction<Input extends ComposeInput, Change extends Com
     request: ComposeRequest<Input, ComposeFinalOutput, Change>,
     result: CoinSelectSuccess,
 ): ComposedTransaction<Input, ComposeFinalOutput, Change> {
-    const convertedInputs = result.inputs.flatMap(input => {
-        const utxo = request.utxos[input.i];
+    const convertedInputs = result.inputs.map(input => request.utxos[input.i]);
 
-        return utxo ? [utxo] : [];
-    });
-
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     return strategyMap[request.sortingStrategy]({ result, request, convertedInputs });
 }

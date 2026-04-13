@@ -510,17 +510,25 @@ export const composeTransaction = async (api: TrezorConnect) => {
 
     if (precompose.success) {
         const tx = precompose.payload[0];
-        if (!tx) throw new Error('no tx');
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (tx.type === 'error') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             tx.error.toLowerCase();
         }
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (tx.type === 'nonfinal') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             tx.bytes.toFixed();
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             tx.feePerByte.toLowerCase();
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             tx.inputs.map((a: any) => a);
         }
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (tx.type === 'final') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             tx.inputs.map((a: any) => a);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             tx.outputs.map((a: any) => a);
         }
     } else {

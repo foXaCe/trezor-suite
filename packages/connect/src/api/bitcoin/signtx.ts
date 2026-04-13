@@ -52,16 +52,9 @@ const requestPrevTxInfo = ({
                 `requestPrevTxInfo: Requested unknown TXINPUT: ${tx_hash}`,
             );
 
-        const prevInput = tx.inputs[details.request_index];
-        if (!prevInput) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestPrevTxInfo: Requested unknown TXINPUT at index ${details.request_index}`,
-            );
-        }
-
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return typedCall('TxAckPrevInput', 'TxRequest', {
-            tx: { input: prevInput },
+            tx: { input: tx.inputs[details.request_index] },
         });
     }
     if (request_type === 'TXOUTPUT') {
@@ -72,16 +65,9 @@ const requestPrevTxInfo = ({
                 `requestPrevTxInfo: Requested unknown TXOUTPUT: ${tx_hash}`,
             );
 
-        const prevOutput = tx.bin_outputs[details.request_index];
-        if (!prevOutput) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestPrevTxInfo: Requested unknown TXOUTPUT at index ${details.request_index}`,
-            );
-        }
-
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return typedCall('TxAckPrevOutput', 'TxRequest', {
-            tx: { output: prevOutput },
+            tx: { output: tx.bin_outputs[details.request_index] },
         });
     }
     if (request_type === 'TXORIGINPUT') {
@@ -92,16 +78,9 @@ const requestPrevTxInfo = ({
                 `requestPrevTxInfo: Requested unknown TXORIGINPUT: ${tx_hash}`,
             );
 
-        const origInput = tx.inputs[details.request_index];
-        if (!origInput) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestPrevTxInfo: Requested unknown TXORIGINPUT at index ${details.request_index}`,
-            );
-        }
-
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return typedCall('TxAckInput', 'TxRequest', {
-            tx: { input: origInput },
+            tx: { input: tx.inputs[details.request_index] },
         });
     }
     if (request_type === 'TXORIGOUTPUT') {
@@ -112,16 +91,9 @@ const requestPrevTxInfo = ({
                 `requestPrevTxInfo: Requested unknown TXORIGOUTPUT: ${tx_hash}`,
             );
 
-        const origOutput = tx.outputs[details.request_index];
-        if (!origOutput) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestPrevTxInfo: Requested unknown TXORIGOUTPUT at index ${details.request_index}`,
-            );
-        }
-
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return typedCall('TxAckOutput', 'TxRequest', {
-            tx: { output: origOutput },
+            tx: { output: tx.outputs[details.request_index] },
         });
     }
     if (request_type === 'TXEXTRADATA') {
@@ -171,29 +143,15 @@ const requestSignedTxInfo = ({
     paymentRequests,
 }: SignTxHelperProps) => {
     if (request_type === 'TXINPUT') {
-        const input = inputs[details.request_index];
-        if (!input) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestSignedTxInfo: Requested unknown TXINPUT at ${details.request_index}`,
-            );
-        }
-
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return typedCall('TxAckInput', 'TxRequest', {
-            tx: { input },
+            tx: { input: inputs[details.request_index] },
         });
     }
     if (request_type === 'TXOUTPUT') {
-        const output = outputs[details.request_index];
-        if (!output) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestSignedTxInfo: Requested unknown TXOUTPUT at ${details.request_index}`,
-            );
-        }
-
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return typedCall('TxAckOutput', 'TxRequest', {
-            tx: { output },
+            tx: { output: outputs[details.request_index] },
         });
     }
     if (request_type === 'TXPAYMENTREQ') {
@@ -276,6 +234,7 @@ const processTxRequest = async (props: SignTxHelperProps): Promise<SignedTransac
 
     return processTxRequest({
         ...props,
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         txRequest: message,
     });
 };

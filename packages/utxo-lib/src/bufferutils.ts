@@ -79,7 +79,8 @@ export function writeInt64LE(buffer: Buffer, value: number, offset: number) {
     const v = new Int64LE(value);
     const a = v.toArray();
     for (let i = 0; i < 8; i++) {
-        buffer.writeUInt8(a[i] ?? 0, offset + i);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        buffer.writeUInt8(a[i], offset + i);
     }
 
     return offset + 8;

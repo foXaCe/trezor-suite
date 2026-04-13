@@ -57,7 +57,8 @@ const xor = (a: Buffer, b: Buffer) => {
     }
     const result = Buffer.alloc(a.length);
     for (let i = 0; i < a.length; i++) {
-        result[i] = (a[i] ?? 0) ^ (b[i] ?? 0);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        result[i] = a[i] ^ b[i];
     }
 
     return result;
@@ -151,15 +152,13 @@ export const verifyEntropy = async ({
 
         // derive xpubs and compare with FW results
         const node = bip32.fromSeed(seed);
-        for (const path of Object.keys(xpubs)) {
-            const expectedXpub = xpubs[path];
-            if (expectedXpub === undefined) continue;
+        Object.keys(xpubs).forEach(path => {
             const pubKey = node.derivePath(path);
             const xpub = pubKey.neutered().toBase58();
-            if (xpub !== expectedXpub) {
+            if (xpub !== xpubs[path]) {
                 throw new Error('verifyEntropy xpub mismatch');
             }
-        }
+        });
 
         return { success: true as const };
     } catch (error) {

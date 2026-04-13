@@ -26,9 +26,9 @@ const generateTx = (vin: any[], vout: any[]) => {
 const calcAnonymity = (transactions: any[]) => {
     const anonymity: Record<string, number> = {};
     const calc = (vinvout: any) => {
-        const existing = anonymity[vinvout.Address];
-        if (typeof existing === 'number') {
-            anonymity[vinvout.Address] = existing + 1;
+        if (typeof anonymity[vinvout.Address] === 'number') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            anonymity[vinvout.Address] += 1;
         } else {
             anonymity[vinvout.Address] = 1;
         }

@@ -44,9 +44,9 @@ export async function findProcessFromIncomingPort(
                     (!filterSelf || !line.includes(` ${process.pid} `)), // Filter out self
             );
             if (processLine) {
-                const parts = processLine.split(/\s+/);
-                const name = (parts[0] ?? '').replace(/\\x\d{2}/g, ' ');
-                const pid = parts[1] ?? '';
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                const name = processLine.split(/\s+/)[0].replace(/\\x\d{2}/g, ' ');
+                const pid = processLine.split(/\s+/)[1];
 
                 if (process.platform === 'darwin') {
                     const fullPathCommand = `ps -p ${pid} -o comm=`;
@@ -55,19 +55,23 @@ export async function findProcessFromIncomingPort(
                     const appPathRegex = /^(\/Users\/[^/]*)?\/Applications\/([^/]*)\.app\//;
                     const appPathMatch = fullPath.match(appPathRegex);
                     if (appPathMatch) {
-                        const appName = appPathMatch[2] ?? name;
+                        const appName = appPathMatch[2];
 
-                        return { name: appName, pid, fullPath: appPathMatch[0] ?? fullPath };
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        return { name: appName, pid, fullPath: appPathMatch[0] };
                     } else {
                         // Binary in unusual location, show warning
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         return { name, pid, fullPath, warning: true };
                     }
                 } else {
                     const fullPathCommand = `cat /proc/${pid}/cmdline`;
                     const fullPathRaw = await spawnAndCollectStdout(fullPathCommand);
-                    const fullPath = (fullPathRaw.split('\0')[0] ?? '').trim();
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    const fullPath = fullPathRaw.split('\0')[0].trim();
                     // Binaries can be all over the place on Linux, so we don't check the path
 
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     return { name, pid, fullPath };
                 }
             }
@@ -81,11 +85,12 @@ export async function findProcessFromIncomingPort(
             const record = lines
                 .map(line => {
                     const parts = line.trim().split(/\s+/);
-                    const pid = parts[parts.length - 1] ?? '';
-                    const local = parts[1] ?? '';
+                    const pid = parts[parts.length - 1];
+                    const local = parts[1];
 
                     return { pid, local };
                 })
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 .find(({ local }) => local.endsWith(`:${port}`));
             if (record) {
                 // Extract the app name from the full path on Windows
@@ -98,9 +103,11 @@ export async function findProcessFromIncomingPort(
                     /^(?:[A-Z]:\\(?:Program Files(?: \(x86\))?|Windows(?:\\(?:System32|SysWOW64))?|Users\\[^\\]+\\AppData\\(?:Local(?:\\Programs)?|Roaming))\\[^:*?"<>|\r\n]+\.exe)$/;
                 const appPathMatch = fullPath.match(appPathRegex);
                 if (appPathMatch) {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     return { name: appName, pid: record.pid, fullPath };
                 } else {
                     // Binary in unusual location, show warning
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     return { name: appName, pid: record.pid, fullPath, warning: true };
                 }
             }

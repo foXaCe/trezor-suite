@@ -76,7 +76,8 @@ describe('Status', () => {
         await status.start();
         expect(setTimeoutSpy).toHaveBeenLastCalledWith(expect.any(Function), STATUS_TIMEOUT.idle);
 
-        expect(setTimeoutSpy.mock.calls[0]?.[1]).toEqual(STATUS_TIMEOUT.idle);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(setTimeoutSpy.mock.calls[0][1]).toEqual(STATUS_TIMEOUT.idle);
 
         status.setMode('enabled');
         expect(setTimeoutSpy).toHaveBeenLastCalledWith(
@@ -144,18 +145,22 @@ describe('Status', () => {
         });
 
         expect(coordinatorRequestSpy).toHaveBeenCalledTimes(1); // status fetched once on start
-        expect(setTimeoutSpy.mock.calls[0]?.[1]).toEqual(half); // setTimeout is set to ~1500ms (half of defaultTimeout > coinjoinRound.phaseDeadline)
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(setTimeoutSpy.mock.calls[0][1]).toEqual(half); // setTimeout is set to ~1500ms (half of defaultTimeout > coinjoinRound.phaseDeadline)
 
         await fastForward(half);
 
         expect(coordinatorRequestSpy).toHaveBeenCalledTimes(2);
-        expect(setTimeoutSpy.mock.calls[1]?.[1]).toBeGreaterThan(half); // setTimeout is set to ~2500ms (half of defaultTimeout < coinjoinRound.phaseDeadline < defaultTimeout)
-        expect(setTimeoutSpy.mock.calls[1]?.[1]).toBeLessThanOrEqual(half + 2500);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(setTimeoutSpy.mock.calls[1][1]).toBeGreaterThan(half); // setTimeout is set to ~2500ms (half of defaultTimeout < coinjoinRound.phaseDeadline < defaultTimeout)
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(setTimeoutSpy.mock.calls[1][1]).toBeLessThanOrEqual(half + 2500);
 
         await fastForward(half + 2500);
 
         expect(coordinatorRequestSpy).toHaveBeenCalledTimes(3);
-        expect(setTimeoutSpy.mock.calls[2]?.[1]).toEqual(STATUS_TIMEOUT.enabled); // setTimeout is set to 3000ms (coinjoinRound.phaseDeadline > defaultTimeout)
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(setTimeoutSpy.mock.calls[2][1]).toEqual(STATUS_TIMEOUT.enabled); // setTimeout is set to 3000ms (coinjoinRound.phaseDeadline > defaultTimeout)
     });
 
     it('Status identities', async () => {

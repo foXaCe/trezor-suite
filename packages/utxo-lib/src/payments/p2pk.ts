@@ -45,6 +45,7 @@ export function p2pk(a: Payment, opts?: PaymentOpts): Payment {
     lazy.prop(o, 'output', () => {
         if (!a.pubkey) return;
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return bscript.compile([a.pubkey, OPS.OP_CHECKSIG]);
     });
     lazy.prop(o, 'pubkey', () => {

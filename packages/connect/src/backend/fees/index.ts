@@ -31,8 +31,8 @@ export const getOrInitFeeLevels = (coinInfo: CoinInfo): MiscFeeLevels => {
         instancesPerCoin[shortcut] = feeLevelsPerTypeFactory(coinInfo);
     }
 
-    // Safe to access: we just ensured the key exists above
-    return instancesPerCoin[shortcut] ?? feeLevelsPerTypeFactory(coinInfo);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    return instancesPerCoin[shortcut];
 };
 
 export const getOrInitBitcoinFeeLevels = (coinInfo: BitcoinNetworkInfo) =>

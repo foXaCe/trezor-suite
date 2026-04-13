@@ -36,7 +36,7 @@ export const bigEndianBytesToBigInt = (bytes: Uint8Array): bigint => {
     const result: bigint[] = [];
     const { length } = bytes;
     for (let i = 0; i < length; i++) {
-        // @ts-expect-error noUncheckedIndexedAccess: low-level byte manipulation with known bounds
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         result.push(BigInt(bytes[i] * 256 ** (length - (1 + i))));
     }
 
@@ -47,7 +47,7 @@ export const bigEndianBytesToBigInt = (bytes: Uint8Array): bigint => {
 export const littleEndianBytesToBigInt = (bytes: Uint8Array): bigint => {
     let result = 0n;
     for (let i = 0; i < bytes.length; i++) {
-        // @ts-expect-error noUncheckedIndexedAccess: low-level byte manipulation with known bounds
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         result += BigInt(bytes[i]) << (8n * BigInt(i));
     }
 

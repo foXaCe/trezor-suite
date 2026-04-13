@@ -72,9 +72,8 @@ export default class MoneroGetAddress extends AbstractMethod<'moneroGetAddress',
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
-            const currentParam = this.params[this.progress];
-            if (!currentParam) return;
-            const { proto, address } = currentParam;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const { proto, address } = this.params[this.progress];
 
             return {
                 type: 'address' as const,
@@ -103,47 +102,46 @@ export default class MoneroGetAddress extends AbstractMethod<'moneroGetAddress',
         return { address };
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run() {
         const responses: Address[] = [];
 
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
-            if (!batch) continue;
             // silently get address and compare with requested address
             // or display as default inside popup
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (batch.proto.show_display) {
                 const silent = await this._call({
                     ...batch,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     proto: { ...batch.proto, show_display: false },
                 });
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 if (typeof batch.address === 'string') {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     if (batch.address !== silent.address) {
                         throw ERRORS.TypedError('Method_AddressNotMatch');
                     }
                 } else {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     batch.address = silent.address;
                 }
             }
 
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const response = await this._call(batch);
             responses.push({
                 address: response.address,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 path: batch.proto.address_n,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 serializedPath: getSerializedPath(batch.proto.address_n),
             });
 
             this.progress++;
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw ERRORS.TypedError('Runtime', 'MoneroGetAddress: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

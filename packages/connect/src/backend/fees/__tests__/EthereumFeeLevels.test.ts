@@ -6,13 +6,6 @@ import { getEthereumNetwork, parseCoinsJson } from '../../../data/coinInfo';
 import { initBlockchain } from '../../BlockchainLink';
 import { EthereumFeeLevels } from '../EthereumFeeLevels';
 
-const getEthereumNetworkOrThrow = (name: string) => {
-    const network = getEthereumNetwork(name);
-    if (!network) throw new Error(`missing network: ${name}`);
-
-    return network;
-};
-
 describe('api/ethereum/Fees', () => {
     parseCoinsJson({ ...coinsJSON, ...coinsJSONEth });
 
@@ -54,7 +47,7 @@ describe('api/ethereum/Fees', () => {
     /*  1) Ethereum mainnet – EIP-1559 happy-path                             */
     /* ---------------------------------------------------------------------- */
     it('Ethereum smart FeeLevels (EIP-1559) – exact match', async () => {
-        const coinInfo = getEthereumNetworkOrThrow('eth');
+        const coinInfo = getEthereumNetwork('eth')!;
 
         const spy = jest
             .spyOn(BlockchainLink.prototype, 'estimateFee')
@@ -81,7 +74,7 @@ describe('api/ethereum/Fees', () => {
     /* ---------------------------------------------------------------------- */
     describe('Ethereum smart FeeLevels – clamp edge-cases', () => {
         it('clamps to minFee when backend returns feePerUnit = 0', async () => {
-            const coinInfo = getEthereumNetworkOrThrow('eth');
+            const coinInfo = getEthereumNetwork('eth')!;
             const spy = jest
                 .spyOn(BlockchainLink.prototype, 'estimateFee')
                 .mockResolvedValue([{ feePerUnit: '0' }]);
@@ -89,10 +82,10 @@ describe('api/ethereum/Fees', () => {
             const backend = await initBlockchain(coinInfo, () => {});
             const feeLevels = new EthereumFeeLevels(coinInfo);
 
-            const level = (await feeLevels.load(backend, ETH_REQUEST))[0];
-            if (!level) throw new Error('missing level');
+            const [level] = await feeLevels.load(backend, ETH_REQUEST);
 
             // 0.1 Gwei → 0.1 × 1e9 = 100 000 000 wei
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             expect(level.feePerUnit).toBe('100000000');
 
             backend.disconnect();
@@ -108,11 +101,11 @@ describe('api/ethereum/Fees', () => {
             const backend = await initBlockchain(coinInfo, () => {});
             const feeLevels = new EthereumFeeLevels(coinInfo);
 
-            const levels = await feeLevels.load(backend, ETH_REQUEST);
-            const level = levels[0];
+            const [level] = await feeLevels.load(backend, ETH_REQUEST);
 
             // must be an integer wei string — fromWei("1500000000.7", 'gwei') would crash
-            expect(level?.feePerUnit).toMatch(/^\d+$/);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            expect(level.feePerUnit).toMatch(/^\d+$/);
 
             backend.disconnect();
             spy.mockRestore();
@@ -150,7 +143,7 @@ describe('api/ethereum/Fees', () => {
         });
 
         it('clamps to maxFee when backend returns over-limit value', async () => {
-            const coinInfo = getEthereumNetworkOrThrow('eth');
+            const coinInfo = getEthereumNetwork('eth')!;
             const overLimit = (coinInfo.maxFee * 1e9 * 10).toFixed(0); // 10× max
             const spy = jest
                 .spyOn(BlockchainLink.prototype, 'estimateFee')
@@ -159,10 +152,10 @@ describe('api/ethereum/Fees', () => {
             const backend = await initBlockchain(coinInfo, () => {});
             const feeLevels = new EthereumFeeLevels(coinInfo);
 
-            const level = (await feeLevels.load(backend, ETH_REQUEST))[0];
-            if (!level) throw new Error('missing level');
+            const [level] = await feeLevels.load(backend, ETH_REQUEST);
 
             // maxFee = 10 000 Gwei → 10 000 × 1e9 = 10 000 000 000 000 wei
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             expect(level.feePerUnit).toBe('10000000000000');
 
             backend.disconnect();
@@ -174,7 +167,7 @@ describe('api/ethereum/Fees', () => {
     /*  3) BNB Smart Chain – legacy gasPrice                                  */
     /* ---------------------------------------------------------------------- */
     it('BSC smart FeeLevels (legacy gasPrice)', async () => {
-        const coinInfo = getEthereumNetworkOrThrow('bsc');
+        const coinInfo = getEthereumNetwork('bsc')!;
 
         const spy = jest
             .spyOn(BlockchainLink.prototype, 'estimateFee')
@@ -186,9 +179,12 @@ describe('api/ethereum/Fees', () => {
         const smartLevels = await feeLevels.load(backend, ETH_REQUEST);
 
         expect(smartLevels).toHaveLength(1);
-        expect(smartLevels?.[0]?.label).toBe('normal');
-        expect(smartLevels?.[0]?.feePerUnit).toBe('5000000000');
-        expect(smartLevels?.[0]?.feeLimit).toBe('21000');
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(smartLevels?.[0].label).toBe('normal');
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(smartLevels?.[0].feePerUnit).toBe('5000000000');
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        expect(smartLevels?.[0].feeLimit).toBe('21000');
 
         backend.disconnect();
         spy.mockRestore();
@@ -198,7 +194,7 @@ describe('api/ethereum/Fees', () => {
     /*  4) minPriorityFeePerGas clamp (Polygon – 30 Gwei floor)           */
     /* ------------------------------------------------------------------ */
     it('Polygon – adjusts maxFeePerGas & priority tip up to minPriorityFee (30 Gwei)', async () => {
-        const coinInfo = getEthereumNetworkOrThrow('pol');
+        const coinInfo = getEthereumNetwork('pol')!;
 
         const LOW_LIMIT_RESPONSE = [
             {
@@ -245,7 +241,7 @@ describe('api/ethereum/Fees', () => {
     });
 
     it('keeps previous state when backend throws', async () => {
-        const coinInfo = getEthereumNetworkOrThrow('eth');
+        const coinInfo = getEthereumNetwork('eth')!;
         const spy = jest
             .spyOn(BlockchainLink.prototype, 'estimateFee')
             .mockRejectedValue(new Error('backend down'));

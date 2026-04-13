@@ -17,11 +17,8 @@ const EMPTY_BUFFER = Buffer.alloc(0);
 function stacksEqual(a: Buffer[], b: Buffer[]): boolean {
     if (a.length !== b.length) return false;
 
-    return a.every((x, i) => {
-        const bItem = b[i];
-
-        return bItem !== undefined && x.equals(bItem);
-    });
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    return a.every((x, i) => x.equals(b[i]));
 }
 
 function chunkHasUncompressedPubkey(chunk: StackElement): boolean {
@@ -103,6 +100,7 @@ export function p2wsh(a: Payment, opts?: PaymentOpts): Payment {
     lazy.prop(o, 'output', () => {
         if (!o.hash) return;
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return bscript.compile([OPS.OP_0, o.hash]);
     });
     lazy.prop(o, 'redeem', () => {
@@ -213,11 +211,13 @@ export function p2wsh(a: Payment, opts?: PaymentOpts): Payment {
         }
 
         if (a.witness && a.witness.length > 0) {
-            const wScript = a.witness[a.witness.length - 1] ?? Buffer.alloc(0);
+            const wScript = a.witness[a.witness.length - 1];
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (a.redeem && a.redeem.output && !a.redeem.output.equals(wScript))
                 throw new TypeError('Witness and redeem.output mismatch');
             if (
                 a.witness.some(chunkHasUncompressedPubkey) ||
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 (bscript.decompile(wScript) || []).some(chunkHasUncompressedPubkey)
             )
                 throw new TypeError('Witness contains uncompressed pubkey');

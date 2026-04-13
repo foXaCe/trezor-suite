@@ -6,8 +6,7 @@ import { getReleaseInfo } from '../firmwareInfo';
 
 const { getDeviceFeatures, releasesT2T1 } = global.JestMocks;
 
-const latestT2T1 = releasesT2T1[0];
-if (!latestT2T1) throw new Error('missing T2T1 release');
+const [latestT2T1] = releasesT2T1;
 
 const fixtures = [
     {
@@ -47,6 +46,7 @@ const fixtures = [
             },
             isRequired: true,
             isNewer: true,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT2T1.translations,
         },
     },

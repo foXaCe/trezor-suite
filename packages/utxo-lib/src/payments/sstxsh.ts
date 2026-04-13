@@ -44,6 +44,7 @@ export function sstxsh(a: Payment, opts?: PaymentOpts): Payment {
     lazy.prop(o, 'output', () => {
         if (!o.hash) return;
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return bscript.compile([OPS.OP_SSTX, OPS.OP_HASH160, o.hash, OPS.OP_EQUAL]);
     });
 

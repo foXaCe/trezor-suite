@@ -144,15 +144,14 @@ export class BackendManager {
     private patchCoinInfo(coinInfo: CoinInfo): CoinInfo {
         const custom = this.custom[coinInfo.shortcut];
         const preferred = this.preferred[coinInfo.shortcut];
-        const url = preferred ? [preferred] : (custom?.url ?? coinInfo.blockchainLink?.url ?? []);
-
-        const baseLink = coinInfo.blockchainLink ?? { type: '', url: [] };
+        const url = preferred ? [preferred] : (custom?.url ?? coinInfo.blockchainLink?.url);
 
         return {
             ...coinInfo,
             blockchainLink: {
-                ...baseLink,
-                ...(custom ? custom : {}),
+                ...coinInfo.blockchainLink,
+                ...custom,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 url,
             },
         };

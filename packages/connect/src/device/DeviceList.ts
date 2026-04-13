@@ -35,15 +35,15 @@ const createAuthPenaltyManager = (priority: number) => {
     const get = () =>
         100 * priority +
         Object.keys(penalizedDevices).reduce(
-            (penalty, key) => Math.max(penalty, penalizedDevices[key] ?? 0),
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            (penalty, key) => Math.max(penalty, penalizedDevices[key]),
             0,
         );
 
     const add = (device: Device) => {
         if (!device.isInitialized() || device.isBootloader() || !device.features.device_id) return;
         const deviceID = device.features.device_id;
-        const currentPenalty = penalizedDevices[deviceID];
-        const penalty = currentPenalty ? currentPenalty + 500 : 2000;
+        const penalty = penalizedDevices[deviceID] ? penalizedDevices[deviceID] + 500 : 2000;
         penalizedDevices[deviceID] = Math.min(penalty, 5000);
     };
 
@@ -228,10 +228,7 @@ export class DeviceList extends TypedEmitter<DeviceListEvents> implements IDevic
 
     private onBatteryLevel(event: { id: string; data: number[] }) {
         const device = this.devices.find(d => d.descriptor.id === event.id);
-        const batteryLevel = event.data[0];
-        if (device && batteryLevel !== undefined) {
-            device.updateFeature('soc', batteryLevel);
-        }
+        device?.updateFeature('soc', event.data[0]);
     }
 
     private getOrCreateTransportManager(apiType: TransportApiType) {
@@ -367,7 +364,8 @@ export class DeviceList extends TypedEmitter<DeviceListEvents> implements IDevic
     }
 
     getDeviceByStaticState(state: StaticSessionId): Device | undefined {
-        const deviceId = state.split('@')[1]?.split(':')[0] ?? '';
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const deviceId = state.split('@')[1].split(':')[0];
 
         return this.getPrioritizedDevices().find(d => d.features?.device_id === deviceId);
     }

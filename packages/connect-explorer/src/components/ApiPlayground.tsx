@@ -96,10 +96,11 @@ export const ApiPlayground = ({ options }: ApiPlaygroundProps) => {
 
     useEffect(() => {
         const option = options[selectedOption];
-        if (!option) return;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if ('legacyConfig' in option) {
             actions.onSetMethod(option.legacyConfig);
         } else {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const { method, schema } = option;
             actions.onSetSchema(method, schema ?? Object({}));
         }
@@ -135,7 +136,8 @@ export const ApiPlayground = ({ options }: ApiPlaygroundProps) => {
                                         label="Select method"
                                         value={{
                                             value: selectedOption,
-                                            label: options[selectedOption]?.title ?? '',
+                                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                                            label: options[selectedOption].title,
                                         }}
                                         onChange={option => setSelectedOption(option.value)}
                                         options={options.map((option, index) => ({

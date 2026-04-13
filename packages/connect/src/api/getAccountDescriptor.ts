@@ -81,28 +81,28 @@ export default class GetAccountDescriptor extends AbstractMethod<
             [coin: string]: { coinInfo: CoinInfo; values: DerivationPath[] };
         } = {};
         this.params.forEach(b => {
-            const existing = keys[b.coinInfo.label];
-            if (!existing) {
+            if (!keys[b.coinInfo.label]) {
                 keys[b.coinInfo.label] = {
                     coinInfo: b.coinInfo,
-                    values: [b.address_n],
+                    values: [],
                 };
-            } else {
-                existing.values.push(b.address_n);
             }
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            keys[b.coinInfo.label].values.push(b.address_n);
         });
 
         // prepare html for popup
         const str: string[] = [];
         Object.keys(keys).forEach((k, _i, _a) => {
             const details = keys[k];
-            if (!details) return;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             details.values.forEach(acc => {
                 str.push(k);
                 str.push(' ');
                 if (typeof acc === 'string') {
                     str.push(acc);
                 } else {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     str.push(getAccountLabel(acc, details.coinInfo));
                 }
             });
@@ -122,12 +122,11 @@ export default class GetAccountDescriptor extends AbstractMethod<
         // find invalid ranges
         const invalid = [];
         for (let i = 0; i < this.params.length; i++) {
-            const batch = this.params[i];
-            if (!batch) continue;
             // set FW range for current batch
             this.firmwareRange = getFirmwareRange(
                 this.name,
-                batch.coinInfo,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                this.params[i].coinInfo,
                 DEFAULT_FIRMWARE_RANGE,
             );
             const exception = super.checkFirmwareRange();
@@ -135,7 +134,8 @@ export default class GetAccountDescriptor extends AbstractMethod<
                 invalid.push({
                     index: i,
                     exception,
-                    coin: batch.coin,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    coin: this.params[i].coin,
                 });
             }
         }
@@ -169,7 +169,6 @@ export default class GetAccountDescriptor extends AbstractMethod<
 
         for (let i = 0; i < this.params.length; i++) {
             const request = this.params[i];
-            if (!request) continue;
 
             if (this.disposed) break;
 
@@ -177,8 +176,11 @@ export default class GetAccountDescriptor extends AbstractMethod<
                 const { descriptor, address_n, legacyXpub } = await this.getDevice()
                     .getCommands()
                     .getAccountDescriptor(
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         request.coinInfo,
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         request.address_n,
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         request.derivationType,
                     );
                 const response = {
@@ -202,16 +204,7 @@ export default class GetAccountDescriptor extends AbstractMethod<
 
         if (this.disposed) return new Promise<typeof responses>(() => []);
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse == null) {
-            throw ERRORS.TypedError('Runtime', 'GetAccountDescriptor: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0]!;
     }
 
     dispose() {

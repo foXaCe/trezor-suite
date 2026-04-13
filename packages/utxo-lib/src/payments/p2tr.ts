@@ -114,6 +114,7 @@ export function p2tr(a: Payment, opts?: PaymentOpts): Payment {
     lazy.prop(o, 'output', () => {
         if (!o.hash) return;
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return bscript.compile([OPS.OP_1, o.hash]);
     });
 

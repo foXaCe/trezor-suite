@@ -20,26 +20,12 @@ const requestPrevTxInfo = ({
         throw ERRORS.TypedError('Runtime', `requestPrevTxInfo: bin_outputs not set tx: ${tx_hash}`);
     }
     if (request_type === 'TXINPUT') {
-        const input = tx.inputs[details.request_index];
-        if (!input) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestPrevTxInfo: Requested unknown TXINPUT at index ${details.request_index}`,
-            );
-        }
-
-        return { inputs: [input] };
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        return { inputs: [tx.inputs[details.request_index]] };
     }
     if (request_type === 'TXOUTPUT') {
-        const output = tx.bin_outputs[details.request_index];
-        if (!output) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestPrevTxInfo: Requested unknown TXOUTPUT at index ${details.request_index}`,
-            );
-        }
-
-        return { bin_outputs: [output] };
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        return { bin_outputs: [tx.bin_outputs[details.request_index]] };
     }
     if (request_type === 'TXEXTRADATA') {
         if (typeof details.extra_data_len !== 'number') {
@@ -92,26 +78,12 @@ const requestSignedTxInfo = ({
     outputs,
 }: SignTxHelperProps): PROTO.TxAckResponse => {
     if (request_type === 'TXINPUT') {
-        const input = inputs[details.request_index];
-        if (!input) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestSignedTxInfo: Requested unknown TXINPUT at index ${details.request_index}`,
-            );
-        }
-
-        return { inputs: [input] };
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        return { inputs: [inputs[details.request_index]] };
     }
     if (request_type === 'TXOUTPUT') {
-        const output = outputs[details.request_index];
-        if (!output) {
-            throw ERRORS.TypedError(
-                'Runtime',
-                `requestSignedTxInfo: Requested unknown TXOUTPUT at index ${details.request_index}`,
-            );
-        }
-
-        return { outputs: [output] };
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        return { outputs: [outputs[details.request_index]] };
     }
     if (request_type === 'TXMETA') {
         throw ERRORS.TypedError(

@@ -53,10 +53,9 @@ backends.forEach((b, i) => {
 
         beforeEach(async () => {
             server = await BackendWebsocketServerMock.create(b.type);
-            const backend = backends[i];
-            if (!backend) throw new Error('Missing backend');
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             blockchain = new BlockchainLink({
-                ...backend,
+                ...backends[i],
                 timeout: 1000,
                 server: [`ws://localhost:${server.options.port}`],
                 debug: false,

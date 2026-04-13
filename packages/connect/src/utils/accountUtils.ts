@@ -47,13 +47,9 @@ export const getAccountAddressN = (
 
 export const getAccountLabel = (path: number[], coinInfo: CoinInfo) => {
     if (coinInfo.type === 'bitcoin') {
-        if (path[0] === undefined || path[2] === undefined) {
-            throw ERRORS.TypedError(
-                'Method_InvalidParameter',
-                'Invalid BIP44 path: missing purpose or account index',
-            );
-        }
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const accountType = fromHardened(path[0]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const account = fromHardened(path[2]);
         let prefix = '';
 
@@ -67,12 +63,7 @@ export const getAccountLabel = (path: number[], coinInfo: CoinInfo) => {
 
         return `${prefix} account #${account + 1}`;
     }
-    if (path[4] === undefined) {
-        throw ERRORS.TypedError(
-            'Method_InvalidParameter',
-            'Invalid BIP44 path: missing account index at path[4]',
-        );
-    }
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const account = fromHardened(path[4]);
 
     return `account #${account + 1}`;
@@ -88,36 +79,19 @@ export const getPublicKeyLabel = (path: number[], coinInfo?: BitcoinNetworkInfo)
         coinLabel = getCoinName(path);
     }
 
-    if (path[0] === undefined) {
-        throw ERRORS.TypedError(
-            'Method_InvalidParameter',
-            'Invalid BIP44 path: missing purpose element',
-        );
-    }
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const p1 = fromHardened(path[0]);
-    let account = -1;
-    if (path.length >= 3) {
-        if (path[2] === undefined) {
-            throw ERRORS.TypedError(
-                'Method_InvalidParameter',
-                'Invalid BIP44 path: missing account element',
-            );
-        }
-        account = fromHardened(path[2]);
-    }
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    let account = path.length >= 3 ? fromHardened(path[2]) : -1;
     let realAccountId = account + 1;
     let prefix = 'Export public key';
     let accountType = '';
 
     // Copay id
     if (p1 === 45342) {
-        if (path[1] === undefined || path[3] === undefined) {
-            throw ERRORS.TypedError(
-                'Method_InvalidParameter',
-                'Invalid Copay BIP44 path: missing elements',
-            );
-        }
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const p2 = fromHardened(path[1]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         account = fromHardened(path[3]);
         realAccountId = account + 1;
         prefix = 'Export Copay ID of';

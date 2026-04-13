@@ -148,11 +148,11 @@ export class SessionsBackground
             if (!this.pathInternalPathPublicMap[d.path]) {
                 this.pathInternalPathPublicMap[d.path] = PathPublic(`${(this.lastPathId += 1)}`);
             }
-            const pathPublic = this.pathInternalPathPublicMap[d.path];
-            if (!this.descriptors[d.path] && pathPublic) {
+            if (!this.descriptors[d.path]) {
                 this.descriptors[d.path] = {
                     ...d,
-                    path: pathPublic,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                    path: this.pathInternalPathPublicMap[d.path],
                     session: null,
                     apiType: d.apiType,
                 };
@@ -230,12 +230,10 @@ export class SessionsBackground
     }
 
     private releaseDone(payload: ReleaseDoneRequest) {
-        const descriptor = this.descriptors[payload.path];
-        if (!descriptor) {
-            return error({ code: ERRORS.DEVICE_NOT_FOUND });
-        }
-        descriptor.session = null;
-        descriptor.sessionOwner = undefined;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        this.descriptors[payload.path].session = null;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        this.descriptors[payload.path].sessionOwner = undefined;
 
         this.clearLock();
 
@@ -279,12 +277,10 @@ export class SessionsBackground
     private clearLock() {
         const lock = this.locksQueue[0];
         if (lock) {
-            lock.dfd.resolve(undefined);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            this.locksQueue[0].dfd.resolve(undefined);
             this.locksQueue.shift();
-            const timeout = this.locksTimeoutQueue[0];
-            if (timeout) {
-                clearTimeout(timeout);
-            }
+            clearTimeout(this.locksTimeoutQueue[0]);
             this.locksTimeoutQueue.shift();
         }
     }

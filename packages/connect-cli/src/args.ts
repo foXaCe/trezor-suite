@@ -44,18 +44,21 @@ const parseArgv = () => {
 
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
-        if (!arg) continue;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (arg.startsWith('--')) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const key = arg.slice(2);
             if (key.includes('=')) {
                 const [k, v] = key.split('=');
-                if (k && v) {
-                    add(k, v.toLowerCase());
-                }
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                add(k, v.toLowerCase());
             } else if (add(key, argv[i + 1])) i++;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
         } else if (arg.startsWith('-') && arg.length === 2) {
-            if (add(arg[1] ?? '', argv[i + 1])) i++;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            if (add(arg[1], argv[i + 1])) i++;
         } else {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             keys.push(arg);
         }
     }

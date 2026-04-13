@@ -2,7 +2,6 @@
 
 import {
     CipherKeyValue as CipherKeyValueSchema,
-    ERRORS,
     UI_REQUEST,
     createUiMessage,
 } from '@trezor/connect-common';
@@ -51,6 +50,7 @@ export default class CipherKeyValue extends AbstractMethod<
         return 'Cipher key value';
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: PROTO.CipheredKeyValue[] = [];
         const cmd = this.getDevice().getCommands();
@@ -74,14 +74,6 @@ export default class CipherKeyValue extends AbstractMethod<
             }
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-        const first = responses[0];
-        if (!first) {
-            throw ERRORS.TypedError('Runtime', 'CipherKeyValue: No response received');
-        }
-
-        return first;
+        return this.hasBundle ? responses : responses[0];
     }
 }

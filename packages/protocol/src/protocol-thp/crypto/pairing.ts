@@ -91,7 +91,7 @@ export const handleHandshakeInit = ({
     let [ck, k] = hkdf(getProtocolName(), point);
 
     // 6. Set trezor_masked_static_pubkey, success = AES-GCM-DECRYPT(key=k, IV=0^96 (bits, 12 bytes), ad=h, plaintext=encrypted_trezor_static_pubkey). Assert that success is True.
-    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     aes = aesgcm(k, iv0);
     aes.auth(h);
     const trezorStaticPubkey = trezorEncryptedStaticPubkey.subarray(0, 32);
@@ -101,11 +101,11 @@ export const handleHandshakeInit = ({
     h = hashOfTwo(h, trezorEncryptedStaticPubkey);
     // 8. Set ck, k = HKDF(ck, X25519(host_ephemeral_privkey, trezor_masked_static_pubkey))
     point = curve25519(hostEphemeralKeys.privateKey, trezorMaskedStaticPubkey);
-    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     [ck, k] = hkdf(ck, point);
 
     // 9. Set tag_of_empty_string, success = AES-GCM-DECRYPT(key=k, IV=0^96 (bits, 12 bytes), ad=h, plaintext=empty_string). Assert that success is True.
-    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     aes = aesgcm(k, iv0);
     aes.auth(h);
     aes.decrypt(Buffer.alloc(0), tag);
@@ -131,7 +131,7 @@ export const handleHandshakeInit = ({
         : randomBytes(32);
     const hostStaticKeys = getCurve25519KeyPair(staticKey);
     // 12. Set encrypted_host_static_pubkey = AES-GCM-ENCRYPT(key=k, IV=0^95 || 1, ad=h, plaintext=temp_host_static_pubkey).
-    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     aes = aesgcm(k, iv1);
     aes.auth(h);
     const hostEncryptedStaticPubkey = Buffer.concat([
@@ -142,14 +142,14 @@ export const handleHandshakeInit = ({
     h = hashOfTwo(h, hostEncryptedStaticPubkey);
     // 14. Set ck, k = HKDF(ck, X25519(temp_host_static_privkey, trezor_ephemeral_pubkey)).
     point = curve25519(hostStaticKeys.privateKey, trezorEphemeralPubkey);
-    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     [ck, k] = hkdf(ck, point);
     // 15. Set payload_binary = PROTOBUF-ENCODE(type=HandshakeCompletionReqNoisePayload, host_pairing_credential).
     const { message } = protobufEncoder('ThpHandshakeCompletionReqNoisePayload', {
         host_pairing_credential: credentials?.credential,
     });
     // 16. Set *encrypted_payload* = AES-GCM-ENCRYPT(*key*=*k*, *IV*=*0^96*, *ad*=*h*, *plaintext*=*payload_binary*).
-    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     aes = aesgcm(k, iv0);
     aes.auth(h);
     const encryptedPayload = Buffer.concat([aes.encrypt(message), aes.finish()]);
@@ -157,7 +157,7 @@ export const handleHandshakeInit = ({
 
     // HH2 and HH3
     // 1. Set key_request, key_response = HKDF(ck, empty_string).
-    // @ts-expect-error noUncheckedIndexedAccess: hkdf always returns exactly 2 elements
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const [hostKey, trezorKey] = hkdf(ck, Buffer.alloc(0));
 
     return {

@@ -6,11 +6,9 @@ type AddressPaths = {
     [address: string]: string;
 };
 
-const isCoinbaseUtxo = (tx: Transaction) => {
-    const firstVin = tx.details.vin[0];
-
-    return tx.details.vin.length === 1 && firstVin && !firstVin.isAddress && !firstVin.txid;
-};
+const isCoinbaseUtxo = (tx: Transaction) =>
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    tx.details.vin.length === 1 && !tx.details.vin[0].isAddress && !tx.details.vin[0].txid;
 
 const getHeightData = (tx: Transaction) =>
     tx.blockHeight && tx.blockHeight > 0
@@ -26,17 +24,13 @@ const getHeightData = (tx: Transaction) =>
 const getAddressData = (vout: VinVout, paths: AddressPaths) => {
     const address = vout.addresses?.[0] ?? throwError('Address is missing from tx output');
 
-    const derivationPath = paths[address];
-    if (derivationPath === undefined) {
-        throw new Error(`Derivation path not found for address: ${address}`);
-    }
-
     return {
         address,
-        path: derivationPath,
+        path: paths[address],
     };
 };
 
+// @ts-expect-error: indexing with noUncheckedIndexedAccess
 const transformUtxo = (vout: VinVout, tx: Transaction, paths: AddressPaths): Utxo => ({
     amount: vout.value ?? throwError('Value is missing from tx output'),
     vout: vout.n,

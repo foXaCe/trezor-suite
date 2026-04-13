@@ -70,27 +70,25 @@ export default class CardanoGetPublicKey extends AbstractMethod<'cardanoGetPubli
     }
 
     get confirmation() {
-        const firstParam = this.params[0];
-        const accountIndex = firstParam?.proto.address_n[2];
-
         return {
             view: 'export-xpub' as const,
             label:
-                this.params.length > 1 || !firstParam
+                this.params.length > 1
                     ? 'Export multiple Cardano public keys'
                     : `Export Cardano public key for account #${
-                          accountIndex !== undefined ? fromHardened(accountIndex) + 1 : '?'
+                          // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                          fromHardened(this.params[0].proto.address_n[2]) + 1
                       }`,
         };
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: MethodReturnType<typeof this.name> = [];
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
-            const param = this.params[i];
-            if (!param) continue;
-            const batch = param.proto;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const batch = this.params[i].proto;
             const { message } = await cmd.typedCall(
                 'CardanoGetPublicKey',
                 'CardanoPublicKey',
@@ -115,15 +113,6 @@ export default class CardanoGetPublicKey extends AbstractMethod<'cardanoGetPubli
             }
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw new Error('CardanoGetPublicKey: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

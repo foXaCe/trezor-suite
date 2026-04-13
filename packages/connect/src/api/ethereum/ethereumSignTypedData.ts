@@ -24,11 +24,11 @@ export function parseArrayType(arrayTypeName: string) {
             `typename ${arrayTypeName} could not be parsed as an EIP-712 array`,
         );
     }
-    const entryTypeName = arrayMatch[1] ?? '';
-    const arraySize = arrayMatch[2] ?? '';
+    const [_, entryTypeName, arraySize] = arrayMatch;
 
     return {
         entryTypeName,
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         arraySize: parseInt(arraySize, 10) || null,
     };
 }
@@ -106,8 +106,8 @@ export function encodeData(typeName: string, data: any) {
     }
     const numberMatch = paramTypeNumber.exec(typeName);
     if (numberMatch) {
-        const intType = numberMatch[1] ?? '';
-        const bits = numberMatch[2] ?? '0';
+        const [_, intType, bits] = numberMatch;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const bytes = Math.ceil(parseInt(bits, 10) / 8);
 
         return intToHex(data, bytes, intType === 'int');
@@ -142,12 +142,13 @@ export function getFieldType(
 ): PROTO.EthereumFieldType {
     const arrayMatch = paramTypeArray.exec(typeName);
     if (arrayMatch) {
-        const arrayItemTypeName = arrayMatch[1] ?? '';
-        const arraySize = arrayMatch[2] ?? '';
+        const [_, arrayItemTypeName, arraySize] = arrayMatch;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const entryType = getFieldType(arrayItemTypeName, types);
 
         return {
             data_type: PROTO.EthereumDataType.ARRAY,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             size: parseInt(arraySize, 10) || undefined,
             entry_type: entryType,
         };
@@ -155,21 +156,22 @@ export function getFieldType(
 
     const numberMatch = paramTypeNumber.exec(typeName);
     if (numberMatch) {
-        const type = numberMatch[1] ?? '';
-        const bits = numberMatch[2] ?? '0';
+        const [_, type, bits] = numberMatch;
 
         return {
             data_type: type === 'uint' ? PROTO.EthereumDataType.UINT : PROTO.EthereumDataType.INT,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             size: Math.floor(parseInt(bits, 10) / 8),
         };
     }
 
     const bytesMatch = paramTypeBytes.exec(typeName);
     if (bytesMatch) {
-        const size = bytesMatch[1] ?? '';
+        const [_, size] = bytesMatch;
 
         return {
             data_type: PROTO.EthereumDataType.BYTES,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             size: parseInt(size, 10) || undefined,
         };
     }
@@ -181,11 +183,11 @@ export function getFieldType(
         };
     }
 
-    const structType = types[typeName];
-    if (structType) {
+    if (typeName in types) {
         return {
             data_type: PROTO.EthereumDataType.STRUCT,
-            size: structType.length,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            size: types[typeName].length,
             struct_name: typeName,
         };
     }

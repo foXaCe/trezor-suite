@@ -28,13 +28,16 @@ background.on('releaseRequest', descriptor => {
 
 self.onconnect = function (e) {
     const port = e.ports[0];
-    if (!port) return;
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     ports.push(port);
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     port.addEventListener('message', e => {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         handleMessage(e.data, port);
     });
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     port.start();
 };

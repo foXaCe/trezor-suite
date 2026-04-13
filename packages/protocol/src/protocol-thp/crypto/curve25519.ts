@@ -44,7 +44,7 @@ const getConstants = (): {
 function littleEndianBytesToBigInt(bytes: Uint8Array): bigint {
     let result = 0n;
     for (let i = 0; i < bytes.length; i++) {
-        // @ts-expect-error noUncheckedIndexedAccess: low-level byte manipulation with known bounds
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         result += BigInt(bytes[i]) << (8n * BigInt(i));
     }
 
@@ -85,11 +85,11 @@ function decodeScalar(scalar: Uint8Array): bigint {
     }
 
     const array = new Uint8Array(scalar);
-    // @ts-expect-error noUncheckedIndexedAccess: 32-byte array with validated length
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     array[0] &= 248;
-    // @ts-expect-error noUncheckedIndexedAccess: 32-byte array with validated length
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     array[31] &= 127;
-    // @ts-expect-error noUncheckedIndexedAccess: 32-byte array with validated length
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     array[31] |= 64;
 
     return littleEndianBytesToBigInt(array);
@@ -103,7 +103,7 @@ function decodeCoordinate(coordinate: Uint8Array): bigint {
     }
 
     const array = new Uint8Array(coordinate);
-    // @ts-expect-error noUncheckedIndexedAccess: 32-byte array with validated length
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     array[array.length - 1] &= 0x7f;
 
     return littleEndianBytesToBigInt(array);
@@ -252,11 +252,11 @@ export function elligator2(point: Uint8Array): Uint8Array {
 // Computing secret keys
 export const getCurve25519KeyPair = (randomBytes: Buffer) => {
     const randomPriv = Buffer.from(randomBytes);
-    // @ts-expect-error noUncheckedIndexedAccess: 32-byte buffer with known layout
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     randomPriv[0] &= 248;
-    // @ts-expect-error noUncheckedIndexedAccess: 32-byte buffer with known layout
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     randomPriv[31] &= 127;
-    // @ts-expect-error noUncheckedIndexedAccess: 32-byte buffer with known layout
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     randomPriv[31] |= 64;
 
     const basepoint = Buffer.alloc(32).fill(0);

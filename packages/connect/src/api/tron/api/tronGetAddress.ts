@@ -67,28 +67,25 @@ export default class TronGetAddress extends AbstractMethod<'tronGetAddress', Par
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
-            const currentParam = this.params[this.progress];
-            if (!currentParam) return;
-
             return {
                 type: 'address' as const,
-                serializedPath: getSerializedPath(currentParam.proto.address_n),
-                address: currentParam.address || 'not-set',
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                address: this.params[this.progress].address || 'not-set',
             };
         }
     }
 
     get confirmation() {
-        const firstParam = this.params[0];
-        const accountIndex = firstParam?.proto.address_n[2];
-
         return {
             view: 'export-address' as const,
             label:
-                this.params.length > 1 || !firstParam
+                this.params.length > 1
                     ? 'Export multiple Tron addresses'
                     : `Export Tron address for account #${
-                          accountIndex !== undefined ? fromHardened(accountIndex) + 1 : '?'
+                          // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                          fromHardened(this.params[0].proto.address_n[2]) + 1
                       }`,
         };
     }
@@ -100,32 +97,40 @@ export default class TronGetAddress extends AbstractMethod<'tronGetAddress', Par
         return response.message;
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     async run({ sendCoreMessage }: MethodContext) {
         const responses: MethodReturnType<typeof this.name> = [];
         for (let i = 0; i < this.params.length; i++) {
             const batch = this.params[i];
-            if (!batch) continue;
 
             // silently get address and compare with requested address
             // or display as default inside popup
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (batch.proto.show_display) {
                 const silent = await this._call({
                     ...batch,
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     proto: { ...batch.proto, show_display: false },
                 });
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 if (typeof batch.address === 'string') {
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     if (batch.address !== silent.address) {
                         throw ERRORS.TypedError('Method_AddressNotMatch');
                     }
                 } else {
                     // save address for future verification in "getButtonRequestData"
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     batch.address = silent.address;
                 }
             }
 
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const message = await this._call(batch);
             responses.push({
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 path: batch.proto.address_n,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 serializedPath: getSerializedPath(batch.proto.address_n),
                 address: message.address,
                 mac: message.mac,
@@ -145,15 +150,6 @@ export default class TronGetAddress extends AbstractMethod<'tronGetAddress', Par
             this.progress++;
         }
 
-        if (this.hasBundle) {
-            return responses;
-        }
-
-        const firstResponse = responses[0];
-        if (firstResponse === undefined) {
-            throw ERRORS.TypedError('Runtime', 'TronGetAddress: expected single response');
-        }
-
-        return firstResponse;
+        return this.hasBundle ? responses : responses[0];
     }
 }

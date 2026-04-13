@@ -48,20 +48,23 @@ export const accumulative: CoinSelectAlgorithm = (
     // continue with the rest
     for (let i = 0; i < utxos.length; ++i) {
         const utxo = utxos[i];
-        if (!utxo) continue;
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const utxoBytes = inputBytes(utxo);
         const utxoFee = getFeeForBytes(feeRate, utxoBytes);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const utxoValue = bignumberOrNaN(utxo.value);
 
         // skip detrimental input
         if (!utxoValue || utxoValue.lt(new BN(utxoFee))) {
             if (i === utxos.length - 1) {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 const fee = getFee([...inputs, utxo], outputs, feeRate, options);
 
                 return { fee };
             }
         } else {
             inAccum = inAccum.add(utxoValue);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             inputs.push(utxo);
 
             const fee = getFee(inputs, outputs, feeRate, options);

@@ -15,14 +15,15 @@ export class EthereumFeeLevels extends MiscFeeLevels {
 
     async load(blockchain: Blockchain, request: Parameters<typeof blockchain.estimateFee>[0]) {
         try {
-            const response = (await blockchain.estimateFee(request))[0];
-            if (!response) return this.levels;
+            const [response] = await blockchain.estimateFee(request);
 
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const { eip1559 } = response;
 
             // gas price in wei
             const maxFeeInWei = new BigNumber(this.coinInfo.maxFee).multipliedBy('1e+9').toNumber();
             const minFeeInWei = new BigNumber(this.coinInfo.minFee).multipliedBy('1e+9').toNumber();
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const feeInWei = new BigNumber(response.feePerUnit).toNumber();
 
             // validate gas price from backend; clamp and round to integer wei (backend may return decimal)
@@ -58,6 +59,7 @@ export class EthereumFeeLevels extends MiscFeeLevels {
                     return {
                         label,
                         feePerUnit,
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
                         feeLimit: response.feeLimit,
                         blocks: Math.ceil(
                             Math.max(
@@ -73,14 +75,12 @@ export class EthereumFeeLevels extends MiscFeeLevels {
 
                 this.levels = levels.filter(level => level) as FeeLevel[];
             } else {
-                const existingLevel = this.levels[0];
-                if (existingLevel) {
-                    this.levels[0] = {
-                        ...existingLevel,
-                        ...response,
-                        feePerUnit,
-                    };
-                }
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                this.levels[0] = {
+                    ...this.levels[0],
+                    ...response,
+                    feePerUnit,
+                };
             }
             this.wasFetchedSuccessfully = true;
         } catch {

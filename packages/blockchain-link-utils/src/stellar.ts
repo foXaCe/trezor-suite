@@ -102,9 +102,7 @@ export const transformTransaction = (
     }
 
     const rawOp = parsedTx.operations[0];
-    if (!rawOp) {
-        return baseTx;
-    }
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const opSource = rawOp.source || rawTx.source_account;
     const fromAddress = extractBaseAddress(opSource);
 
@@ -113,6 +111,7 @@ export const transformTransaction = (
     let isTokenTransfer = false;
     let tokenInfo: { assetCode: string; assetIssuer: string; amount: string } | undefined;
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     switch (rawOp.type) {
         case 'createAccount':
             toAddress = extractBaseAddress(rawOp.destination);
@@ -154,8 +153,7 @@ export const transformTransaction = (
                 ...baseTx,
                 type: 'self',
                 stellarSpecific: {
-                    memo: baseTx.stellarSpecific?.memo,
-                    feeSource: baseTx.stellarSpecific?.feeSource ?? fromAddress,
+                    ...baseTx.stellarSpecific!,
                     operationType: 'changeTrust',
                     changeTrust: {
                         assetCode,

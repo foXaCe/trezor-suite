@@ -18,32 +18,37 @@ export class TorIdentities {
         timeout?: number,
         protocol?: 'http' | 'https',
     ): SocksProxyAgent {
-        const [user = '', password] = identity.split(':');
+        const [user, password] = identity.split(':');
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (password && this.passwords[user] !== password) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             if (this.identities[user]) {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 this.removeIdentity(user);
             }
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             this.passwords[user] = password;
         }
 
         const { host, port } = this.getTorSettings();
 
         // TODO clean agents when host/port changes?
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (!this.identities[user]) {
             const socksServerUrl = new URL(`socks://${host}:${port}`);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             socksServerUrl.username = user;
-            socksServerUrl.password = password ?? '';
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            socksServerUrl.password = password;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             this.identities[user] = new SocksProxyAgent(socksServerUrl, {
                 timeout,
             });
         }
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const agent = this.identities[user];
-
-        if (!agent) {
-            throw new Error(`Failed to create agent for identity ${user}`);
-        }
 
         // @sentry/node (used in suite-desktop) is wrapping each outgoing request
         // and requires protocol to be explicitly set to https while using TOR + https/wss address combination
@@ -54,7 +59,8 @@ export class TorIdentities {
 
     public removeIdentity(user: string) {
         // looks like destroy does nothing, but just in case
-        this.identities[user]?.destroy();
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        this.identities[user].destroy();
         delete this.identities[user];
         delete this.passwords[user];
     }

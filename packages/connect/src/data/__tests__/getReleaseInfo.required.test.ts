@@ -6,10 +6,8 @@ import { getReleaseInfo } from '../firmwareInfo';
 
 const { getDeviceFeatures, releasesT1B1, releasesT2T1 } = global.JestMocks;
 
-const latestT1B1 = releasesT1B1[0];
-if (!latestT1B1) throw new Error('missing T1B1 release');
-const latestT2T1 = releasesT2T1[0];
-if (!latestT2T1) throw new Error('missing T2T1 release');
+const [latestT1B1] = releasesT1B1;
+const [latestT2T1] = releasesT2T1;
 
 const fixtures = [
     {
@@ -38,6 +36,7 @@ const fixtures = [
             intermediary: undefined,
             isRequired: false,
             isNewer: true,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT2T1.translations,
         },
     },
@@ -67,6 +66,7 @@ const fixtures = [
             intermediary: undefined,
             isRequired: false,
             isNewer: true,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT2T1.translations,
         },
     },
@@ -76,8 +76,11 @@ const fixtures = [
         features: getDeviceFeatures({
             bootloader_mode: null,
             firmware_present: true,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             major_version: latestT2T1.version[0],
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             minor_version: latestT2T1.version[1],
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             patch_version: latestT2T1.version[2],
         }),
         release: latestT2T1,
@@ -97,6 +100,7 @@ const fixtures = [
             intermediary: undefined,
             isRequired: null,
             isNewer: false,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT2T1.translations,
         },
     },
@@ -136,6 +140,7 @@ const fixtures = [
             },
             isRequired: true,
             isNewer: true,
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             translations: latestT1B1.translations,
         },
     },

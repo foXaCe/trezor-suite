@@ -96,7 +96,8 @@ const registerOutput = async (
                     }
                     if (error.errorCode === WabiSabiProtocolErrorCode.NotEnoughFunds) {
                         logger.error(
-                            `NotEnoughFunds. Amount: ${amountCredentials[0]?.Value} Delta: ${outputAmountCredentials.CredentialsRequest.Delta} FeeRate: ${roundParameters.MiningFeeRate}`,
+                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                            `NotEnoughFunds. Amount: ${amountCredentials[0].Value} Delta: ${outputAmountCredentials.CredentialsRequest.Delta} FeeRate: ${roundParameters.MiningFeeRate}`,
                         );
                     }
                 }

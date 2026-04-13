@@ -27,10 +27,12 @@ export const getRoundEvents = <T extends CoinjoinStateEvent['Type']>(
 
 export const getRoundParameters = (round: Round) => {
     const events = getRoundEvents('RoundCreated', round.CoinjoinState.Events);
-    const firstEvent = events[0];
-    if (!firstEvent) return;
+    if (events.length < 1) return;
 
-    return firstEvent.RoundParameters;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const [{ RoundParameters }] = events;
+
+    return RoundParameters;
 };
 
 // round commitmentData used in request for input ownershipProof
@@ -45,31 +47,32 @@ export const getCommitmentData = (identifier: string, roundId: string) => {
 // transform '0d 0h 1m 0s' (WabiSabi TimeSpan) to milliseconds
 export const readTimeSpan = (ts: string) => {
     const span = ts.split(' ').map(v => parseInt(v, 10));
-    if (span.length < 4) {
-        throw new Error(`Invalid TimeSpan format: "${ts}", expected "Xd Xh Xm Xs"`);
-    }
 
     const date = new Date();
     const now = date.getTime();
-    // Validated above that span has at least 4 elements.
-    const days = span[0] as number;
-    const hours = span[1] as number;
-    const minutes = span[2] as number;
-    const seconds = span[3] as number;
+    const [days, hours, minutes, seconds] = span;
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     if (days > 0) {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         date.setDate(date.getDate() + days);
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     if (hours > 0) {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         date.setHours(date.getHours() + hours);
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     if (minutes > 0) {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         date.setMinutes(date.getMinutes() + minutes);
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     if (seconds > 0) {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         date.setSeconds(date.getSeconds() + seconds);
     }
 
@@ -214,11 +217,8 @@ export const transformStatus = ({
     const { allowedInputAmounts, coordinationFeeRate } = getDataFromRounds(rounds);
     // coinJoinFeeRateMedians include an array of medians per day, week and month - we take the first (day) median as the recommended fee rate base.
     // The value is converted from kvBytes (kilo virtual bytes) to vBytes (how the value is displayed in UI).
-    const firstMedian = CoinJoinFeeRateMedians[0];
-    if (!firstMedian) {
-        throw new Error('CoinJoinFeeRateMedians is empty');
-    }
-    const feeRateMedian = Math.round(firstMedian.MedianFeeRate / 1000);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const feeRateMedian = Math.round(CoinJoinFeeRateMedians[0].MedianFeeRate / 1000);
 
     return {
         rounds,
@@ -288,14 +288,8 @@ export const getBroadcastedTxDetails = ({
             index: input.index,
             script: Buffer.allocUnsafe(0), // script is not used in calculation
             sequence,
-            witness: (() => {
-                const witnessData = Witnesses[index];
-                if (witnessData === undefined) {
-                    throw new Error(`Missing witness data at index ${index}`);
-                }
-
-                return new BufferReader(Buffer.from(witnessData, 'hex')).readVector();
-            })(),
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            witness: new BufferReader(Buffer.from(Witnesses[index], 'hex')).readVector(),
         });
     });
 

@@ -5,14 +5,22 @@ function filterUtxos(utxos: CoinSelectInput[], minConfOwn: number, minConfOther:
     const usable: CoinSelectInput[] = [];
     const unusable: CoinSelectInput[] = [];
 
-    for (const utxo of utxos) {
-        const isUsed = utxo.own
-            ? utxo.confirmations >= minConfOwn
-            : utxo.confirmations >= minConfOther;
+    for (let i = 0; i < utxos.length; i++) {
+        const utxo = utxos[i];
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const isUsed = utxo.own
+            ? // @ts-expect-error: indexing with noUncheckedIndexedAccess
+              utxo.confirmations >= minConfOwn
+            : // @ts-expect-error: indexing with noUncheckedIndexedAccess
+              utxo.confirmations >= minConfOther;
+
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (isUsed || utxo.required) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             usable.push(utxo);
         } else {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             unusable.push(utxo);
         }
     }
@@ -60,9 +68,9 @@ export function tryConfirmed(
 
         for (i = 0; i < trials.length; i++) {
             const trial = trials[i];
-            if (!trial) continue;
 
             // since the restrictions are always loosening, we can just filter the unusable so far
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const filterResult = filterUtxos(unusable, trial.own, trial.other);
 
             // and we can try the algorithm only if there are some newly usable utxos

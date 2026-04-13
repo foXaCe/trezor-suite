@@ -35,13 +35,10 @@ export const scanAccount = async (
     const xpub = params.descriptor;
     const { checkpoints } = params;
 
-    const firstCheckpoint = checkpoints[0];
-    if (!firstCheckpoint) {
-        throw new Error('No checkpoints provided');
-    }
-    const addresses = new CoinjoinAddressController(xpub, network, firstCheckpoint, params.cache);
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const addresses = new CoinjoinAddressController(xpub, network, checkpoints[0], params.cache);
 
-    let checkpoint: ScanAccountCheckpoint = firstCheckpoint;
+    let [checkpoint] = checkpoints;
     const checkpointCooldown = createCooldown(CHECKPOINT_COOLDOWN);
 
     const txs = new Set<BlockbookTransaction>();
@@ -94,6 +91,7 @@ export const scanAccount = async (
             pending = mempool.getTransactions(addresses).map(transformTx(addresses));
         }
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         checkpoint = {
             ...checkpoint,
             receiveCount: addresses.receive.length,
@@ -108,6 +106,7 @@ export const scanAccount = async (
 
     return {
         pending,
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         checkpoint,
         cache,
     };

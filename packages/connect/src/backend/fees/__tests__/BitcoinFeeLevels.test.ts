@@ -110,15 +110,15 @@ describe('BitcoinFeeLevels', () => {
         const coinInfo = getBitcoinNetwork('Testnet');
         if (!coinInfo) throw new Error('coinInfo is missing');
         // testnet has only one fee level 'normal'
-        const singleFee = defaultFeesMock[1];
-        if (!singleFee) throw new Error('missing fee mock');
-        const coinInfoMock = { ...coinInfo, defaultFees: [singleFee] };
+        const coinInfoMock = { ...coinInfo, defaultFees: [defaultFeesMock[1]] };
 
         jest.spyOn(BlockchainLink.prototype, 'estimateFee').mockImplementation(
             estimateFeeMockIncomplete,
         );
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const backend = await initBlockchain(coinInfoMock, () => {});
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const feeLevelsInstance = new BitcoinFeeLevels(coinInfoMock);
 
         expect(feeLevelsInstance.levels.length).toEqual(1);

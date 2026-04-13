@@ -74,6 +74,7 @@ export function p2wpkh(a: Payment, opts?: PaymentOpts): Payment {
     lazy.prop(o, 'output', () => {
         if (!o.hash) return;
 
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         return bscript.compile([OPS.OP_0, o.hash]);
     });
     lazy.prop(o, 'pubkey', () => {
@@ -134,19 +135,21 @@ export function p2wpkh(a: Payment, opts?: PaymentOpts): Payment {
 
         if (a.witness) {
             if (a.witness.length !== 2) throw new TypeError('Witness is invalid');
-            const witness0 = a.witness[0];
-            const witness1 = a.witness[1];
-            if (!witness0 || !witness1) throw new TypeError('Witness is invalid');
-            if (!bscript.isCanonicalScriptSignature(witness0))
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            if (!bscript.isCanonicalScriptSignature(a.witness[0]))
                 throw new TypeError('Witness has invalid signature');
-            if (!ecc.isPoint(witness1) || witness1.length !== 33)
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            if (!ecc.isPoint(a.witness[1]) || a.witness[1].length !== 33)
                 throw new TypeError('Witness has invalid pubkey');
 
-            if (a.signature && !a.signature.equals(witness0))
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            if (a.signature && !a.signature.equals(a.witness[0]))
                 throw new TypeError('Signature mismatch');
-            if (a.pubkey && !a.pubkey.equals(witness1)) throw new TypeError('Pubkey mismatch');
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            if (a.pubkey && !a.pubkey.equals(a.witness[1])) throw new TypeError('Pubkey mismatch');
 
-            const pkh = bcrypto.hash160(witness1);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const pkh = bcrypto.hash160(a.witness[1]);
             if (hash.length > 0 && !hash.equals(pkh)) throw new TypeError('Hash mismatch');
         }
     }
