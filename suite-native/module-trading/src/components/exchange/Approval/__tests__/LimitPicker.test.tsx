@@ -6,7 +6,7 @@ import {
     renderWithStoreProvider,
     userEvent,
     within,
-} from '@suite-native/test-utils';
+} from '@suite-native/test-utils-store';
 import { exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import { LimitPicker } from '../LimitPicker';

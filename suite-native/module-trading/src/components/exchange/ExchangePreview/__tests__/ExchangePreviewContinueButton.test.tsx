@@ -2,7 +2,11 @@ import {
     type AccountKey,
     type GeneralPrecomposedTransactionFinal,
 } from '@suite-common/wallet-types';
-import { type PreloadedState, renderWithStoreProvider, userEvent } from '@suite-native/test-utils';
+import {
+    type PreloadedState,
+    renderWithStoreProvider,
+    userEvent,
+} from '@suite-native/test-utils-store';
 import { exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import {

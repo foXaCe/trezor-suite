@@ -1,4 +1,4 @@
-import { act, fireEvent, renderWithStoreProvider } from '@suite-native/test-utils';
+import { act, fireEvent, renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { buyQuotes, getInitializedTradingState } from '@suite-native/trading-fixtures';
 
 import { PaymentMethodListItem, type PaymentMethodListItemProps } from '../PaymentMethodListItem';
