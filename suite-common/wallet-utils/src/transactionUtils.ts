@@ -144,17 +144,16 @@ export const groupJointTransactions = (transactions: WalletAccountTransaction[])
             const last = prev.pop();
             if (!last) return [[tx]];
 
-            return tx.type === 'joint' && last[0]?.type === 'joint'
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            return tx.type === 'joint' && last[0].type === 'joint'
                 ? [...prev, [...last, tx]]
                 : [...prev, last, [tx]];
         }, [])
-        .map(txs => {
-            const firstTx = txs[0];
-
-            return txs.length > 1 && firstTx
+        .map(txs =>
+            txs.length > 1
                 ? ({ type: 'joint-batch', rounds: txs } as const)
-                : ({ type: 'single-tx', tx: firstTx } as const);
-        });
+                : ({ type: 'single-tx', tx: txs[0] } as const),
+        );
 
 export const formatCardanoWithdrawal = (tx: WalletAccountTransaction) =>
     tx.cardanoSpecific?.withdrawal
@@ -345,9 +344,8 @@ export const findTransactions = (
     transactions: { [key: AccountKey]: WalletAccountTransaction[] },
 ) =>
     typedObjectKeys(transactions).flatMap(key => {
-        const accountTxs = transactions[key];
-        if (!accountTxs) return [];
-        const tx = findTransaction(txid, accountTxs);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const tx = findTransaction(txid, transactions[key]);
         if (!tx) return [];
 
         return [{ key, tx }];
@@ -364,7 +362,8 @@ export const findChainedTransactions = (
         const ownTxs = result.own.map(tx => tx.txid);
         const othersTxs = result.others.map(tx => tx.txid);
         // check if any pending transaction is using the utxo/vin with requested txid
-        const txs = (transactions[accountKey] ?? []).filter(tx => {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const txs = transactions[accountKey].filter(tx => {
             if (!isPending(tx) || !tx.details.vin.find(i => i.txid === txid)) {
                 return false;
             }
@@ -477,15 +476,16 @@ export const analyzeTransactions = (
             // use simple for loop to have possibility to `break`
             for (index; index < len; index++) {
                 const kTx = knownSorted[index];
-                if (!kTx) continue;
                 // known tx is pending, it will be removed
                 // move sliceIndex, set firstKnownIndex
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 if (isPending(kTx)) {
                     firstKnownIndex = index + 1;
                     sliceIndex = index + 1;
                 }
                 // known tx is "older"
-                if (!isPending(kTx) && (kTx.blockHeight ?? 0) < height) {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                if (!isPending(kTx) && kTx.blockHeight! < height) {
                     // set sliceIndex
                     sliceIndex = isLast ? len : index;
                     // all fresh txs to this point needs to be added
@@ -495,9 +495,11 @@ export const analyzeTransactions = (
                     break;
                 }
                 // known tx is on the same height
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 if (kTx.blockHeight === height) {
                     firstKnownIndex = index + 1;
                     // known tx changed (rollback)
+                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     if (kTx.blockHash !== tx.blockHash) {
                         // set sliceIndex
                         sliceIndex = isLast ? len : index + 1;
@@ -562,7 +564,8 @@ export const getNftTokenId = (transfer: TokenTransfer) =>
     transfer.standard &&
     NFT_MULTITOKEN_STANDARDS.has(transfer.standard) &&
     transfer.multiTokenValues?.length
-        ? (transfer.multiTokenValues[0]?.id ?? transfer.amount)
+        ? // @ts-expect-error: indexing with noUncheckedIndexedAccess
+          transfer.multiTokenValues[0].id
         : transfer.amount;
 
 export const isSwapTransaction = (transaction: WalletAccountTransaction) => {
@@ -714,21 +717,22 @@ const getEthereumRbfParams = (
 
     const txSignature = getEvmTransactionTextSignature(transactionData);
 
-    const toAddress = vout[0]?.addresses?.[0] ?? '';
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const toAddress = vout[0].addresses![0];
 
-    let output: { address: string; amount: string; formattedAmount: string; token?: string };
+    let output;
     switch (txSignature) {
         case 'transfer': {
             const token = tx.tokens[0];
-            if (!token) {
-                output = { address: toAddress, amount: '0', formattedAmount: '0' };
-                break;
-            }
 
             output = {
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 address: token.to,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 token: token.contract,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 amount: token.amount,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 formattedAmount: convertAmountSubunitsToUnits(token.amount, token.decimals),
             };
             break;
@@ -753,8 +757,10 @@ const getEthereumRbfParams = (
         default:
             output = {
                 address: toAddress,
-                amount: vout[0]?.value ?? '0',
-                formattedAmount: formatNetworkAmount(vout[0]?.value ?? '0', account.symbol),
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                amount: vout[0].value!,
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                formattedAmount: formatNetworkAmount(vout[0].value!, account.symbol),
             };
     }
 
@@ -762,6 +768,7 @@ const getEthereumRbfParams = (
         type: 'ethereum',
         txid: tx.txid,
         outputs: [
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             {
                 type: 'payment',
                 ...output,
@@ -795,7 +802,8 @@ const getBitcoinRbfParams = (
             // TODO: this should be done in @trezor/connect, blockchain-link or even blockbook
             // blockbook sends output.hex as scriptPubKey with additional prefix where: 6a - OP_RETURN and XX - data len. this field should be parsed by @trezor/utxo-lib
             // blockbook sends ascii data in output.address[0] field in format: "OP_RETURN (ASCII-VALUE)". as a workaround we are extracting ascii data from here
-            const dataAscii = output.addresses?.[0]?.match(/^OP_RETURN \((.*)\)/)?.pop(); // strip ASCII data from brackets
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const dataAscii = output.addresses![0].match(/^OP_RETURN \((.*)\)/)?.pop(); // strip ASCII data from brackets
             if (dataAscii) {
                 outputs.push({
                     type: 'opreturn',
@@ -807,9 +815,10 @@ const getBitcoinRbfParams = (
             const changeOutput = changeAddresses.find(a => output.addresses?.includes(a.address));
             outputs.push({
                 type: changeOutput ? 'change' : 'payment',
-                address: output.addresses?.[0] ?? '',
-                amount: output.value ?? '0',
-                formattedAmount: formatNetworkAmount(output.value ?? '0', account.symbol),
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                address: output.addresses![0],
+                amount: output.value!,
+                formattedAmount: formatNetworkAmount(output.value!, account.symbol),
             });
             if (changeOutput) {
                 changeAddress = changeOutput;
@@ -894,9 +903,8 @@ export const getTxHeaderSymbol = (transaction: WalletAccountTransaction) => {
     const isSingleTokenTransaction = transaction.tokens.length === 1;
 
     // if there's exactly one token, use its symbol; otherwise, use the main network symbol
-    const symbol = isSingleTokenTransaction
-        ? (transaction.tokens[0]?.symbol ?? transaction.symbol)
-        : transaction.symbol;
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const symbol = isSingleTokenTransaction ? transaction.tokens[0].symbol : transaction.symbol;
 
     return symbol;
 };
