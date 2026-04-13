@@ -100,7 +100,9 @@ const getTransactionData = async (
     const { account } = selectedAccount;
 
     const selectedBlockchain = blockchain[account.symbol];
-    const outputAmount = formValues.outputs[0]?.amount ?? '';
+    const firstOutput = formValues.outputs[0];
+    if (!firstOutput) return;
+    const outputAmount = firstOutput.amount;
 
     let txData;
     if (stakeType === 'stake') {

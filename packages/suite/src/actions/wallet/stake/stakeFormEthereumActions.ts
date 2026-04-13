@@ -142,7 +142,9 @@ export const signTransaction =
 
         // transform to TrezorConnect.ethereumSignTransaction params
         const { stakeType } = formValues;
-        const outputAmount = formValues.outputs[0]?.amount ?? '';
+        const firstOutput = formValues.outputs[0];
+        if (!firstOutput) return;
+        const outputAmount = firstOutput.amount;
         let txData;
         if (stakeType === 'stake') {
             txData = await prepareStakeEthTx({

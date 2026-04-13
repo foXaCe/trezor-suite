@@ -400,6 +400,14 @@ export const signEthereumSendFormTransactionThunk = createThunk<
 
         const addressDisplayType = selectAddressDisplayType(getState());
 
+        const firstOutput = formState.outputs[0];
+        if (!firstOutput) {
+            return rejectWithValue({
+                error: 'sign-transaction-failed',
+                message: 'No output found in form state.',
+            });
+        }
+
         const { nonce } = await dispatch(
             ethereumGetCurrentNonceThunk({
                 selectedAccount,
@@ -411,8 +419,8 @@ export const signEthereumSendFormTransactionThunk = createThunk<
         const transaction = prepareEthereumTransaction({
             token: precomposedTransaction.token,
             chainId: network.chainId,
-            to: formState.outputs[0]?.address ?? '',
-            amount: formState.outputs[0]?.amount ?? '0',
+            to: firstOutput.address,
+            amount: firstOutput.amount,
             data: formState.transactionData,
             gasLimit: precomposedTransaction.feeLimit || '',
             maxFeePerGas: precomposedTransaction.maxFeePerGas,

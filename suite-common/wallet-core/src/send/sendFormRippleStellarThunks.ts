@@ -248,14 +248,17 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
         let response;
 
         const firstOutput = formState.outputs[0];
+        if (!firstOutput) {
+            return rejectWithValue({
+                error: 'sign-transaction-failed',
+                message: 'No output found in form state.',
+            });
+        }
 
         if (selectedAccount.networkType === 'ripple') {
             const payment: RipplePayment = {
-                destination: firstOutput?.address ?? '',
-                amount: networkAmountToSmallestUnit(
-                    firstOutput?.amount ?? '0',
-                    selectedAccount.symbol,
-                ),
+                destination: firstOutput.address,
+                amount: networkAmountToSmallestUnit(firstOutput.amount, selectedAccount.symbol),
             };
 
             if (formState.destinationTag) {
@@ -284,7 +287,7 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
             }
         } else if (selectedAccount.networkType === 'stellar') {
             const destinationAccount = await TrezorConnect.getAccountInfo({
-                descriptor: firstOutput?.address ?? '',
+                descriptor: firstOutput.address,
                 coin: selectedAccount.symbol,
                 suppressBackupWarning: true,
             });
@@ -315,14 +318,14 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
                 operation = {
                     type: 'payment',
                     asset,
-                    amount: toStroops(firstOutput?.amount ?? '0').toString(),
-                    destination: firstOutput?.address ?? '',
+                    amount: toStroops(firstOutput.amount).toString(),
+                    destination: firstOutput.address,
                 };
             } else {
                 operation = {
                     type: 'createAccount',
-                    startingBalance: toStroops(firstOutput?.amount ?? '0').toString(),
-                    destination: firstOutput?.address ?? '',
+                    startingBalance: toStroops(firstOutput.amount).toString(),
+                    destination: firstOutput.address,
                 };
             }
 
@@ -331,8 +334,8 @@ export const signRippleStellarSendFormTransactionThunk = createThunk<
                 sequence: selectedAccount.misc.stellarSequence,
                 fee: precomposedTransaction.feePerByte,
                 destinationActivated,
-                destination: firstOutput?.address ?? '',
-                amount: firstOutput?.amount ?? '0',
+                destination: firstOutput.address,
+                amount: firstOutput.amount,
                 asset,
                 destinationTag: formState.destinationTag,
                 isTestnet: isTestnet(selectedAccount.symbol),

@@ -359,10 +359,18 @@ export const signSolanaSendFormTransactionThunk = createThunk<
                 message: 'Missing token accounts.',
             });
 
+        const firstOutput = formState.outputs[0];
+        if (!firstOutput) {
+            return rejectWithValue({
+                error: 'sign-transaction-failed',
+                message: 'No output found in form state.',
+            });
+        }
+
         const transaction = await TrezorConnect.solanaComposeTransaction({
             fromAddress: selectedAccount.descriptor,
-            toAddress: formState.outputs[0]?.address ?? '',
-            amount: formState.outputs[0]?.amount ?? '0',
+            toAddress: firstOutput.address,
+            amount: firstOutput.amount,
             token: token
                 ? {
                       mint: token.contract,
@@ -418,6 +426,7 @@ export const signSolanaSendFormTransactionThunk = createThunk<
             });
         }
 
-        return { serializedTx: response.payload.serializedTx ?? '' };
+        // @ts-expect-error: serializedTx is expected to be defined in a successful response
+        return { serializedTx: response.payload.serializedTx };
     },
 );

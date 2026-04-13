@@ -671,14 +671,13 @@ const signCoinjoinTx =
                             let utxoIndex = 0;
                             tx.inputs.forEach((input, index) => {
                                 if (input.script_type !== 'EXTERNAL') {
-                                    const utxo = utxos[utxoIndex];
-                                    if (utxo) {
-                                        response.inputs.push({
-                                            outpoint: utxo.outpoint,
-                                            signature: signTx.payload.signatures[index] ?? '',
-                                            index,
-                                        });
-                                    }
+                                    response.inputs.push({
+                                        // @ts-expect-error: noUncheckedIndexedAccess - utxos align 1-to-1 with non-EXTERNAL tx inputs
+                                        outpoint: utxos[utxoIndex].outpoint,
+                                        // @ts-expect-error: noUncheckedIndexedAccess - signatures align with input indices
+                                        signature: signTx.payload.signatures[index],
+                                        index,
+                                    });
                                     utxoIndex++;
                                 }
                             });
@@ -777,8 +776,10 @@ export const initCoinjoinService =
                 const realAccount = selectAccountByKey(state, account.key);
                 if (!realAccount) return [];
 
-                const utxos = (realAccount.utxo ?? []).map(getUtxoOutpoint);
-                const usedChange = (realAccount.addresses?.change ?? [])
+                // @ts-expect-error: realAccount.utxo is expected to be defined for active coinjoin accounts
+                const utxos = realAccount.utxo.map(getUtxoOutpoint);
+                // @ts-expect-error: realAccount.addresses is expected to be defined for active coinjoin accounts
+                const usedChange = realAccount.addresses.change
                     .filter(a => a.transfers > 0)
                     .map(a => a.address);
 

@@ -397,7 +397,13 @@ export const signTronSendFormTransactionThunk = createThunk<
 
         const { blockHash, blockHeight } = blockchainInfo.payload;
         const { token } = precomposedTransaction;
-        const output = formState.outputs[0] ?? { address: '', amount: '0' };
+        const output = formState.outputs[0];
+        if (!output) {
+            return rejectWithValue({
+                error: 'sign-transaction-failed',
+                message: 'No output found in form state.',
+            });
+        }
 
         const network = getNetwork(selectedAccount.symbol);
         const amountInSubunits = unitsToSubunits({

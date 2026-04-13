@@ -384,6 +384,13 @@ export const addAccountMetadata =
         ) as AccountLabels;
 
         if (payload.type === 'outputLabel') {
+            const { outputIndex } = payload;
+            // Prevent prototype pollution via user-controlled metadata keys
+            const isSafeKey =
+                outputIndex !== '__proto__' &&
+                outputIndex !== 'constructor' &&
+                outputIndex !== 'prototype';
+
             if (typeof payload.value !== 'string' || payload.value.length === 0) {
                 if (!nextMetadata.outputLabels[payload.txid]) {
                     // If we try to delete already deleted label it's ok.
@@ -393,8 +400,8 @@ export const addAccountMetadata =
                 }
 
                 const txOutputLabels = nextMetadata.outputLabels[payload.txid];
-                if (txOutputLabels) {
-                    delete txOutputLabels[payload.outputIndex];
+                if (txOutputLabels && isSafeKey) {
+                    delete txOutputLabels[outputIndex];
                     if (Object.keys(txOutputLabels).length === 0) {
                         delete nextMetadata.outputLabels[payload.txid];
                     }
@@ -405,8 +412,8 @@ export const addAccountMetadata =
                 }
 
                 const txLabels = nextMetadata.outputLabels[payload.txid];
-                if (txLabels) {
-                    txLabels[payload.outputIndex] = payload.value;
+                if (txLabels && isSafeKey) {
+                    txLabels[outputIndex] = payload.value;
                 }
 
                 // 2.0.0
