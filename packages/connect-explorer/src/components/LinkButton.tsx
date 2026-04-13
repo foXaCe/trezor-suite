@@ -1,20 +1,28 @@
 import type { ComponentProps } from 'react';
 
-import Link from 'next/link';
-import styled from 'styled-components';
+import { useRouter } from 'next/router';
 
 import { Button } from '@trezor/components';
 
-const StyledLink = styled(Link)`
-    text-decoration: none;
-`;
-
-type LinkButtonProps = Omit<ComponentProps<typeof Button>, 'href' | 'target'> & {
+type LinkButtonProps = Omit<ComponentProps<typeof Button>, 'target'> & {
     href: string;
 };
 
-export const LinkButton = ({ href, children, ...props }: LinkButtonProps) => (
-    <StyledLink href={href}>
-        <Button {...props}>{children}</Button>
-    </StyledLink>
-);
+export const LinkButton = ({ href, children, ...props }: LinkButtonProps) => {
+    const router = useRouter();
+
+    return (
+        <Button
+            {...props}
+            href={href}
+            target="_self"
+            onClick={e => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                e.preventDefault();
+                void router.push(href);
+            }}
+        >
+            {children}
+        </Button>
+    );
+};
