@@ -10,7 +10,7 @@ import {
 import { MockMempoolClient } from '../mocks/MockMempoolClient';
 
 const TXS = BLOCKS.flatMap(block => block.txs); // There is 6 of them
-const ADDRESS = SEGWIT_RECEIVE_ADDRESSES[1] ?? '';
+const ADDRESS = SEGWIT_RECEIVE_ADDRESSES[1] as string;
 const TXS_MATCH = [TXS[1], TXS[3]];
 
 describe('CoinjoinMempoolController', () => {
@@ -82,8 +82,8 @@ describe('CoinjoinMempoolController', () => {
             client,
             network: networks.regtest,
             filter: address =>
-                address === (SEGWIT_RECEIVE_ADDRESSES[1] ?? '') ||
-                address === (SEGWIT_CHANGE_ADDRESSES[0] ?? ''),
+                address === (SEGWIT_RECEIVE_ADDRESSES[1] as string) ||
+                address === (SEGWIT_CHANGE_ADDRESSES[0] as string),
         });
         client.setMempoolTxs(TXS);
         await mempool.init();
@@ -96,10 +96,10 @@ describe('CoinjoinMempoolController', () => {
         expect(mempool.getTransactions()).toEqual(TXS);
 
         mempool.removeTransactions([
-            TXS[0]?.txid ?? '',
-            TXS[2]?.txid ?? '',
+            (TXS[0] as (typeof TXS)[number]).txid,
+            (TXS[2] as (typeof TXS)[number]).txid,
             'unknown',
-            TXS[4]?.txid ?? '',
+            (TXS[4] as (typeof TXS)[number]).txid,
         ]);
         expect(mempool.getTransactions()).toEqual([TXS[1], TXS[3], TXS[5]]);
     });

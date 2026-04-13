@@ -26,9 +26,14 @@ const getHeightData = (tx: Transaction) =>
 const getAddressData = (vout: VinVout, paths: AddressPaths) => {
     const address = vout.addresses?.[0] ?? throwError('Address is missing from tx output');
 
+    const derivationPath = paths[address];
+    if (derivationPath === undefined) {
+        throw new Error(`Derivation path not found for address: ${address}`);
+    }
+
     return {
         address,
-        path: paths[address] ?? '',
+        path: derivationPath,
     };
 };
 

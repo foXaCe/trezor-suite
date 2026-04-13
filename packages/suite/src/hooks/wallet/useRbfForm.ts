@@ -102,7 +102,11 @@ const getEthereumFeeInfo = (info: FeeInfo, rbfParams: RbfTransactionParamsEthere
         };
     }
 
-    const minFeeFromNetwork = new BigNumber(feeInfo.levels[0]?.feePerUnit ?? '0');
+    const firstLevel = feeInfo.levels[0];
+    if (!firstLevel) {
+        throw new Error('Fee info is missing fee levels');
+    }
+    const minFeeFromNetwork = new BigNumber(firstLevel.feePerUnit);
     const fee = BigNumber.maximum(minFeeFromNetwork, currentGasPrice.plus(feeInfo.minFee));
 
     // increase FeeLevel only if it's lower than predefined

@@ -11,7 +11,7 @@ export class MockFilterClient implements FilterClient {
     fetchNetworkInfo(): ReturnType<FilterClient['fetchNetworkInfo']> {
         const tip = this.filters[this.filters.length - 1];
 
-        return Promise.resolve({ bestHeight: tip?.blockHeight ?? 0 } as any);
+        return Promise.resolve({ bestHeight: tip!.blockHeight } as any);
     }
 
     fetchBlockFilters(

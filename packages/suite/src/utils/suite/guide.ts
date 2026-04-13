@@ -1,8 +1,14 @@
 import { type GuideCategory, type GuideNode } from '@suite-common/suite-types';
 
 /** @returns title in given language or in english if not available. */
-export const getNodeTitle = (node: GuideNode, language: string): string =>
-    node.title[language.toLowerCase()] ?? node.title['en-us'] ?? '';
+export const getNodeTitle = (node: GuideNode, language: string): string => {
+    const title = node.title[language.toLowerCase()] ?? node.title['en-us'];
+    if (title === undefined) {
+        throw new Error(`Guide node "${node.id}" is missing title for "${language}" and "en-us"`);
+    }
+
+    return title;
+};
 
 export const getNodeById = (id: string, root: GuideNode): GuideNode | undefined => {
     if (id === root.id) {

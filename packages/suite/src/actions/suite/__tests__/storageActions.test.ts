@@ -292,7 +292,7 @@ describe('Storage actions', () => {
         const load1 = store.getState();
         const load1DevicesCount = selectDevicesCount(load1);
         expect(load1DevicesCount).toEqual(3);
-        expect(load1.device.devices[0] ?? undefined).toEqual({ ...dev1, path: '' });
+        expect(load1.device.devices[0]).toEqual({ ...dev1, path: '' });
 
         // stored txs
         const acc1Txs = getAccountTransactions(acc1.key, load1.wallet.transactions.transactions);
@@ -303,18 +303,18 @@ describe('Storage actions', () => {
         });
 
         expect(acc1Txs.length).toEqual(1);
-        expect(acc1Txs[0]?.deviceState).toEqual(tx1.deviceState);
+        expect(acc1Txs[0]!.deviceState).toEqual(tx1.deviceState);
         // stored accounts
         expect(load1.wallet.accounts.length).toEqual(2);
         expect(load1.wallet.accounts[0]).toEqual(acc1);
 
         // stored device2
-        expect(load1.device.devices[1]?.state).toEqual(dev2.state);
+        expect(load1.device.devices[1]!.state).toEqual(dev2.state);
         // stored txs
         const acc2Txs = getAccountTransactions(acc2.key, load1.wallet.transactions.transactions);
 
         expect(acc2Txs.length).toEqual(1);
-        expect(acc2Txs[0]?.deviceState).toEqual(tx2.deviceState);
+        expect(acc2Txs[0]!.deviceState).toEqual(tx2.deviceState);
         // stored 1 account
         expect(load1.wallet.accounts[1]).toEqual(acc2);
 
@@ -481,7 +481,7 @@ describe('Storage actions', () => {
         // verify that graph data for acc1 were removed
         store.dispatch(await preloadStore());
         expect(store.getState().wallet.graph.data.length).toBe(1);
-        expect(store.getState().wallet.graph.data[0]?.account.symbol).toBe('ltc');
+        expect(store.getState().wallet.graph.data[0]!.account.symbol).toBe('ltc');
     });
 
     it('should store SuiteSyncOwner on setSuiteSyncOwner and remove it on forgetDevice', async () => {

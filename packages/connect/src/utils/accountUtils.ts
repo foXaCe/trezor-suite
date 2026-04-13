@@ -47,8 +47,14 @@ export const getAccountAddressN = (
 
 export const getAccountLabel = (path: number[], coinInfo: CoinInfo) => {
     if (coinInfo.type === 'bitcoin') {
-        const accountType = fromHardened(path[0] ?? 0);
-        const account = fromHardened(path[2] ?? 0);
+        if (path[0] === undefined || path[2] === undefined) {
+            throw ERRORS.TypedError(
+                'Method_InvalidParameter',
+                'Invalid BIP44 path: missing purpose or account index',
+            );
+        }
+        const accountType = fromHardened(path[0]);
+        const account = fromHardened(path[2]);
         let prefix = '';
 
         if (accountType === 48) {
@@ -61,7 +67,13 @@ export const getAccountLabel = (path: number[], coinInfo: CoinInfo) => {
 
         return `${prefix} account #${account + 1}`;
     }
-    const account = fromHardened(path[4] ?? 0);
+    if (path[4] === undefined) {
+        throw ERRORS.TypedError(
+            'Method_InvalidParameter',
+            'Invalid BIP44 path: missing account index at path[4]',
+        );
+    }
+    const account = fromHardened(path[4]);
 
     return `account #${account + 1}`;
 };
@@ -76,16 +88,37 @@ export const getPublicKeyLabel = (path: number[], coinInfo?: BitcoinNetworkInfo)
         coinLabel = getCoinName(path);
     }
 
-    const p1 = fromHardened(path[0] ?? 0);
-    let account = path.length >= 3 ? fromHardened(path[2] ?? 0) : -1;
+    if (path[0] === undefined) {
+        throw ERRORS.TypedError(
+            'Method_InvalidParameter',
+            'Invalid BIP44 path: missing purpose element',
+        );
+    }
+    const p1 = fromHardened(path[0]);
+    let account = -1;
+    if (path.length >= 3) {
+        if (path[2] === undefined) {
+            throw ERRORS.TypedError(
+                'Method_InvalidParameter',
+                'Invalid BIP44 path: missing account element',
+            );
+        }
+        account = fromHardened(path[2]);
+    }
     let realAccountId = account + 1;
     let prefix = 'Export public key';
     let accountType = '';
 
     // Copay id
     if (p1 === 45342) {
-        const p2 = fromHardened(path[1] ?? 0);
-        account = fromHardened(path[3] ?? 0);
+        if (path[1] === undefined || path[3] === undefined) {
+            throw ERRORS.TypedError(
+                'Method_InvalidParameter',
+                'Invalid Copay BIP44 path: missing elements',
+            );
+        }
+        const p2 = fromHardened(path[1]);
+        account = fromHardened(path[3]);
         realAccountId = account + 1;
         prefix = 'Export Copay ID of';
         if (p2 === 48) {

@@ -14,7 +14,7 @@ const NON_TAPROOT_TX = {
         {},
         { addresses: [] as string[] },
     ],
-    vout: [{ addresses: [SEGWIT_RECEIVE_ADDRESSES[0] ?? ''] }],
+    vout: [{ addresses: [SEGWIT_RECEIVE_ADDRESSES[0] as string] }],
 };
 
 const TAPROOT_TX = {

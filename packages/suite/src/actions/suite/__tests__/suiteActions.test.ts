@@ -127,10 +127,9 @@ describe('Suite Actions', () => {
             const store = initStore(state);
             f.actions.forEach((action: any, i: number) => {
                 store.dispatch(action);
-                const expected = f.result[i];
-                if (expected) {
-                    expect(store.getState().suite).toMatchObject(expected);
-                }
+                const expected = f.result[i] as (typeof f.result)[number];
+                if (!expected) throw new Error(`missing fixture result at index ${i}`);
+                expect(store.getState().suite).toMatchObject(expected);
             });
         });
     });
@@ -182,10 +181,9 @@ describe('Suite Actions', () => {
             const actions = filterThunkActionTypes(store.getActions());
             expect(actions.length).toEqual(f.result.length);
             actions.forEach((a, i) => {
-                const expected = f.result[i];
-                if (expected) {
-                    expect(a.payload.device).toMatchObject(expected);
-                }
+                const expected = f.result[i] as (typeof f.result)[number];
+                if (!expected) throw new Error(`missing fixture result at index ${i}`);
+                expect(a.payload.device).toMatchObject(expected);
             });
         });
     });

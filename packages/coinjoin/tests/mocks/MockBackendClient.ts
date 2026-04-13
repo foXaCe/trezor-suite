@@ -60,7 +60,7 @@ export class MockBackendClient extends CoinjoinBackendClient {
             case 'getServerInfo': {
                 const lastBlock = this.blocks[this.blocks.length - 1];
 
-                return Promise.resolve({ bestHeight: lastBlock?.height ?? 0 });
+                return Promise.resolve({ bestHeight: lastBlock!.height });
             }
             case 'getTransaction': {
                 const tx = this.transactions.find(t => t.txid === params[0]);

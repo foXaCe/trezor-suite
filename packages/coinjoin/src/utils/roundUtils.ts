@@ -45,13 +45,17 @@ export const getCommitmentData = (identifier: string, roundId: string) => {
 // transform '0d 0h 1m 0s' (WabiSabi TimeSpan) to milliseconds
 export const readTimeSpan = (ts: string) => {
     const span = ts.split(' ').map(v => parseInt(v, 10));
+    if (span.length < 4) {
+        throw new Error(`Invalid TimeSpan format: "${ts}", expected "Xd Xh Xm Xs"`);
+    }
 
     const date = new Date();
     const now = date.getTime();
-    const days = span[0] ?? 0;
-    const hours = span[1] ?? 0;
-    const minutes = span[2] ?? 0;
-    const seconds = span[3] ?? 0;
+    // Validated above that span has at least 4 elements.
+    const days = span[0] as number;
+    const hours = span[1] as number;
+    const minutes = span[2] as number;
+    const seconds = span[3] as number;
 
     if (days > 0) {
         date.setDate(date.getDate() + days);
@@ -210,7 +214,11 @@ export const transformStatus = ({
     const { allowedInputAmounts, coordinationFeeRate } = getDataFromRounds(rounds);
     // coinJoinFeeRateMedians include an array of medians per day, week and month - we take the first (day) median as the recommended fee rate base.
     // The value is converted from kvBytes (kilo virtual bytes) to vBytes (how the value is displayed in UI).
-    const feeRateMedian = Math.round((CoinJoinFeeRateMedians[0]?.MedianFeeRate ?? 0) / 1000);
+    const firstMedian = CoinJoinFeeRateMedians[0];
+    if (!firstMedian) {
+        throw new Error('CoinJoinFeeRateMedians is empty');
+    }
+    const feeRateMedian = Math.round(firstMedian.MedianFeeRate / 1000);
 
     return {
         rounds,
@@ -280,7 +288,14 @@ export const getBroadcastedTxDetails = ({
             index: input.index,
             script: Buffer.allocUnsafe(0), // script is not used in calculation
             sequence,
-            witness: new BufferReader(Buffer.from(Witnesses[index] ?? '', 'hex')).readVector(),
+            witness: (() => {
+                const witnessData = Witnesses[index];
+                if (witnessData === undefined) {
+                    throw new Error(`Missing witness data at index ${index}`);
+                }
+
+                return new BufferReader(Buffer.from(witnessData, 'hex')).readVector();
+            })(),
         });
     });
 

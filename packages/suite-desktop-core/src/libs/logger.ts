@@ -253,7 +253,12 @@ export class Logger implements ILogger {
     }
 
     public get level(): LogLevel {
-        return logLevels[this.logLevel] ?? 'error';
+        const level = logLevels[this.logLevel];
+        if (level === undefined) {
+            throw new Error(`Invalid log level index: ${this.logLevel}`);
+        }
+
+        return level;
     }
 
     public set level(level: LogLevel) {

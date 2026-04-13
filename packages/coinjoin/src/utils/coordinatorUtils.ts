@@ -61,7 +61,12 @@ export const getScriptTypeFromScriptPubKey = (scriptPubKey: string): AllowedScri
 export function prefixScriptPubKey(scriptPubKey: string, useHex?: boolean): string;
 export function prefixScriptPubKey(scriptPubKey: string, useHex: false): Buffer;
 export function prefixScriptPubKey(scriptPubKey: string, useHex = true) {
-    const [OP = '0', hash = ''] = scriptPubKey.split(' ');
+    const parts = scriptPubKey.split(' ');
+    const OP = parts[0];
+    const hash = parts[1];
+    if (OP === undefined || hash === undefined) {
+        throw new Error(`Invalid scriptPubKey format: "${scriptPubKey}"`);
+    }
     const script = bscript.fromASM(`OP_${OP} ${hash}`);
 
     return useHex ? script.toString('hex') : script;
