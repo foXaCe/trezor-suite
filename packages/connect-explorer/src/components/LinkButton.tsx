@@ -10,11 +10,12 @@ type LinkButtonProps = Omit<ComponentProps<typeof Button>, 'target'> & {
 
 export const LinkButton = ({ href, children, ...props }: LinkButtonProps) => {
     const router = useRouter();
+    const resolvedHref = `${router.basePath}${href}`;
 
     return (
         <Button
             {...props}
-            href={href}
+            href={resolvedHref}
             target="_self"
             onClick={e => {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
