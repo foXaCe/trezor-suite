@@ -108,10 +108,11 @@ describe('api/ethereum/Fees', () => {
             const backend = await initBlockchain(coinInfo, () => {});
             const feeLevels = new EthereumFeeLevels(coinInfo);
 
-            const [level] = await feeLevels.load(backend, ETH_REQUEST);
+            const levels = await feeLevels.load(backend, ETH_REQUEST);
+            const level = levels[0];
 
             // must be an integer wei string — fromWei("1500000000.7", 'gwei') would crash
-            expect(level.feePerUnit).toMatch(/^\d+$/);
+            expect(level?.feePerUnit).toMatch(/^\d+$/);
 
             backend.disconnect();
             spy.mockRestore();

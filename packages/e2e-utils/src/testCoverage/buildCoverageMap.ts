@@ -20,10 +20,12 @@ const parseArgs = () => {
     let outputFile = 'coverage-map/index.json';
 
     for (let i = 0; i < args.length; i++) {
-        if (args[i] === '--input' && args[i + 1]) {
-            inputDir = args[++i];
-        } else if (args[i] === '--output' && args[i + 1]) {
-            outputFile = args[++i];
+        if (args[i] === '--input' && args[i + 1] !== undefined) {
+            i++;
+            inputDir = args[i] ?? inputDir;
+        } else if (args[i] === '--output' && args[i + 1] !== undefined) {
+            i++;
+            outputFile = args[i] ?? outputFile;
         }
     }
 

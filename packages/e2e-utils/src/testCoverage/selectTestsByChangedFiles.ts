@@ -27,10 +27,12 @@ const parseArgs = () => {
     let explicitFiles: string[] = [];
 
     for (let i = 0; i < args.length; i++) {
-        if (args[i] === '--coverage-map' && args[i + 1]) {
-            coverageMapFile = args[++i];
-        } else if (args[i] === '--files' && args[i + 1]) {
-            explicitFiles = args[++i].split(',').filter(Boolean);
+        if (args[i] === '--coverage-map' && args[i + 1] !== undefined) {
+            i++;
+            coverageMapFile = args[i] ?? coverageMapFile;
+        } else if (args[i] === '--files' && args[i + 1] !== undefined) {
+            i++;
+            explicitFiles = (args[i] ?? '').split(',').filter(Boolean);
         }
     }
 
