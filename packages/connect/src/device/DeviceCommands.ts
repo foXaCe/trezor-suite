@@ -25,6 +25,9 @@ export type AccountDescriptor = {
     legacyXpub?: string;
     address_n: number[];
     descriptorChecksum?: string;
+    fingerprint?: number;
+    rootFingerprint?: number;
+    outputDescriptorBip380?: string;
 };
 
 export const DeviceCommands = (deviceTypedCall: TypedCallProvider) => {
@@ -103,6 +106,7 @@ export const DeviceCommands = (deviceTypedCall: TypedCallProvider) => {
             chainCode: publicKey.node.chain_code,
             publicKey: publicKey.node.public_key,
             fingerprint: publicKey.node.fingerprint,
+            rootFingerprint: publicKey.root_fingerprint,
             depth: publicKey.node.depth,
             descriptor: publicKey.descriptor,
         };
@@ -197,12 +201,16 @@ export const DeviceCommands = (deviceTypedCall: TypedCallProvider) => {
     ): Promise<AccountDescriptor> => {
         if (coinInfo.type === 'bitcoin') {
             const resp = await getHDNode({ address_n }, { coinInfo, validation: false });
+            console.log('resp hdnode', resp);
 
             return {
                 descriptor: resp.xpubSegwit || resp.xpub,
                 legacyXpub: resp.xpub,
                 address_n,
                 descriptorChecksum: resp.descriptorChecksum,
+                fingerprint: resp.fingerprint,
+                rootFingerprint: resp.rootFingerprint,
+                outputDescriptorBip380: resp.descriptor,
             };
         }
         if (coinInfo.type === 'ethereum') {

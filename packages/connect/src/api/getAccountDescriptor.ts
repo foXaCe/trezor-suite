@@ -168,17 +168,19 @@ export default class GetAccountDescriptor extends AbstractMethod<
             if (this.disposed) break;
 
             try {
-                const { descriptor, address_n, legacyXpub } = await this.getDevice()
-                    .getCommands()
-                    .getAccountDescriptor(
-                        request.coinInfo,
-                        request.address_n,
-                        request.derivationType,
-                    );
+                const { descriptor, address_n, legacyXpub, outputDescriptorBip380 } =
+                    await this.getDevice()
+                        .getCommands()
+                        .getAccountDescriptor(
+                            request.coinInfo,
+                            request.address_n,
+                            request.derivationType,
+                        );
                 const response = {
                     descriptor,
                     path: getSerializedPath(address_n),
                     legacyXpub,
+                    outputDescriptorBip380,
                 };
                 sendProgress(i, response);
                 responses.push(response);

@@ -23,7 +23,8 @@ import { getCoinInfo } from '../data/coinInfo';
 import { Discovery } from './common/Discovery';
 import { bundlify, getFirmwareRange, validateParams } from './common/paramsValidator';
 import { getAccountLabel, isUtxoBased } from '../utils/accountUtils';
-import { getSerializedPath, validatePath } from '../utils/pathUtils';
+import { fromHardened, getScriptType, getSerializedPath, validatePath } from '../utils/pathUtils';
+import { buildOutputDescriptor } from '@trezor/utxo-lib';
 
 type Request = GetAccountInfoParams & { address_n: number[]; coinInfo: CoinInfo };
 
@@ -220,6 +221,8 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
             let { descriptor } = request;
             let legacyXpub: string | undefined;
             let descriptorChecksum: string | undefined;
+            let rootFingerprint: number | undefined;
+            let outputDescriptorBip380: string | undefined;
 
             if (this.disposed) break;
 
@@ -229,10 +232,39 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                     const accountDescriptor = await this.getDevice()
                         .getCommands()
                         .getAccountDescriptor(request.coinInfo, address_n, request.derivationType);
+                    console.log('accountDescriptor', accountDescriptor);
                     if (accountDescriptor) {
                         descriptor = accountDescriptor.descriptor;
                         legacyXpub = accountDescriptor.legacyXpub;
                         descriptorChecksum = accountDescriptor.descriptorChecksum;
+                        console.log('descriptorChecksum', descriptorChecksum);
+                        rootFingerprint = accountDescriptor.rootFingerprint;
+                        console.log('rootFingerprint', rootFingerprint);
+                        // outputDescriptorBip380 is provided by firmware >= 2.6.5.
+                        // For older firmware, build it from the available data (bitcoin only).
+                        outputDescriptorBip380 =
+                            accountDescriptor.outputDescriptorBip380 ??
+                            (request.coinInfo.type === 'bitcoin' && legacyXpub
+                                ? buildOutputDescriptor({
+                                      coin: request.coinInfo.name,
+                                      account: fromHardened(address_n[2]),
+                                      purpose: fromHardened(address_n[0]),
+                                      scriptType: getScriptType(address_n),
+                                      xpub: legacyXpub,
+                                      rootFingerprint,
+                                  })
+                                : undefined);
+
+                        const justDevBuiltOutputDescriptor = buildOutputDescriptor({
+                                      coin: request.coinInfo.name,
+                                      account: fromHardened(address_n[2]),
+                                      purpose: fromHardened(address_n[0]),
+                                      scriptType: getScriptType(address_n),
+                                      xpub: legacyXpub ?? '',
+                                      rootFingerprint,
+                                  });
+
+                        console.log('justDevBuiltOutputDescriptor', justDevBuiltOutputDescriptor);
                     }
                 } catch (error) {
                     if (this.hasBundle) {
@@ -299,6 +331,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                     legacyXpub,
                     utxo,
                     descriptorChecksum,
+                    outputDescriptorBip380,
                 };
                 responses.push(account);
 
