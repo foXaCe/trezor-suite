@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { type ConnectCallSource, connectPopupActions } from '@suite-common/connect-popup';
+import {
+    type ConnectCallSource,
+    computeGasFeeInWei,
+    connectPopupActions,
+    useHasSufficientFundsForGas,
+} from '@suite-common/connect-popup';
 import { useTxSimulation } from '@suite-common/tx-simulation';
+import { getNetworkDisplaySymbol } from '@suite-common/wallet-config';
 import { ETH_CONTRACT_CALL_BACKUP_GAS_LIMIT } from '@suite-common/wallet-constants';
 import { type Account, type TxSimulationAction } from '@suite-common/wallet-types';
 import { AccountsListItem } from '@suite-native/accounts';
@@ -10,6 +16,7 @@ import {
     Button,
     Card,
     CardDivider,
+    FullAlertBox,
     HStack,
     Loader,
     PressableOpacity,
@@ -68,6 +75,13 @@ export function TxSimulationInner({ action, account, source }: TxSimulationInner
     });
 
     const isSigningTransaction = action.method === 'ethereumSignTransaction';
+    const gasPriceInWei = isSigningTransaction
+        ? (action.payload.transaction.maxFeePerGas ?? action.payload.transaction.gasPrice)
+        : undefined;
+    const hasSufficientFundsForGas = useHasSufficientFundsForGas(
+        gasPriceInWei ? computeGasFeeInWei(gasLimit, gasPriceInWei) : undefined,
+        account.balance,
+    );
 
     const onConfirm = () => {
         if (isSigningTransaction) {
@@ -263,6 +277,20 @@ export function TxSimulationInner({ action, account, source }: TxSimulationInner
                     values={{ provider: 'Blockaid' }}
                 />
             </Text>
+
+            {!hasSufficientFundsForGas && (
+                <FullAlertBox
+                    variant="warning"
+                    title={
+                        <Translation
+                            id="transactionManagement.precomposedTransaction.errors.amountNotEnoughCurrencyFee"
+                            values={{
+                                networkDisplaySymbol: getNetworkDisplaySymbol(account.symbol),
+                            }}
+                        />
+                    }
+                />
+            )}
 
             <Button
                 testID="@popup/confirm-simulation"

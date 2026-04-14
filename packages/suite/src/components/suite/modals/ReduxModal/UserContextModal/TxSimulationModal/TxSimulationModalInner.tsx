@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 
+import { Translation } from '@suite/intl';
 import {
     TxSimulationBanner,
     TxSimulationProvider,
     TxSimulationResult,
     TxSimulationTitle,
 } from '@suite/tx-simulation';
+import { useHasSufficientFundsForGas } from '@suite-common/connect-popup';
 import { getSimulationErrorRiskLevel, useTxSimulation } from '@suite-common/tx-simulation';
+import { getNetworkDisplaySymbol } from '@suite-common/wallet-config';
 import { type Account, type TxSimulationAction } from '@suite-common/wallet-types';
-import { Column, Modal, Spinner } from '@trezor/components';
+import { Banner, Column, Modal, Spinner } from '@trezor/components';
 
 import { ConnectModalBackdrop } from 'src/components/suite/ConnectModalBackdrop';
 import { Fees } from 'src/components/wallet/Fees/Fees';
@@ -57,6 +60,13 @@ export function TxSimulationModalInner({ action, account }: TxSimulationModalInn
     });
     // Show only after simulation is loaded
     const composedLevelsFiltered = txSimulationQuery.isLoading ? null : composedLevels;
+
+    const selectedFee = form.watch('selectedFee') || 'normal';
+    const currentComposedLevel = composedLevels?.[selectedFee];
+    const hasSufficientFundsForGas = useHasSufficientFundsForGas(
+        currentComposedLevel?.type === 'final' ? currentComposedLevel.fee : undefined,
+        account.balance,
+    );
 
     const { confirm, cancel } = useTxSimulationActions({
         method: action.method,
@@ -163,6 +173,24 @@ export function TxSimulationModalInner({ action, account }: TxSimulationModalInn
                                 />
                             )}
                         </Column>
+
+                        {!hasSufficientFundsForGas && (
+                            <Banner
+                                intent="warning"
+                                icon
+                                data-testid="@tx-simulation-modal/insufficient-gas-banner"
+                                title={
+                                    <Translation
+                                        id="AMOUNT_NOT_ENOUGH_CURRENCY_FEE"
+                                        values={{
+                                            networkDisplaySymbol: getNetworkDisplaySymbol(
+                                                account.symbol,
+                                            ),
+                                        }}
+                                    />
+                                }
+                            />
+                        )}
                     </Column>
                 </FormProvider>
             </Modal.ModalBase>
