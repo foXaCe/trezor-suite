@@ -53,9 +53,8 @@ test.describe('Onboarding - create wallet', { tag: ['@firmware-ready', '@T1B1'] 
                 await device.pressYes();
                 // Emulator needs to initialize the seed first
                 await page.waitForTimeout(1_000);
-                for (let i = 0; i < 48; i++) {
-                    await device.pressYes();
-                }
+
+                await device.pressYesMultiple({ count: 48 });
                 await page.getByTestId('@onboarding/continue-button').click();
             });
 
@@ -80,7 +79,8 @@ test.describe('Onboarding - create wallet', { tag: ['@firmware-ready', '@T1B1'] 
 
             await test.step('Finish wallet creation', async () => {
                 await expect(onboardingPage.suiteLoadedIndicator).toBeVisible();
-                await expect(dashboardPage.walletReady).toBeVisible({ timeout: 30_000 });
+                // await expect(dashboardPage.walletReady).toBeVisible({ timeout: 30_000 });
+                await expect(dashboardPage.walletReady).toBeVisible();
             });
         },
     );
