@@ -3,7 +3,7 @@ import { type NetworkSymbol } from '@suite-common/wallet-config';
 import { Form, useForm } from '@suite-native/forms';
 import {
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderWithStoreProvider,
     userEvent,
 } from '@suite-native/test-utils-store';
@@ -108,7 +108,7 @@ describe('FeeOption', () => {
     };
 
     beforeEach(() => {
-        store = initStore(getPreloadedState()).store;
+        store = createStoreFromPreloadedState(getPreloadedState());
 
         // Default mock implementations
         mockSelectConvertedNetworkFeeLevelTimeEstimate.mockReturnValue('~10 minutes');

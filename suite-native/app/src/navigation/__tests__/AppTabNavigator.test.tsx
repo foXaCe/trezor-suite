@@ -1,18 +1,20 @@
 import { FeatureFlag, featureFlagsInitialState } from '@suite-native/feature-flags';
-import {
-    type PreloadedState,
-    act,
-    fireEvent,
-    renderWithStoreProvider,
-} from '@suite-native/test-utils-store';
+import { act, fireEvent, renderWithStoreProvider } from '@suite-native/test-utils-store';
 
 import { AppTabNavigator } from '../AppTabNavigator';
 
 jest.mock('@suite-common/tx-simulation', () => ({}));
 
+const defaultPreloadedState = {
+    featureFlags: featureFlagsInitialState,
+    bluetooth: { permissionStatus: 'unavailable' },
+};
+
 describe('AppTabNavigator', () => {
-    const renderTabs = (preloadedState?: PreloadedState) =>
-        renderWithStoreProvider(<AppTabNavigator />, { preloadedState });
+    const renderTabs = (preloadedState?: any) =>
+        renderWithStoreProvider(<AppTabNavigator />, {
+            preloadedState: { ...defaultPreloadedState, ...preloadedState },
+        });
 
     beforeEach(() => {
         global.fetch = jest.fn().mockResolvedValue({
@@ -71,7 +73,7 @@ describe('AppTabNavigator', () => {
                     ],
                 },
             },
-        } as unknown as PreloadedState);
+        });
 
         expect(queryByText('Trade')).toBe(null);
     });

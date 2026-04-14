@@ -2,7 +2,6 @@ import { events } from '@suite-native/analytics';
 import { Form } from '@suite-native/forms';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     act,
     fireEvent,
     renderHookWithStoreProvider,
@@ -35,7 +34,7 @@ jest.mock('@suite-native/services', () => {
 describe('BuyProviderPicker', () => {
     let form: BuyFormType;
 
-    const renderUseTradingBuyForm = (preloadedState: PreloadedState = {}) => {
+    const renderUseTradingBuyForm = (preloadedState: any = {}) => {
         const { result } = renderHookWithStoreProvider(() => useBuyForm(), {
             preloadedState,
         });
@@ -44,7 +43,7 @@ describe('BuyProviderPicker', () => {
         return form;
     };
 
-    const renderTradingProviderPicker = (preloadedState: PreloadedState = {}) =>
+    const renderTradingProviderPicker = (preloadedState: any = {}) =>
         renderWithStoreProvider(
             <Form form={form}>
                 <BuyProviderPicker />
@@ -72,7 +71,7 @@ describe('BuyProviderPicker', () => {
     });
 
     it('should display loader while quotes are fetched', () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: { trading: { buy: { isLoading: true, quotes: [] } } },
         };
         renderUseTradingBuyForm();
@@ -82,7 +81,7 @@ describe('BuyProviderPicker', () => {
     });
 
     describe('with quotes loaded', () => {
-        let preloadedState: PreloadedState;
+        let preloadedState: any;
 
         beforeEach(() => {
             act(() => {

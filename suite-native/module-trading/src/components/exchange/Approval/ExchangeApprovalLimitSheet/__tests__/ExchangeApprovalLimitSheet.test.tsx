@@ -1,5 +1,5 @@
 import { getTranslation } from '@suite-native/intl';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { exchangeQuotes, getInitializedTradingState } from '@suite-native/trading-fixtures';
 
 import { ExchangeApprovalLimitSheet } from '../ExchangeApprovalLimitSheet';
@@ -9,7 +9,7 @@ const mockOnApprovalTypeSelect = jest.fn();
 
 const testQuote = exchangeQuotes[0];
 
-const getPreloadedState = (): PreloadedState => ({
+const getPreloadedState = (): any => ({
     wallet: {
         trading: {
             ...getInitializedTradingState('exchange'),

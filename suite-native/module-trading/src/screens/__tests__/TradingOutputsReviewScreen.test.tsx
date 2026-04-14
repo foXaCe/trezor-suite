@@ -6,7 +6,11 @@ import type {
     TradingStackParamList,
     TradingStackRoutes,
 } from '@suite-native/navigation';
-import { type TestStore, initStore, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import {
+    type TestStore,
+    createStoreFromPreloadedState,
+    renderWithStoreProvider,
+} from '@suite-native/test-utils-store';
 import { getWalletState } from '@suite-native/trading-fixtures';
 
 import {
@@ -146,7 +150,9 @@ describe('TradingSellOutputsReviewScreen', () => {
 
         beforeEach(() => {
             jest.clearAllMocks();
-            store = initStore({ wallet: getWalletState({ tradeType: 'sell' }) }).store;
+            store = createStoreFromPreloadedState({
+                wallet: getWalletState({ tradeType: 'sell' }),
+            });
             mockNavigation.navigate.mockClear();
             mockNavigation.goBack.mockClear();
             mockNavigation.popToTop.mockClear();
@@ -189,7 +195,9 @@ describe('TradingSellOutputsReviewScreen', () => {
 
         beforeEach(() => {
             jest.clearAllMocks();
-            store = initStore({ wallet: getWalletState({ tradeType: 'exchange' }) }).store;
+            store = createStoreFromPreloadedState({
+                wallet: getWalletState({ tradeType: 'exchange' }),
+            });
             mockNavigation.navigate.mockClear();
             mockNavigation.goBack.mockClear();
             mockNavigation.popToTop.mockClear();

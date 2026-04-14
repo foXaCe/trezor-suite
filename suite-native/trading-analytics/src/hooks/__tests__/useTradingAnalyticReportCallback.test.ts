@@ -6,7 +6,7 @@ import {
     events,
 } from '@suite-native/analytics';
 import { useAnalytics } from '@suite-native/services';
-import { type PreloadedState, renderHookWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderHookWithStoreProvider } from '@suite-native/test-utils-store';
 import {
     banxaCreditCardSellQuote,
     exchangeQuotes,
@@ -27,7 +27,7 @@ jest.mock('@suite-native/services', () => {
 });
 
 describe('useTradingAnalyticReportCallback', () => {
-    let preloadedState: PreloadedState;
+    let preloadedState: any;
 
     beforeEach(() => {
         jest.clearAllMocks();

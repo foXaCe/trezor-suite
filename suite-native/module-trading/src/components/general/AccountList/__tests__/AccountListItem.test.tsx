@@ -2,8 +2,8 @@ import { asAccountDescriptor } from '@suite-common/wallet-types';
 import { mockWalletAccount } from '@suite-common/wallet-types/mocks';
 import {
     type TestStore,
+    createStoreFromPreloadedState,
     fireEvent,
-    initStore,
     renderWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { type ReceiveAccount } from '@suite-native/trading-types';
@@ -66,7 +66,7 @@ describe('AccountListItem', () => {
         receiveAccount: ReceiveAccount,
         preloadedState = defaultPreloadedState,
     ) => {
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
 
         return renderWithStoreProvider(
             <AccountListItem onPress={onPressMock} receiveAccount={receiveAccount} />,

@@ -1,12 +1,7 @@
 import type { BuyTradeStatus, ExchangeTradeStatus, SellTradeStatus } from 'invity-api';
 
 import { type TradingTransaction } from '@suite-common/trading';
-import {
-    type PreloadedState,
-    act,
-    fireEvent,
-    renderWithStoreProvider,
-} from '@suite-native/test-utils-store';
+import { act, fireEvent, renderWithStoreProvider } from '@suite-native/test-utils-store';
 import {
     buyMercuryo,
     exchangeMercuryo,
@@ -38,10 +33,7 @@ jest.mock('@react-navigation/native', () => ({
     useNavigation: () => mockNavigation,
 }));
 
-const createPreloadedState = (
-    trades: TradingTransaction[],
-    statusUrl?: string | null,
-): PreloadedState => {
+const createPreloadedState = (trades: TradingTransaction[], statusUrl?: string | null): any => {
     const tradingState = getInitializedTradingStateWithQuotes();
     tradingState.trades = trades;
 

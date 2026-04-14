@@ -2,7 +2,6 @@ import { events } from '@suite-native/analytics';
 import { Form } from '@suite-native/forms';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -37,10 +36,10 @@ jest.mock('@suite-native/services', () => {
 });
 
 describe('SellForm', () => {
-    const renderFormHook = (preloadedState: PreloadedState) =>
+    const renderFormHook = (preloadedState: any) =>
         renderHookWithStoreProvider(() => useSellForm(), { preloadedState });
 
-    const renderSellForm = (preloadedState: PreloadedState, form: SellFormType) =>
+    const renderSellForm = (preloadedState: any, form: SellFormType) =>
         renderWithStoreProvider(<SellForm />, {
             preloadedState,
             wrapper: ({ children }) => <Form form={form}>{children}</Form>,
@@ -68,7 +67,7 @@ describe('SellForm', () => {
 
     describe('with preloaded sell data', () => {
         let form: SellFormType;
-        let preloadedState: PreloadedState;
+        let preloadedState: any;
 
         beforeEach(() => {
             preloadedState = {

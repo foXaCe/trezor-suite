@@ -1,10 +1,9 @@
 import { INVITY_API_RELOAD_QUOTES_AFTER_SECONDS, tradingSellActions } from '@suite-common/trading';
 import { type AccountKey } from '@suite-common/wallet-types';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -49,14 +48,14 @@ jest.mock('@suite-common/trading', () => ({
 
 describe('useSellQuotes', () => {
     const getInitializedStore = () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({
                 tradeType: 'sell',
             }),
         };
         preloadedState.wallet!.trading!.sell!.tradingAccountKey = 'btc-account-1';
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseSellQuotes = (store: TestStore) =>

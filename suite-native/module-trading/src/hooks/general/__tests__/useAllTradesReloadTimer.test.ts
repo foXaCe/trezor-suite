@@ -1,8 +1,7 @@
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -41,7 +40,7 @@ describe('useAllTradesReloadTimer', () => {
     });
 
     const getInitializedStore = ({ trades = [] }: { trades?: any[] } = {}) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: {
                     ...getInitializedTradingState(),
@@ -81,7 +80,7 @@ describe('useAllTradesReloadTimer', () => {
             },
         };
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseAllTradesReloadTimer = (store: TestStore) =>

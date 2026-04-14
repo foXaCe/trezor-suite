@@ -3,7 +3,7 @@ import { type RouteProp } from '@react-navigation/native';
 import { type NetworkSymbol } from '@suite-common/wallet-config';
 import { type Account } from '@suite-common/wallet-types';
 import { type TradingStackParamList, type TradingStackRoutes } from '@suite-native/navigation';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { accounts, getInitializedTradingState } from '@suite-native/trading-fixtures';
 
 import { TradingReceiveAccountsPickerScreen } from '../TradingReceiveAccountsPickerScreen';
@@ -21,7 +21,7 @@ jest.mock('@react-navigation/native', () => ({
         }) as RouteProp<TradingStackParamList, TradingStackRoutes.ReceiveAccounts>,
 }));
 
-const getPreloadedState = (preloadedAccounts: Account[]): PreloadedState => ({
+const getPreloadedState = (preloadedAccounts: Account[]): any => ({
     device: {
         devices: [],
         selectedDevice: {
@@ -44,7 +44,7 @@ const getPreloadedState = (preloadedAccounts: Account[]): PreloadedState => ({
 describe('TradingReceiveAccountsPickerScreen', () => {
     let unmount: (() => void) | undefined;
 
-    const renderScreen = (preloadedState: PreloadedState) => {
+    const renderScreen = (preloadedState: any) => {
         const result = renderWithStoreProvider(<TradingReceiveAccountsPickerScreen />, {
             preloadedState,
         });

@@ -1,6 +1,11 @@
+import { type AccountKey } from '@suite-common/wallet-types';
 import { getTranslation } from '@suite-native/intl';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
-import { banxaCreditCardSellQuote, getWalletState } from '@suite-native/trading-fixtures';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
+import {
+    banxaCreditCardSellQuote,
+    eth1NormalAccount,
+    getWalletState,
+} from '@suite-native/trading-fixtures';
 import type { ProviderConfirmationStatus } from '@suite-native/trading-types';
 
 import { SellFeePickerCard, type SellFeePickerCardProps } from '../SellFeePickerCard';
@@ -14,14 +19,18 @@ jest.mock('@suite-native/transaction-management', () => ({
 describe('SellFeePickerCard', () => {
     const renderSellFeePickerCard = (
         props: Partial<SellFeePickerCardProps> = {},
-        tradingAccountKey = 'eth-account-1',
+        tradingAccountKey: AccountKey = eth1NormalAccount.key,
         providerConfirmationStatus: ProviderConfirmationStatus = 'confirmation_success',
     ) => {
-        const preloadedState: PreloadedState = {
-            wallet: getWalletState({ tradeType: 'sell' }),
+        const walletState = getWalletState({ tradeType: 'sell' });
+        const preloadedState = {
+            wallet: {
+                ...walletState,
+                formDrafts: {},
+            },
         };
-        preloadedState.wallet!.trading!.sell!.tradingAccountKey = tradingAccountKey;
-        preloadedState.wallet!.trading!.providerConfirmationStatus = providerConfirmationStatus;
+        preloadedState.wallet.trading.sell.tradingAccountKey = tradingAccountKey;
+        preloadedState.wallet.trading.providerConfirmationStatus = providerConfirmationStatus;
 
         return renderWithStoreProvider(<SellFeePickerCard isTxnError={false} {...props} />, {
             preloadedState,
@@ -56,7 +65,7 @@ describe('SellFeePickerCard', () => {
     it('should render nothing when account is not found', () => {
         const { toJSON } = renderSellFeePickerCard(
             { quote: banxaCreditCardSellQuote },
-            'unknown-account-key',
+            'unknown-account-key' as AccountKey,
         );
 
         expect(toJSON()).toBeNull();
@@ -65,7 +74,7 @@ describe('SellFeePickerCard', () => {
     it('should render nothing when providerConfirmationStatus is not in "confirmation_success" state', () => {
         const { toJSON } = renderSellFeePickerCard(
             { quote: banxaCreditCardSellQuote },
-            'eth-account-1',
+            eth1NormalAccount.key,
             'window_closed_with_success',
         );
 

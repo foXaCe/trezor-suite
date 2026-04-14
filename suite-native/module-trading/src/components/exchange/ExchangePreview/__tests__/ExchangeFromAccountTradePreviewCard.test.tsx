@@ -1,5 +1,8 @@
+import { deviceInitialState } from '@suite-common/device';
+import { messageSystemInitialState } from '@suite-common/message-system';
+import { initialSuiteSyncDataState, initialSuiteSyncState } from '@suite-common/suite-sync';
 import type { AccountKey } from '@suite-common/wallet-types';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { eth1NormalAccount, exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import {
@@ -12,11 +15,22 @@ describe('ExchangeFromAccountTradePreviewCard', () => {
         props: Partial<ExchangeFromAccountTradePreviewCardProps> = {},
         tradingAccountKey = eth1NormalAccount.key,
     ) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState = {
+            device: deviceInitialState,
+            messageSystem: messageSystemInitialState,
+            suiteSync: initialSuiteSyncState,
+            suiteSyncData: initialSuiteSyncDataState,
             wallet: getWalletState({ tradeType: 'exchange' }),
         };
-        preloadedState.wallet!.trading!.composedTransactionInfo = { composed: { fee: '1000' } };
-        preloadedState.wallet!.trading!.exchange!.tradingAccountKey = tradingAccountKey;
+        preloadedState.wallet.trading.composedTransactionInfo = {
+            composed: {
+                fee: '1000',
+                feePerByte: '1',
+                feeLimit: '21000',
+                estimatedFeeLimit: '21000',
+            },
+        };
+        preloadedState.wallet.trading.exchange.tradingAccountKey = tradingAccountKey;
 
         return renderWithStoreProvider(<ExchangeFromAccountTradePreviewCard {...props} />, {
             preloadedState,

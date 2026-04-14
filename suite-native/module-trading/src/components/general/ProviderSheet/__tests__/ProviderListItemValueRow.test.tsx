@@ -1,5 +1,5 @@
 import type { TradingTradeType } from '@suite-common/trading';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { getInitializedTradingStateWithQuotes } from '@suite-native/trading-fixtures';
 
 import { ProviderListItemValueRow } from '../ProviderListItemValueRow';
@@ -11,10 +11,7 @@ describe('ProviderListItemValueRow', () => {
         },
     });
 
-    const renderProviderListItemValueRow = (
-        quote: TradingTradeType,
-        preloadedState: PreloadedState = {},
-    ) =>
+    const renderProviderListItemValueRow = (quote: TradingTradeType, preloadedState: any = {}) =>
         renderWithStoreProvider(<ProviderListItemValueRow quote={quote} />, {
             preloadedState,
         });

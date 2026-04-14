@@ -1,10 +1,9 @@
 import { tradingSellActions, tradingThunks } from '@suite-common/trading';
 import { type AccountKey } from '@suite-common/wallet-types';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { getBtcAccount, getInitializedTradingState } from '@suite-native/trading-fixtures';
@@ -22,7 +21,7 @@ const btc3AccountKey = 'btc-account-3' as AccountKey; // Todo: create properly v
 
 describe('useSellData', () => {
     const getInitializedStore = (tradingAccountKey: AccountKey | undefined) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: getInitializedTradingState('sell'),
                 accounts: [
@@ -34,7 +33,7 @@ describe('useSellData', () => {
         };
         preloadedState.wallet!.trading!.sell!.tradingAccountKey = tradingAccountKey;
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseSellData = async (

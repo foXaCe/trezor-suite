@@ -38,7 +38,7 @@ type TableName = Parameters<BaseEvoluClient['readFrom']>[0];
 class NativeEvoluClient extends BaseEvoluClient {
     async expectInTable<T extends TableName>(
         table: T,
-        expectedData: Record<string, unknown>[],
+        expectedData: any[],
         options?: { omit?: string[]; timeout?: number },
     ) {
         const omitFields = options?.omit ?? ['createdAt'];

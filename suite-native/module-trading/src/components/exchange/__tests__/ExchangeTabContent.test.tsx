@@ -1,10 +1,4 @@
-import {
-    type PreloadedState,
-    act,
-    renderWithStoreProvider,
-    screen,
-    userEvent,
-} from '@suite-native/test-utils-store';
+import { act, renderWithStoreProvider, screen, userEvent } from '@suite-native/test-utils-store';
 
 import { ExchangeTabContent } from '../ExchangeTabContent';
 
@@ -28,7 +22,7 @@ describe('ExchangeTab', () => {
         }));
     });
 
-    const renderExchangeTab = (preloadedState?: PreloadedState) =>
+    const renderExchangeTab = (preloadedState?: any) =>
         renderWithStoreProvider(<ExchangeTabContent />, { preloadedState });
 
     const expectSkeleton = () => {

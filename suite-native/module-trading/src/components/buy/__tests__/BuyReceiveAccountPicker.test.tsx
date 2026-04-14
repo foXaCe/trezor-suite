@@ -1,6 +1,5 @@
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     fireEvent,
     renderHookWithStoreProvider,
@@ -51,7 +50,7 @@ describe('BuyReceiveAccountPicker', () => {
         return result.current;
     };
 
-    const renderPicker = ({ preloadedState }: { preloadedState?: PreloadedState } = {}) =>
+    const renderPicker = ({ preloadedState }: { preloadedState?: any } = {}) =>
         renderWithStoreProvider(<BuyReceiveAccountPicker />, {
             preloadedState,
             wrapper: ({ children }) => <Form form={buyForm}>{children}</Form>,

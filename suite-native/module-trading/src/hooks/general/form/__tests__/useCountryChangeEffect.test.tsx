@@ -1,7 +1,7 @@
 import { type TradingCountryCode, type TradingCountryOption } from '@suite-common/trading';
 import {
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { selectTradingResidenceCountry } from '@suite-native/trading-state';
@@ -15,7 +15,7 @@ describe('useCountryChangeEffect', () => {
         renderHookWithStoreProvider(() => useCountryChangeEffect(watch), { store });
 
     beforeEach(() => {
-        store = initStore().store;
+        store = createStoreFromPreloadedState();
     });
 
     it('should do nothing on mount', () => {

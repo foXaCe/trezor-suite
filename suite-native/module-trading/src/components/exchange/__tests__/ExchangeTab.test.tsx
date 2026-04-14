@@ -1,4 +1,4 @@
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 
 import { ExchangeTab } from '../ExchangeTab';
 
@@ -28,7 +28,7 @@ jest.mock('@suite-native/trading-state', () => ({
 }));
 
 describe('ExchangeTab', () => {
-    const renderExchangeTab = (preloadedState: PreloadedState = {}) =>
+    const renderExchangeTab = (preloadedState = {}) =>
         renderWithStoreProvider(<ExchangeTab />, { preloadedState });
 
     beforeEach(() => {

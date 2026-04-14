@@ -7,7 +7,7 @@ import {
 } from '@suite-common/trading';
 import { type Account, type TokenAddress, type TokenInfoBranded } from '@suite-common/wallet-types';
 import { getFormDraftKey } from '@suite-common/wallet-utils';
-import { type PreloadedState, type TestStore, initStore } from '@suite-native/test-utils-store';
+import { type TestStore, createStoreFromPreloadedState } from '@suite-native/test-utils-store';
 import { selectAccountTokenInfo } from '@suite-native/tokens';
 import { eth1NormalAccount, exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
@@ -155,7 +155,7 @@ describe('thunks', () => {
             const walletState = getWalletState({ tradeType: 'exchange' });
             walletState.trading.exchange.tradingAccountKey = eth1NormalAccount.key;
 
-            const preloadedState: PreloadedState = {
+            const preloadedState: any = {
                 wallet: walletState,
                 device: {
                     selectedDevice: {
@@ -164,7 +164,7 @@ describe('thunks', () => {
                     },
                 },
             };
-            store = initStore(preloadedState).store;
+            store = createStoreFromPreloadedState(preloadedState);
         });
 
         it('should reject when dexTx data is missing', async () => {
@@ -210,7 +210,7 @@ describe('thunks', () => {
             const walletState = getWalletState({ tradeType: 'exchange' });
             walletState.trading.exchange.tradingAccountKey = eth1NormalAccount.key;
 
-            const preloadedState: PreloadedState = {
+            const preloadedState: any = {
                 wallet: {
                     ...walletState,
                     formDrafts: {
@@ -237,7 +237,7 @@ describe('thunks', () => {
                     },
                 },
             };
-            const localStore = initStore(preloadedState).store;
+            const localStore = createStoreFromPreloadedState(preloadedState);
             const ethAccount = localStore
                 .getState()
                 .wallet.accounts.find((account: Account) => account.key === eth1NormalAccount.key);
@@ -265,7 +265,7 @@ describe('thunks', () => {
             const walletState = getWalletState({ tradeType: 'exchange' });
             walletState.trading.exchange.tradingAccountKey = eth1NormalAccount.key;
 
-            const preloadedState: PreloadedState = {
+            const preloadedState: any = {
                 wallet: {
                     ...walletState,
                     formDrafts: {},
@@ -277,7 +277,7 @@ describe('thunks', () => {
                     },
                 },
             };
-            const localStore = initStore(preloadedState).store;
+            const localStore = createStoreFromPreloadedState(preloadedState);
             const ethAccount = localStore
                 .getState()
                 .wallet.accounts.find((account: Account) => account.key === eth1NormalAccount.key);

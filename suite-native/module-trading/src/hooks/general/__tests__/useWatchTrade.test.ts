@@ -3,8 +3,7 @@ import React from 'react';
 import { type AccountKey } from '@suite-common/wallet-types';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { getBuyTrade, getInitializedTradingState } from '@suite-native/trading-fixtures';
@@ -68,7 +67,7 @@ describe('useWatchTrade', () => {
         trades = [],
         accounts = [],
     }: { trades?: any[]; accounts?: any[] } = {}) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: {
                     ...getInitializedTradingState(),
@@ -95,7 +94,7 @@ describe('useWatchTrade', () => {
             },
         };
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseWatchTrade = (

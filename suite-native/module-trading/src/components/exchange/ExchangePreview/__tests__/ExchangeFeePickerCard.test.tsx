@@ -1,6 +1,7 @@
+import { type AccountKey } from '@suite-common/wallet-types';
 import { getTranslation } from '@suite-native/intl';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
-import { exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { btc1NormalAccount, exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import { ExchangeFeePickerCard, type ExchangeFeePickerCardProps } from '../ExchangeFeePickerCard';
 
@@ -13,12 +14,16 @@ jest.mock('@suite-native/transaction-management', () => ({
 describe('ExchangeFeePickerCard', () => {
     const renderExchangeFeePickerCard = (
         props: Partial<ExchangeFeePickerCardProps> = {},
-        tradingAccountKey = 'btc-account-1',
+        tradingAccountKey: AccountKey = btc1NormalAccount.key,
     ) => {
-        const preloadedState: PreloadedState = {
-            wallet: getWalletState({ tradeType: 'exchange' }),
+        const walletState = getWalletState({ tradeType: 'exchange' });
+        const preloadedState = {
+            wallet: {
+                ...walletState,
+                formDrafts: {},
+            },
         };
-        preloadedState.wallet!.trading!.exchange!.tradingAccountKey = tradingAccountKey;
+        preloadedState.wallet.trading.exchange.tradingAccountKey = tradingAccountKey;
 
         return renderWithStoreProvider(<ExchangeFeePickerCard isTxnError={false} {...props} />, {
             preloadedState,
@@ -43,7 +48,7 @@ describe('ExchangeFeePickerCard', () => {
     it('should render nothing when account is not found', () => {
         const { toJSON } = renderExchangeFeePickerCard(
             { quote: exchangeQuotes[0] },
-            'unknown-account-key',
+            'unknown-account-key' as AccountKey,
         );
 
         expect(toJSON()).toBeNull();

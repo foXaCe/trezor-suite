@@ -1,4 +1,4 @@
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 
 import { FaqCard } from '../FaqCard';
 
@@ -16,7 +16,7 @@ jest.mock('@suite-native/trading-state', () => ({
 }));
 
 describe('FaqCard', () => {
-    const renderFaqCard = (preloadedState: PreloadedState = {}) =>
+    const renderFaqCard = (preloadedState = {}) =>
         renderWithStoreProvider(<FaqCard />, { preloadedState });
 
     beforeEach(() => {

@@ -2,7 +2,7 @@ import { tradingExchangeActions } from '@suite-common/trading';
 import { type AccountKey } from '@suite-common/wallet-types';
 import {
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderWithStoreProvider,
     userEvent,
 } from '@suite-native/test-utils-store';
@@ -36,7 +36,7 @@ describe('ApprovalButton', () => {
         preloadedState!.wallet!.trading!.exchange!.selectedQuote = exchangeQuotes[0];
         preloadedState!.wallet!.trading!.exchange!.tradingAccountKey =
             'eth-account-1' as AccountKey;
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
     });
 
     it('should render continue button when isReady is true', () => {

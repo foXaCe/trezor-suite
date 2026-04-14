@@ -2,7 +2,6 @@ import { events } from '@suite-native/analytics';
 import { Form } from '@suite-native/forms';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -28,7 +27,7 @@ jest.mock('@suite-native/services', () => {
 
 describe('ExchangeRateAndProviderPicker', () => {
     let exchangeForm: ExchangeFormType;
-    let preloadedState: PreloadedState;
+    let preloadedState: any;
 
     const renderExchangeForm = () => renderHookWithStoreProvider(() => useExchangeForm());
 

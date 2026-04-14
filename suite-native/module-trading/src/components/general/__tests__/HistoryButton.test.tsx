@@ -1,9 +1,5 @@
 import { type TradingTransaction } from '@suite-common/trading';
-import {
-    type PreloadedState,
-    fireEvent,
-    renderWithStoreProvider,
-} from '@suite-native/test-utils-store';
+import { fireEvent, renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { getBuyTrade } from '@suite-native/trading-fixtures';
 
 import { HistoryButton } from '../HistoryButton';
@@ -24,7 +20,7 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 describe('HistoryButton', () => {
-    const renderHistoryButton = (preloadedState: PreloadedState) =>
+    const renderHistoryButton = (preloadedState: any) =>
         renderWithStoreProvider(<HistoryButton />, {
             preloadedState,
         });

@@ -1,10 +1,9 @@
 import { tradingExchangeActions, tradingThunks } from '@suite-common/trading';
 import { type AccountKey } from '@suite-common/wallet-types';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { getBtcAccount, getInitializedTradingState } from '@suite-native/trading-fixtures';
@@ -22,7 +21,7 @@ const btc3AccountKey = 'btc-account-3' as AccountKey; // Todo: create properly v
 
 describe('useExchangeData', () => {
     const getInitializedStore = (tradingAccountKey: string | undefined) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: getInitializedTradingState('exchange'),
                 accounts: [
@@ -34,7 +33,7 @@ describe('useExchangeData', () => {
         };
         preloadedState.wallet!.trading!.exchange!.tradingAccountKey = tradingAccountKey;
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseExchangeData = async (

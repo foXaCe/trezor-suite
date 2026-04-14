@@ -1,11 +1,7 @@
 import { type RouteProp } from '@react-navigation/native';
 
 import { type TradingStackParamList, type TradingStackRoutes } from '@suite-native/navigation';
-import {
-    type PreloadedState,
-    fireEvent,
-    renderWithStoreProvider,
-} from '@suite-native/test-utils-store';
+import { fireEvent, renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { accounts, getBuyTrade, getInitializedTradingState } from '@suite-native/trading-fixtures';
 
 import { TradingHistoryScreen } from '../TradingHistoryScreen';
@@ -39,7 +35,7 @@ jest.mock('@suite-common/trading', () => {
     };
 });
 
-const getPreloadedState = (): PreloadedState => ({
+const getPreloadedState = (): any => ({
     wallet: {
         trading: {
             ...getInitializedTradingState(),
@@ -60,7 +56,7 @@ const getPreloadedState = (): PreloadedState => ({
 describe('TradingHistoryScreen', () => {
     let unmount: (() => void) | undefined;
 
-    const renderScreen = (preloadedState: PreloadedState) => {
+    const renderScreen = (preloadedState: any) => {
         const result = renderWithStoreProvider(<TradingHistoryScreen />, {
             preloadedState,
         });

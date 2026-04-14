@@ -10,9 +10,8 @@ import { getTranslation } from '@suite-native/intl';
 import { type TradingStackParamList, type TradingStackRoutes } from '@suite-native/navigation';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderWithStoreProvider,
     userEvent,
     waitFor,
@@ -88,7 +87,7 @@ jest.mock('@suite-native/alerts', () => ({
 const mockPopToTop = jest.fn();
 const mockNavigate = jest.fn();
 
-const createPreloadedState = (quote?: ExchangeTrade): PreloadedState => {
+const createPreloadedState = (quote?: ExchangeTrade): any => {
     const preloadedState = { wallet: getWalletState({ tradeType: 'exchange' }) };
     preloadedState.wallet.trading.exchange = {
         ...preloadedState.wallet.trading.exchange,
@@ -158,7 +157,7 @@ describe('TradingExchangePreviewScreen', () => {
         consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
         const preloadedState = createPreloadedState();
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
     });
 
     afterEach(() => {
@@ -340,7 +339,7 @@ describe('TradingExchangePreviewScreen', () => {
             };
 
             const preloadedState = createPreloadedState(quoteWithError);
-            const testStore = initStore(preloadedState).store;
+            const testStore = createStoreFromPreloadedState(preloadedState);
             const { result } = renderTradingExchangePreviewScreen(false, testStore);
 
             expect(result.getByText('Quote error message')).toBeOnTheScreen();
@@ -355,7 +354,7 @@ describe('TradingExchangePreviewScreen', () => {
             };
 
             const preloadedState = createPreloadedState(quoteWithoutError);
-            const testStore = initStore(preloadedState).store;
+            const testStore = createStoreFromPreloadedState(preloadedState);
             const { result } = renderTradingExchangePreviewScreen(false, testStore);
 
             expect(result.queryByText('Transaction error occurred')).toBeNull();
@@ -371,7 +370,7 @@ describe('TradingExchangePreviewScreen', () => {
             };
 
             const preloadedState = createPreloadedState(quoteWithError);
-            const testStore = initStore(preloadedState).store;
+            const testStore = createStoreFromPreloadedState(preloadedState);
             const { result } = renderTradingExchangePreviewScreen(false, testStore);
 
             expect(result.getByText('Transaction error takes priority')).toBeOnTheScreen();

@@ -1,6 +1,5 @@
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     fireEvent,
     renderHookWithStoreProvider,
@@ -26,7 +25,7 @@ describe('ExchangeReceiveAmountInput', () => {
 
     const renderExchangeReceiveAmountInput = (
         props: Partial<ExchangeReceiveAmountInputProps> = {},
-        preloadedState: PreloadedState = {},
+        preloadedState: any = {},
     ) =>
         renderWithStoreProvider(
             <ExchangeReceiveAmountInput showAssetsSheet={jest.fn()} {...props} />,

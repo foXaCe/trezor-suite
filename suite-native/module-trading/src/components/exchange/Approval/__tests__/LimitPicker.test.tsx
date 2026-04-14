@@ -2,7 +2,7 @@ import { selectTradingExchangeActiveQuote, tradingExchangeActions } from '@suite
 import { getTranslation } from '@suite-native/intl';
 import {
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderWithStoreProvider,
     userEvent,
     within,
@@ -43,7 +43,7 @@ describe('LimitPicker', () => {
 
         preloadedState!.wallet!.trading.exchange.preselectedQuote = exchangeQuotes[0];
 
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
         store.dispatch(tradingExchangeActions.saveSelectedQuote(exchangeQuotes[0]));
     });
 

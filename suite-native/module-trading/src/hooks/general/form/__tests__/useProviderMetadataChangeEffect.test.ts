@@ -1,7 +1,7 @@
 import { selectTradingProviderMetadata } from '@suite-common/trading';
 import {
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { buyMercuryo, getWalletState } from '@suite-native/trading-fixtures';
@@ -31,7 +31,7 @@ describe('useProviderMetadataChangeEffect', () => {
         });
 
     beforeEach(() => {
-        ({ store } = initStore({ wallet: getWalletState({ tradeType: 'buy' }) }));
+        store = createStoreFromPreloadedState({ wallet: getWalletState({ tradeType: 'buy' }) });
         mockIsFocused = true;
     });
 

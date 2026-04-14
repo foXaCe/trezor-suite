@@ -1,8 +1,4 @@
-import {
-    type PreloadedState,
-    fireEvent,
-    renderWithStoreProvider,
-} from '@suite-native/test-utils-store';
+import { fireEvent, renderWithStoreProvider } from '@suite-native/test-utils-store';
 
 import { ProviderSheetHandle, type ProviderSheetHandleProps } from '../ProviderSheetHandle';
 
@@ -22,7 +18,7 @@ jest.mock('@suite-common/message-system', () => {
 describe('ProviderSheetHandle', () => {
     const renderProviderSheetHandle = (
         props: Partial<ProviderSheetHandleProps> = {},
-        preloadedState: PreloadedState = {},
+        preloadedState: any = {},
     ) =>
         renderWithStoreProvider(
             <ProviderSheetHandle

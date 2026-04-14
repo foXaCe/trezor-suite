@@ -7,10 +7,9 @@ import { selectTradingProviderMetadata, tradingBuyActions } from '@suite-common/
 import { type AccountKey } from '@suite-common/wallet-types';
 import { Form, useField } from '@suite-native/forms';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHook,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
@@ -46,7 +45,7 @@ describe('useBuyForm', () => {
         renderHookWithStoreProvider(() => useBuyForm(), { store });
 
     const getInitializedStore = (amountInSats = false) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: getInitializedTradingState(),
                 settings: {
@@ -63,7 +62,7 @@ describe('useBuyForm', () => {
         };
         preloadedState.wallet!.trading!.buy!.tradingAccountKey = btc1AccountKey;
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const initFormAndQuotes = (form: BuyFormType, store: EnhancedStore) => {
@@ -408,7 +407,11 @@ describe('useBuyForm', () => {
                 result.current.setValue('quote', buyQuotes[0]);
             });
 
-            expect(selectTradingProviderMetadata(store.getState())).toBe(buyMercuryo);
+            expect(
+                selectTradingProviderMetadata(
+                    store.getState() as Parameters<typeof selectTradingProviderMetadata>[0],
+                ),
+            ).toBe(buyMercuryo);
         });
 
         describe('when quote is selected and new quotes are fetched', () => {
@@ -726,7 +729,11 @@ describe('useBuyForm', () => {
                 });
             });
 
-            expect(selectTradingResidenceCountry(store.getState())).toBe('CA');
+            expect(
+                selectTradingResidenceCountry(
+                    store.getState() as Parameters<typeof selectTradingResidenceCountry>[0],
+                ),
+            ).toBe('CA');
         });
     });
 

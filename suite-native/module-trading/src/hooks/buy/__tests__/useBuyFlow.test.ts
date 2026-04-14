@@ -1,8 +1,7 @@
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -34,14 +33,14 @@ describe('useBuyFlow', () => {
     let store: TestStore;
 
     const getInitializedStore = ({ isLoading }: { isLoading?: boolean }) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: { trading: getInitializedTradingStateWithQuotes() },
         };
         if (isLoading !== undefined) {
             preloadedState.wallet!.trading!.buy!.isLoading = isLoading;
         }
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderBuyForm = () => renderHookWithStoreProvider(() => useBuyForm(), { store });

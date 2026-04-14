@@ -2,12 +2,7 @@ import type { CryptoId } from 'invity-api';
 
 import type { WalletSettings } from '@suite-common/wallet-types';
 import { getFiatRateKey } from '@suite-common/wallet-utils';
-import {
-    type FullAppState,
-    type PreloadedState,
-    act,
-    renderHookWithStoreProvider,
-} from '@suite-native/test-utils-store';
+import { act, renderHookWithStoreProvider } from '@suite-native/test-utils-store';
 import {
     btcAsset,
     createMockRate,
@@ -24,9 +19,7 @@ jest.mock('@suite-common/fiat-services', () => ({
     fetchCurrentFiatRates: () => Promise.resolve(null),
 }));
 
-const getPreloadedState = (
-    walletOverrides: Partial<FullAppState['wallet']> = {},
-): PreloadedState => ({
+const getPreloadedState = (walletOverrides: Partial<any> = {}): any => ({
     wallet: {
         ...mockWalletFiatRatesAndSettings({
             [getFiatRateKey('eth', 'usd', usdcAsset.contractAddress!)]: createMockRate(1, 'eth'),
@@ -38,7 +31,7 @@ const getPreloadedState = (
 const renderUseTradingFiatValues = async (
     amount: string | undefined,
     cryptoId: CryptoId | undefined,
-    preloadedState: PreloadedState = getPreloadedState(),
+    preloadedState: any = getPreloadedState(),
 ) => {
     const res = renderHookWithStoreProvider(() => useTradingFiatValues(amount, cryptoId), {
         preloadedState,

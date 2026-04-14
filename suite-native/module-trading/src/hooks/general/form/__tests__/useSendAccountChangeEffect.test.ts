@@ -3,7 +3,7 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import {
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { getBtcAccount, getWalletState } from '@suite-native/trading-fixtures';
@@ -28,7 +28,7 @@ describe('useSendAccountChangeEffect', () => {
 
     beforeEach(() => {
         const preloadState = { wallet: getWalletState({ tradeType: 'exchange' }) };
-        store = initStore(preloadState).store;
+        store = createStoreFromPreloadedState(preloadState);
         setValue = jest.fn();
     });
 

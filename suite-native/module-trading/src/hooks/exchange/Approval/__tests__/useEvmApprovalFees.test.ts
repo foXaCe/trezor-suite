@@ -2,9 +2,8 @@ import { tradingActions } from '@suite-common/trading';
 import { type AccountKey, type TokenAddress } from '@suite-common/wallet-types';
 import { getFormDraftKey } from '@suite-common/wallet-utils';
 import {
-    type PreloadedState,
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
     waitFor,
 } from '@suite-native/test-utils-store';
@@ -21,7 +20,7 @@ jest.mock('../../../../thunks', () => ({
 
 describe('useEvmApprovalFees', () => {
     let store: TestStore;
-    let preloadedState: PreloadedState;
+    let preloadedState: any;
 
     const exchangeFormDraftKey = getFormDraftKey('trading-exchange', '');
 
@@ -62,7 +61,7 @@ describe('useEvmApprovalFees', () => {
         preloadedState.wallet!.trading!.exchange!.tradingAccountKey = 'eth-account-1' as AccountKey;
         preloadedState.wallet!.trading!.exchange!.selectedQuote = dexQuoteWithApprovalData;
 
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
     });
 
     const renderUseEvmApprovalFees = (params?: Parameters<typeof useEvmApprovalFees>[0]) =>
@@ -83,7 +82,7 @@ describe('useEvmApprovalFees', () => {
 
     it('should return fee and isLoading false when composed transaction info is available', () => {
         preloadedState!.wallet!.trading!.exchange!.selectedQuote = undefined;
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
 
         store.dispatch(
             tradingActions.saveComposedTransactionInfo({
@@ -117,7 +116,7 @@ describe('useEvmApprovalFees', () => {
                 },
             },
         };
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
 
         const { result } = renderUseEvmApprovalFees();
 
@@ -145,7 +144,7 @@ describe('useEvmApprovalFees', () => {
         preloadedState!.wallet!.formDrafts = {
             [exchangeFormDraftKey]: { selectedFee: 'high' },
         };
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
 
         renderUseEvmApprovalFees();
 
@@ -171,7 +170,7 @@ describe('useEvmApprovalFees', () => {
                 maxPriorityFeePerGas: '2',
             },
         };
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
 
         renderUseEvmApprovalFees();
 
@@ -209,7 +208,7 @@ describe('useEvmApprovalFees', () => {
                 ],
             },
         };
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
 
         renderUseEvmApprovalFees();
 

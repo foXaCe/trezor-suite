@@ -2,10 +2,9 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import { events } from '@suite-native/analytics';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -54,14 +53,14 @@ describe('useExchangeFlow', () => {
         tradingState.exchange.receiveAccountKey = btc2AccountKey;
         tradingState.exchange.selectedQuote = tradingState.exchange.quotes[0];
 
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: tradingState,
                 accounts: getMockAccounts(),
             },
         };
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseExchangeFlow = ({ store }: { store: TestStore }) => {
@@ -184,14 +183,14 @@ describe('useExchangeFlow', () => {
             tradingState.exchange.receiveAccountKey = btc2AccountKey;
             tradingState.exchange.selectedQuote = tradingState.exchange.quotes[0];
 
-            const preloadedState: PreloadedState = {
+            const preloadedState: any = {
                 wallet: {
                     trading: tradingState,
                     accounts: getMockAccounts(),
                 },
             };
 
-            const { store } = initStore(preloadedState);
+            const store = createStoreFromPreloadedState(preloadedState);
             const { result } = renderUseExchangeFlow({ store });
 
             const confirmResult = await act(() =>

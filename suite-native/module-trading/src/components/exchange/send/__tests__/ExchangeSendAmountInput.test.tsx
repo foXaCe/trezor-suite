@@ -1,13 +1,13 @@
 import { type Account, type AccountKey, type TokenAddress } from '@suite-common/wallet-types';
+import { FeatureFlag, featureFlagsInitialState } from '@suite-native/feature-flags';
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
     userEvent,
 } from '@suite-native/test-utils-store';
-import { btcAsset, usdcAsset } from '@suite-native/trading-fixtures';
+import { btcAsset, getWalletState, usdcAsset } from '@suite-native/trading-fixtures';
 import { type ExchangeFormType } from '@suite-native/trading-types';
 import { PROTO } from '@trezor/connect';
 
@@ -31,7 +31,7 @@ describe('ExchangeSendAmountInput', () => {
     const renderCryptoAmountInput = (
         props: Partial<ExchangeSendAmountInputProps>,
         form: ExchangeFormType,
-        preloadedState: PreloadedState = {},
+        preloadedState = {},
     ) =>
         renderWithStoreProvider(
             <Form form={form}>
@@ -40,9 +40,24 @@ describe('ExchangeSendAmountInput', () => {
             { preloadedState },
         );
 
-    const renderUseTradingExchangeForm = (preloadedState: PreloadedState = {}) => {
+    const renderUseTradingExchangeForm = (preloadedState = {}) => {
+        const defaultPreloadedState = {
+            featureFlags: {
+                ...featureFlagsInitialState,
+                [FeatureFlag.AreTradingExchangeDexesEnabled]: true,
+            },
+            wallet: getWalletState({ tradeType: 'exchange' }),
+        };
+
         const { result } = renderHookWithStoreProvider(() => useExchangeForm(), {
-            preloadedState,
+            preloadedState: {
+                ...defaultPreloadedState,
+                ...preloadedState,
+                wallet: {
+                    ...defaultPreloadedState.wallet,
+                    ...(preloadedState as { wallet?: Record<string, unknown> }).wallet,
+                },
+            },
         });
 
         return result.current;

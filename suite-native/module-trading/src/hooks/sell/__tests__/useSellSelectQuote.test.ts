@@ -3,7 +3,7 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import {
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { banxaCreditCardSellQuote, getWalletState } from '@suite-native/trading-fixtures';
@@ -29,7 +29,7 @@ describe('useSellSelectQuote', () => {
         renderHookWithStoreProvider(() => useSellSelectQuote(sellForm), { store });
 
     beforeEach(() => {
-        store = initStore({ wallet: getWalletState({ tradeType: 'sell' }) }).store;
+        store = createStoreFromPreloadedState({ wallet: getWalletState({ tradeType: 'sell' }) });
 
         const { result } = renderSellForm();
         sellForm = result.current;

@@ -1,8 +1,9 @@
 import { type EnhancedStore } from '@reduxjs/toolkit';
 
+import { FeatureFlag, featureFlagsInitialState } from '@suite-native/feature-flags';
 import { Form } from '@suite-native/forms';
 import {
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
     screen,
@@ -19,9 +20,13 @@ describe('ExchangeTradeableAssetPicker', () => {
     let form: ExchangeFormType;
 
     const initPreloadedStore = (firmwareType: FirmwareType) =>
-        initStore({
+        createStoreFromPreloadedState({
             device: { selectedDevice: { firmwareType } },
             wallet: { trading: getInitializedTradingState() },
+            featureFlags: {
+                ...featureFlagsInitialState,
+                [FeatureFlag.AreTradingExchangeDexesEnabled]: true,
+            },
         });
 
     const renderFormHook = () => {
@@ -39,7 +44,7 @@ describe('ExchangeTradeableAssetPicker', () => {
         });
 
     beforeEach(() => {
-        store = initPreloadedStore(FirmwareType.Universal).store;
+        store = initPreloadedStore(FirmwareType.Universal);
         form = renderFormHook();
     });
 

@@ -1,7 +1,6 @@
 import { type Account, type AccountKey, type TokenAddress } from '@suite-common/wallet-types';
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -28,7 +27,7 @@ describe('SellSendAmountInput', () => {
     const renderCryptoAmountInput = (
         props: Partial<SellSendAmountInputProps>,
         form: SellFormType,
-        preloadedState: PreloadedState = {},
+        preloadedState: any = {},
     ) =>
         renderWithStoreProvider(
             <Form form={form}>
@@ -37,7 +36,7 @@ describe('SellSendAmountInput', () => {
             { preloadedState },
         );
 
-    const renderUseTradingSellForm = (preloadedState: PreloadedState = {}) => {
+    const renderUseTradingSellForm = (preloadedState: any = {}) => {
         const { result } = renderHookWithStoreProvider(() => useSellForm(), {
             preloadedState,
         });

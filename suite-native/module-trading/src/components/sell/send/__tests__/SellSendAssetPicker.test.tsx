@@ -4,7 +4,7 @@ import { asBaseCurrencyAmount } from '@suite-common/wallet-types';
 import { Form } from '@suite-native/forms';
 import {
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
     userEvent,
@@ -75,7 +75,7 @@ describe('SellSendAssetPicker', () => {
         });
 
     beforeEach(() => {
-        store = initStore(getPreloadedState()).store;
+        store = createStoreFromPreloadedState(getPreloadedState());
         const { result } = renderSellForm();
         form = result.current;
 

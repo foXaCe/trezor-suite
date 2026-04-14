@@ -1,6 +1,6 @@
+import { FeatureFlag, featureFlagsInitialState } from '@suite-native/feature-flags';
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -15,13 +15,20 @@ import { ExchangeSendAmountBadge } from '../ExchangeSendAmountBadge';
 describe('ExchangeSendAmountBadge', () => {
     let form: ExchangeFormType;
 
-    const getPreloadedState = (bitcoinAmountUnit = PROTO.AmountUnit.BITCOIN): PreloadedState => ({
+    const getPreloadedState = (bitcoinAmountUnit = PROTO.AmountUnit.BITCOIN) => ({
+        featureFlags: {
+            ...featureFlagsInitialState,
+            [FeatureFlag.AreTradingExchangeDexesEnabled]: true,
+        },
         wallet: getWalletState({ tradeType: 'exchange', bitcoinAmountUnit }),
     });
 
-    const renderForm = () => renderHookWithStoreProvider(() => useExchangeForm());
+    const renderForm = () =>
+        renderHookWithStoreProvider(() => useExchangeForm(), {
+            preloadedState: getPreloadedState(),
+        });
 
-    const renderExchangeSendAmountBadge = (preloadedState: PreloadedState = getPreloadedState()) =>
+    const renderExchangeSendAmountBadge = (preloadedState = getPreloadedState()) =>
         renderWithStoreProvider(<ExchangeSendAmountBadge />, {
             preloadedState,
             wrapper: ({ children }) => <Form form={form}>{children}</Form>,

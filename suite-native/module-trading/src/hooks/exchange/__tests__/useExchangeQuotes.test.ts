@@ -8,10 +8,9 @@ import {
 import { type AccountKey } from '@suite-common/wallet-types';
 import { events } from '@suite-native/analytics';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -71,7 +70,7 @@ jest.mock('@suite-common/trading', () => ({
 
 describe('useExchangeQuotes', () => {
     const getInitializedStore = (bitcoinAmountUnit = PROTO.AmountUnit.BITCOIN): TestStore => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: getInitializedTradingState(),
                 accounts: [getBtcAccount(), getEthAccount()],
@@ -81,7 +80,7 @@ describe('useExchangeQuotes', () => {
             },
         };
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseExchangeQuotes = (store: TestStore) =>

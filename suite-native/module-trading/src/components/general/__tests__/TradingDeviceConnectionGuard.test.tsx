@@ -1,7 +1,11 @@
 import { Text } from 'react-native';
 
 import { getTranslation } from '@suite-native/intl';
-import { type TestStore, initStore, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import {
+    type TestStore,
+    createStoreFromPreloadedState,
+    renderWithStoreProvider,
+} from '@suite-native/test-utils-store';
 
 import { TradingDeviceConnectionGuard } from '../TradingDeviceConnectionGuard';
 
@@ -37,7 +41,7 @@ describe('TradingDeviceConnectionGuard', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockSelectIsDeviceConnected = false;
-        ({ store } = initStore());
+        store = createStoreFromPreloadedState();
     });
 
     it('should display connect trezor info when no device is connected', () => {

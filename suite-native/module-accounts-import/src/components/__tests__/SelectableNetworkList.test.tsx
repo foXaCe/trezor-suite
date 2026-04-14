@@ -1,9 +1,8 @@
-import { type PreloadedState } from '@suite-native/state';
 import { fireEvent, renderWithStoreProvider } from '@suite-native/test-utils-store';
 
 import { SelectableNetworkList } from '../SelectableNetworkList';
 
-const getMockPreloadedState = (areTestnetsEnabled: boolean): PreloadedState => ({
+const getMockPreloadedState = (areTestnetsEnabled: boolean) => ({
     appSettings: {
         areTestnetsEnabled,
     },

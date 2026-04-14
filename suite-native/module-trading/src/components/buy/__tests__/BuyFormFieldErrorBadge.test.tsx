@@ -3,7 +3,6 @@ import type { CryptoId } from 'invity-api';
 import { Text } from '@suite-native/atoms';
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -21,7 +20,7 @@ import {
 describe('BuyFormFieldErrorBadge', () => {
     let tradingForm: BuyFormType;
 
-    const renderUseTradingBuyForm = (preloadedState: PreloadedState = {}) => {
+    const renderUseTradingBuyForm = (preloadedState: any = {}) => {
         const { result } = renderHookWithStoreProvider(() => useBuyForm(), {
             preloadedState,
         });
@@ -32,7 +31,7 @@ describe('BuyFormFieldErrorBadge', () => {
     const renderBuyFormFieldErrorBadge = (
         props: BuyFormFieldErrorBadgeProps,
         form: BuyFormType,
-        preloadedState: PreloadedState = {},
+        preloadedState: any = {},
     ) =>
         renderWithStoreProvider(<BuyFormFieldErrorBadge {...props} />, {
             preloadedState,

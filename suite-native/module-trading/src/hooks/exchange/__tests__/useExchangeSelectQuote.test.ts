@@ -5,10 +5,9 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import { events } from '@suite-native/analytics';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -81,7 +80,7 @@ describe('useExchangeSelectQuote', () => {
             'eth-account-key' as AccountKey, // Todo: create properly via `createAccountKey()`
         );
 
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: getInitializedTradingStateWithQuotes(),
                 accounts: [btcAccount, ethAccount],
@@ -99,7 +98,7 @@ describe('useExchangeSelectQuote', () => {
         preloadedState.wallet!.trading!.exchange!.tradingAccountKey = 'btc-account-key';
         preloadedState.wallet!.trading!.exchange!.receiveAccountKey = 'eth-account-key';
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderExchangeForm = () =>

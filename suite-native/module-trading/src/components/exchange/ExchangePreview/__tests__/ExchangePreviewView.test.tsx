@@ -1,17 +1,41 @@
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
-import { exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
+import { messageSystemInitialState } from '@suite-common/message-system';
+import { initialSuiteSyncDataState, initialSuiteSyncState } from '@suite-common/suite-sync';
+import { type AccountKey } from '@suite-common/wallet-types';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
+import {
+    btc1NormalAccount,
+    eth1NormalAccount,
+    exchangeQuotes,
+    getWalletState,
+} from '@suite-native/trading-fixtures';
 
 import { ExchangePreviewView, type ExchangePreviewViewProps } from '../ExchangePreviewView';
 
 describe('ExchangePreviewView', () => {
     const renderExchangePreviewView = (props: Partial<ExchangePreviewViewProps> = {}) => {
-        const preloadedState: PreloadedState = {
-            wallet: getWalletState({ tradeType: 'exchange' }),
+        const walletState = getWalletState({ tradeType: 'exchange' });
+        const preloadedState = {
+            messageSystem: messageSystemInitialState,
+            suiteSync: initialSuiteSyncState,
+            suiteSyncData: initialSuiteSyncDataState,
+            wallet: {
+                ...walletState,
+                formDrafts: {},
+            },
         };
-        preloadedState.wallet!.trading!.composedTransactionInfo = { composed: { fee: '1000' } };
-        preloadedState.wallet!.trading!.exchange!.tradingAccountKey = 'btc-account-1';
-        preloadedState.wallet!.trading!.exchange!.receiveAccountKey = 'eth-account-1';
-        preloadedState.wallet!.trading!.exchange!.lastErrorMessage = 'ERROR_MESSAGE';
+        preloadedState.wallet.trading.composedTransactionInfo = {
+            composed: {
+                fee: '1000',
+                feePerByte: '1',
+                feeLimit: '21000',
+                estimatedFeeLimit: '21000',
+            },
+        };
+        preloadedState.wallet.trading.exchange.tradingAccountKey =
+            btc1NormalAccount.key as AccountKey;
+        preloadedState.wallet.trading.exchange.receiveAccountKey =
+            eth1NormalAccount.key as AccountKey;
+        preloadedState.wallet.trading.exchange.lastErrorMessage = 'ERROR_MESSAGE';
 
         return renderWithStoreProvider(
             <ExchangePreviewView quote={exchangeQuotes[0]} txnErrorString={null} {...props} />,

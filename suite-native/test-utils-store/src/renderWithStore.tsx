@@ -7,17 +7,15 @@ import {
     renderHook,
 } from '@testing-library/react-native';
 
-import type { PreloadedState } from '@suite-native/state';
-
 import { StoreProviderForTests, type TestStore } from './StoreProviderForTests';
 
 type RenderOptionsExtended = RenderOptions & {
-    preloadedState?: PreloadedState;
+    preloadedState?: Record<string, unknown>;
     store?: TestStore;
 };
 
 type RenderHookOptionsExtended<Props> = RenderHookOptions<Props> & {
-    preloadedState?: PreloadedState;
+    preloadedState?: Record<string, unknown>;
     store?: TestStore;
 };
 

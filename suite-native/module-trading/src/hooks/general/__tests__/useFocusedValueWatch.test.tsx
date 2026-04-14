@@ -2,7 +2,7 @@ import { Form } from '@suite-native/forms';
 import {
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { selectIsAmountInputActive } from '@suite-native/trading-state';
@@ -30,7 +30,7 @@ describe('useFocusedValueWatch', () => {
         const { result } = renderForm();
         form = result.current;
 
-        store = initStore().store;
+        store = createStoreFromPreloadedState();
     });
 
     it('should return false by default', () => {

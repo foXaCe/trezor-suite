@@ -5,10 +5,9 @@ import { events } from '@suite-native/analytics';
 import { Form } from '@suite-native/forms';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     act,
+    createStoreFromPreloadedState,
     fireEvent,
-    initStore,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
     screen,
@@ -34,7 +33,7 @@ describe('BuyPaymentMethodPicker', () => {
     let form: BuyFormType;
 
     const renderPaymentMethodPicker = (
-        preloadedState: PreloadedState | undefined = {},
+        preloadedState: any | undefined = {},
         store?: EnhancedStore,
     ) => {
         const { result } = renderHookWithStoreProvider(() => useBuyForm());
@@ -67,7 +66,7 @@ describe('BuyPaymentMethodPicker', () => {
     });
 
     it('should display loader when loading initial quotes', () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: { trading: { buy: { isLoading: true, quotes: [] } } },
         };
 
@@ -77,7 +76,7 @@ describe('BuyPaymentMethodPicker', () => {
     });
 
     describe('with quotes loaded', () => {
-        let preloadedState: PreloadedState;
+        let preloadedState: any;
 
         beforeEach(() => {
             preloadedState = { wallet: { trading: getInitializedTradingStateWithQuotes() } };
@@ -105,7 +104,7 @@ describe('BuyPaymentMethodPicker', () => {
         });
 
         it('should display sheet even while quotes are fetched', () => {
-            const { store } = initStore();
+            const store = createStoreFromPreloadedState();
             store.dispatch(tradingBuyActions.saveQuotes(buyQuotes));
             const { getByText } = renderPaymentMethodPicker(undefined, store);
 

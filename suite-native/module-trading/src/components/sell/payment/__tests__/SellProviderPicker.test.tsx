@@ -2,7 +2,6 @@ import { events } from '@suite-native/analytics';
 import { Form } from '@suite-native/forms';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     act,
     fireEvent,
     renderHookWithStoreProvider,
@@ -32,7 +31,7 @@ jest.mock('@suite-native/services', () => {
 
 describe('SellProviderPicker', () => {
     let form: SellFormType;
-    let preloadedState: PreloadedState;
+    let preloadedState: any;
 
     const renderSellForm = () => renderHookWithStoreProvider(() => useSellForm());
 

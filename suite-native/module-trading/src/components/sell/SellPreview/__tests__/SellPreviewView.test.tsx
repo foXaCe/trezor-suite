@@ -1,5 +1,8 @@
+import { deviceInitialState } from '@suite-common/device';
+import { messageSystemInitialState } from '@suite-common/message-system';
+import { initialSuiteSyncDataState, initialSuiteSyncState } from '@suite-common/suite-sync';
 import { getTranslation } from '@suite-native/intl';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import {
     banxaBankTransferSellQuote,
     banxaCreditCardSellQuote,
@@ -21,11 +24,27 @@ describe('SellPreviewView', () => {
         },
     });
 
-    const getPreloadedSellState = (overrides: { formStep?: string }): PreloadedState => {
-        const preloadedState: PreloadedState = {
-            wallet: getWalletState({ tradeType: 'sell' }),
+    const getPreloadedSellState = (overrides: { formStep?: string }) => {
+        const walletState = getWalletState({ tradeType: 'sell' });
+        const preloadedState = {
+            device: deviceInitialState,
+            messageSystem: messageSystemInitialState,
+            suiteSync: initialSuiteSyncState,
+            suiteSyncData: initialSuiteSyncDataState,
+            wallet: {
+                ...walletState,
+                fees: {},
+                formDrafts: {},
+            },
         };
-        preloadedState.wallet!.trading!.composedTransactionInfo = { composed: { fee: '1000' } };
+        preloadedState.wallet.trading.composedTransactionInfo = {
+            composed: {
+                fee: '1000',
+                feePerByte: '1',
+                feeLimit: '21000',
+                estimatedFeeLimit: '21000',
+            },
+        };
         preloadedState.wallet!.trading!.sell!.tradingAccountKey = eth1NormalAccount.key;
         preloadedState.wallet!.trading!.sell!.selectedQuote = banxaBankTransferSellQuote;
         preloadedState.wallet!.trading!.trades = [getSellTradeWithBankAccounts()];

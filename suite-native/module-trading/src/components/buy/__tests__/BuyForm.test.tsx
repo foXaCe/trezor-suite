@@ -1,6 +1,5 @@
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -21,10 +20,10 @@ jest.mock('../../../hooks/general/useFocusedValueWatch', () =>
 );
 
 describe('BuyForm', () => {
-    const renderFormHook = (preloadedState: PreloadedState) =>
+    const renderFormHook = (preloadedState: any) =>
         renderHookWithStoreProvider(() => useBuyForm(), { preloadedState });
 
-    const renderBuyForm = (preloadedState: PreloadedState, form: BuyFormType) =>
+    const renderBuyForm = (preloadedState: any, form: BuyFormType) =>
         renderWithStoreProvider(<BuyForm />, {
             preloadedState,
             wrapper: ({ children }) => <Form form={form}>{children}</Form>,

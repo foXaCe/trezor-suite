@@ -2,7 +2,6 @@ import { type NetworkType as NetworkTypeConfig } from '@suite-common/wallet-conf
 import { type AccountKey } from '@suite-common/wallet-types';
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -18,7 +17,7 @@ describe('CustomFeeLabel', () => {
         wallet: getWalletState(),
     };
 
-    const renderUseFeesForm = (preloadedState?: PreloadedState, defaultFeePerUnit?: string) => {
+    const renderUseFeesForm = (preloadedState?: any, defaultFeePerUnit?: string) => {
         const { result } = renderHookWithStoreProvider(
             () =>
                 useFeesForm({
@@ -40,7 +39,7 @@ describe('CustomFeeLabel', () => {
     }: {
         networkType: NetworkTypeConfig;
         form: FeesFormType;
-        preloadedState?: PreloadedState;
+        preloadedState?: any;
     }) =>
         renderWithStoreProvider(<CustomFeeLabel networkType={networkType} />, {
             preloadedState: preloadedState || defaultState,

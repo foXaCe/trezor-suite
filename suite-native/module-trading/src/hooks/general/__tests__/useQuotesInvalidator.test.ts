@@ -2,7 +2,7 @@ import { type ActionCreatorWithoutPayload } from '@reduxjs/toolkit';
 
 import {
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { type AbortablePromise } from '@suite-native/trading-types';
@@ -37,7 +37,7 @@ describe('useQuotesInvalidator', () => {
         });
 
     beforeEach(() => {
-        store = initStore().store;
+        store = createStoreFromPreloadedState();
     });
 
     it('should call debounce with empty method when form is not valid', () => {

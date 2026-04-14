@@ -267,4 +267,5 @@ export const getWalletState = () => ({
             } as unknown as GeneralPrecomposedLevels,
         },
     },
+    fees: {},
 });

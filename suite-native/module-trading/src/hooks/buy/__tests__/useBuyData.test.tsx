@@ -1,10 +1,9 @@
 import { tradingBuyActions, tradingThunks } from '@suite-common/trading';
 import { type AccountKey } from '@suite-common/wallet-types';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { getBtcAccount, getInitializedTradingState } from '@suite-native/trading-fixtures';
@@ -22,7 +21,7 @@ const btc3AccountKey = 'btc-account-3' as AccountKey; // Todo: create properly v
 
 describe('useBuyData', () => {
     const getInitializedStore = (tradingAccountKey: AccountKey | undefined) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: {
                 trading: getInitializedTradingState(),
                 accounts: [
@@ -34,7 +33,7 @@ describe('useBuyData', () => {
         };
         preloadedState.wallet!.trading!.buy!.tradingAccountKey = tradingAccountKey;
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseBuyData = async (reloadRequestOrdinalInitialValue: number, store: TestStore) => {
@@ -73,7 +72,7 @@ describe('useBuyData', () => {
                     }, 100);
                 }),
         );
-        const { store } = initStore(undefined);
+        const store = createStoreFromPreloadedState(undefined);
         const { result } = await renderUseBuyData(0, store);
 
         expect(result.current.isLoading).toBe(true);
@@ -81,7 +80,7 @@ describe('useBuyData', () => {
     });
 
     it('should settle after API queries are resolved', async () => {
-        const { store } = initStore(undefined);
+        const store = createStoreFromPreloadedState(undefined);
         const { result } = await renderUseBuyData(0, store);
 
         expect(result.current.isLoading).toBe(false);
@@ -93,7 +92,7 @@ describe('useBuyData', () => {
             .spyOn(tradingThunks, 'loadInitialDataThunk')
             .mockImplementation((() => ({ type: 'TEST_ACTION' })) as () => any);
 
-        const { store } = initStore(undefined);
+        const store = createStoreFromPreloadedState(undefined);
         const { rerender } = await renderUseBuyData(0, store);
         rerender({ reloadRequestOrdinal: 0 });
 
@@ -105,7 +104,7 @@ describe('useBuyData', () => {
             .spyOn(tradingThunks, 'loadInitialDataThunk')
             .mockImplementation((() => ({ type: 'TEST_ACTION' })) as () => any);
 
-        const { store } = initStore(undefined);
+        const store = createStoreFromPreloadedState(undefined);
         const { rerender } = await renderUseBuyData(0, store);
         rerender({ reloadRequestOrdinal: 1 });
 

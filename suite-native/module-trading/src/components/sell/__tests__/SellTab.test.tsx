@@ -1,5 +1,5 @@
 import { FeatureFlag } from '@suite-native/feature-flags';
-import { type PreloadedState, act, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { act, renderWithStoreProvider } from '@suite-native/test-utils-store';
 
 import { SellTab } from '../SellTab';
 
@@ -21,7 +21,7 @@ jest.mock('../../../hooks/sell/useSellData', () => ({
 }));
 
 describe('SellTab', () => {
-    const renderSellTab = async (preloadedState: PreloadedState = {}) => {
+    const renderSellTab = async (preloadedState: Record<string, unknown> = {}) => {
         const result = renderWithStoreProvider(<SellTab />, { preloadedState });
 
         // wait for form reactions to run
@@ -65,7 +65,7 @@ describe('SellTab', () => {
                     ],
                 },
             },
-        } as unknown as PreloadedState);
+        });
 
         expect(getByText('Sell disabled')).toBeOnTheScreen();
     });

@@ -1,4 +1,4 @@
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import {
@@ -7,7 +7,7 @@ import {
 } from '../ExchangeProviderPicker';
 
 describe('ExchangeProviderPicker', () => {
-    let preloadedState: PreloadedState;
+    let preloadedState: any;
 
     const renderExchangeProviderPicker = (props: Partial<ExchangeProviderPickerProps>) =>
         renderWithStoreProvider(

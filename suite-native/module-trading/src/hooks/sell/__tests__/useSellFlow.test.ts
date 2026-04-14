@@ -6,7 +6,7 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import {
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -76,7 +76,7 @@ describe('useSellFlow', () => {
     const renderUseSellFlow = () => renderHookWithStoreProvider(() => useSellFlow(), { store });
 
     beforeEach(() => {
-        store = initStore({ wallet: getWalletState({ tradeType: 'sell' }) }).store;
+        store = createStoreFromPreloadedState({ wallet: getWalletState({ tradeType: 'sell' }) });
 
         capturedHandleTradeArgs = null;
         jest.clearAllMocks();

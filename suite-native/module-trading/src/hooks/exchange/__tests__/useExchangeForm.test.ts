@@ -9,10 +9,9 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import { events } from '@suite-native/analytics';
 import { FeatureFlag, type FeatureFlagsRootState } from '@suite-native/feature-flags';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -66,7 +65,7 @@ describe('useExchangeForm', () => {
         renderHookWithStoreProvider(() => useExchangeForm(), { store });
 
     const getInitializedStore = (bitcoinAmountUnit = PROTO.AmountUnit.BITCOIN) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({
                 tradeType: 'exchange',
                 bitcoinAmountUnit,
@@ -76,7 +75,7 @@ describe('useExchangeForm', () => {
             } as FeatureFlagsRootState['featureFlags'],
         };
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     beforeEach(() => {

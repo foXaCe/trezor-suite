@@ -2,7 +2,7 @@ import {
     type AccountKey,
     type GeneralPrecomposedTransactionFinal,
 } from '@suite-common/wallet-types';
-import { type PreloadedState, renderWithStoreProvider, userEvent } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider, userEvent } from '@suite-native/test-utils-store';
 import { banxaCreditCardSellQuote, getWalletState } from '@suite-native/trading-fixtures';
 
 import {
@@ -22,7 +22,7 @@ jest.mock('@react-navigation/native', () => ({
 describe('SellPreviewContinueButton', () => {
     const renderSellPreviewContinueButton = (
         props: Partial<SellPreviewContinueButtonProps> = {},
-        preloadedState: PreloadedState = {},
+        preloadedState: any = {},
     ) =>
         renderWithStoreProvider(
             <SellPreviewContinueButton
@@ -38,7 +38,7 @@ describe('SellPreviewContinueButton', () => {
         jest.restoreAllMocks();
     });
 
-    const getPreloadedState = (): PreloadedState => {
+    const getPreloadedState = (): any => {
         const preloadedState = { wallet: getWalletState({ tradeType: 'sell' }) };
         preloadedState.wallet!.trading!.sell!.tradingAccountKey = 'eth-account-1' as AccountKey; // Todo: create properly via `createAccountKey()`
         preloadedState.wallet!.send!.precomposedTx = {

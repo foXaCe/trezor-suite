@@ -3,7 +3,11 @@ import { type RouteProp } from '@react-navigation/native';
 import { selectTradingExchangeSelectedQuote, tradingExchangeActions } from '@suite-common/trading';
 import { getTranslation } from '@suite-native/intl';
 import { type TradingStackParamList, type TradingStackRoutes } from '@suite-native/navigation';
-import { type TestStore, initStore, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import {
+    type TestStore,
+    createStoreFromPreloadedState,
+    renderWithStoreProvider,
+} from '@suite-native/test-utils-store';
 import { eth1NormalAccount, exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import { TradingExchangeRevokeScreen } from '../TradingExchangeRevokeScreen';
@@ -87,7 +91,7 @@ describe('TradingExchangeRevokeScreen', () => {
             }),
         };
 
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
         store.dispatch(tradingExchangeActions.savePreselectedQuote(testQuote));
         store.dispatch(tradingExchangeActions.setTradingAccountKey(eth1NormalAccount.key));
     });

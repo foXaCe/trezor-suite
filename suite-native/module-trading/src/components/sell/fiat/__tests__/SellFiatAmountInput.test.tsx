@@ -1,6 +1,5 @@
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
     userEvent,
@@ -11,7 +10,7 @@ import { useSellForm } from '../../../../hooks/sell/useSellForm';
 import { SellFiatAmountInput } from '../SellFiatAmountInput';
 
 describe('SellFiatAmountInput', () => {
-    const renderFiatAmountInput = (form: SellFormType, preloadedState: PreloadedState = {}) =>
+    const renderFiatAmountInput = (form: SellFormType, preloadedState: any = {}) =>
         renderWithStoreProvider(
             <Form form={form}>
                 <SellFiatAmountInput />
@@ -19,7 +18,7 @@ describe('SellFiatAmountInput', () => {
             { preloadedState },
         );
 
-    const renderUseTradingSellForm = (preloadedState: PreloadedState = {}) => {
+    const renderUseTradingSellForm = (preloadedState: any = {}) => {
         const { result } = renderHookWithStoreProvider(() => useSellForm(), {
             preloadedState,
         });

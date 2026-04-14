@@ -2,11 +2,7 @@ import {
     type AccountKey,
     type GeneralPrecomposedTransactionFinal,
 } from '@suite-common/wallet-types';
-import {
-    type PreloadedState,
-    renderWithStoreProvider,
-    userEvent,
-} from '@suite-native/test-utils-store';
+import { renderWithStoreProvider, userEvent } from '@suite-native/test-utils-store';
 import { exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import {
@@ -26,7 +22,7 @@ jest.mock('@react-navigation/native', () => ({
 describe('ExchangePreviewContinueButton', () => {
     const renderExchangePreviewContinueButton = (
         props: Partial<ExchangePreviewContinueButtonProps> = {},
-        preloadedState: PreloadedState = {},
+        preloadedState: any = {},
     ) =>
         renderWithStoreProvider(
             <ExchangePreviewContinueButton
@@ -42,7 +38,7 @@ describe('ExchangePreviewContinueButton', () => {
         jest.restoreAllMocks();
     });
 
-    const getPreloadedState = (): PreloadedState => {
+    const getPreloadedState = (): any => {
         const preloadedState = { wallet: getWalletState({ tradeType: 'exchange' }) };
         preloadedState.wallet!.trading!.exchange!.tradingAccountKey = 'btc-account-1' as AccountKey; // Todo: create properly via `createAccountKey()`
         preloadedState.wallet!.trading!.exchange!.receiveAccountKey = 'eth-account-1' as AccountKey; // Todo: create properly via `createAccountKey()`

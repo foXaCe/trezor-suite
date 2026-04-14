@@ -1,6 +1,5 @@
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -17,7 +16,7 @@ describe('BuyCryptoAmountInput', () => {
     const renderCryptoAmountInput = (
         props: Partial<CryptoAmountInputProps>,
         form: BuyFormType,
-        preloadedState: PreloadedState = {},
+        preloadedState: any = {},
     ) =>
         renderWithStoreProvider(
             <Form form={form}>
@@ -26,7 +25,7 @@ describe('BuyCryptoAmountInput', () => {
             { preloadedState },
         );
 
-    const renderUseTradingBuyForm = (preloadedState: PreloadedState = {}) => {
+    const renderUseTradingBuyForm = (preloadedState: any = {}) => {
         const { result } = renderHookWithStoreProvider(() => useBuyForm(), {
             preloadedState,
         });

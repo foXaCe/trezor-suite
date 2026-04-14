@@ -2,7 +2,7 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import {
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { getWalletState } from '@suite-native/trading-fixtures';
@@ -27,7 +27,9 @@ describe('useTradingOutputsReviewErrorAlert', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        store = initStore({ wallet: getWalletState({ tradeType: 'exchange' }) }).store;
+        store = createStoreFromPreloadedState({
+            wallet: getWalletState({ tradeType: 'exchange' }),
+        });
     });
 
     it('should show alert', () => {

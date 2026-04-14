@@ -1,7 +1,16 @@
-import { geolocationActions, selectCountryCode } from '@suite-common/geolocation';
+import { combineReducers } from '@reduxjs/toolkit';
+
+import {
+    geolocationActions,
+    geolocationReducer,
+    selectCountryCode,
+} from '@suite-common/geolocation';
+import { initialWalletSettingsState } from '@suite-common/wallet-core';
+import { localeReducer } from '@suite-native/intl';
 import {
     type TestStore,
-    initStore,
+    createLightStore,
+    createStaticReducer,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 
@@ -23,7 +32,15 @@ describe('useGeolocationCountryCode', () => {
         renderHookWithStoreProvider(() => useGeolocationCountryCode(), { store });
 
     it('should call geolocation thunk on mount', () => {
-        const { store } = initStore();
+        const store = createLightStore({
+            reducer: {
+                geolocation: geolocationReducer,
+                locale: localeReducer,
+                wallet: combineReducers({
+                    settings: createStaticReducer(initialWalletSettingsState),
+                }),
+            },
+        });
 
         renderUseGeolocationCountryCode(store);
 
@@ -31,7 +48,15 @@ describe('useGeolocationCountryCode', () => {
     });
 
     it('should not call geolocation thunk if country code is already known', () => {
-        const { store } = initStore();
+        const store = createLightStore({
+            reducer: {
+                geolocation: geolocationReducer,
+                locale: localeReducer,
+                wallet: combineReducers({
+                    settings: createStaticReducer(initialWalletSettingsState),
+                }),
+            },
+        });
         store.dispatch(geolocationActions.setCountryCode('CZ'));
 
         renderUseGeolocationCountryCode(store);

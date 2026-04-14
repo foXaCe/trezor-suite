@@ -1,7 +1,7 @@
 import {
     type TestStore,
+    createStoreFromPreloadedState,
     fireEvent,
-    initStore,
     renderWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { btc1NormalAccount } from '@suite-native/trading-fixtures';
@@ -37,7 +37,7 @@ describe('ReceiveAccountPicker', () => {
         props: Partial<ReceiveAccountPickerProps>,
         preloadedState = defaultPreloadedState,
     ) => {
-        store = initStore(preloadedState).store;
+        store = createStoreFromPreloadedState(preloadedState);
 
         return renderWithStoreProvider(
             <ReceiveAccountPicker

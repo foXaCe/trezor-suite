@@ -1,5 +1,5 @@
 import { type TradingType } from '@suite-common/trading';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 
 import { TradingTypeAwareContextMessage } from '../TradingTypeAwareContextMessage';
 
@@ -23,7 +23,7 @@ jest.mock('@suite-common/message-system', () => {
 });
 
 describe('TradingTypeAwareContextMessage', () => {
-    const getPreloadedState = (activeTradingType: TradingType | undefined): PreloadedState => ({
+    const getPreloadedState = (activeTradingType: TradingType | undefined): any => ({
         wallet: {
             trading: {
                 activeTradingType,
@@ -31,7 +31,7 @@ describe('TradingTypeAwareContextMessage', () => {
         },
     });
 
-    const renderTradingTypeAwareContextMessage = (preloadedState: PreloadedState) =>
+    const renderTradingTypeAwareContextMessage = (preloadedState: any) =>
         renderWithStoreProvider(<TradingTypeAwareContextMessage />, { preloadedState });
 
     it.each<[TradingType, string]>([

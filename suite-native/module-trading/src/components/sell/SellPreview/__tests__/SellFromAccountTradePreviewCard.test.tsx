@@ -1,5 +1,5 @@
 import { type AccountKey } from '@suite-common/wallet-types';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import {
     banxaCreditCardSellQuote,
     eth1NormalAccount,
@@ -16,7 +16,7 @@ describe('SellFromAccountTradePreviewCard', () => {
         props: Partial<SellFromAccountTradePreviewCardProps> = {},
         tradingAccountKey = eth1NormalAccount.key,
     ) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         preloadedState.wallet!.trading!.sell!.tradingAccountKey = tradingAccountKey;

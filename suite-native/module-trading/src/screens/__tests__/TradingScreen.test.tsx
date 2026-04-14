@@ -1,9 +1,9 @@
+import { deviceInitialState } from '@suite-common/device';
+import { geolocationInitialState } from '@suite-common/geolocation';
+import { messageSystemInitialState } from '@suite-common/message-system';
 import { FeatureFlag, featureFlagsInitialState } from '@suite-native/feature-flags';
-import {
-    type PreloadedState,
-    renderWithStoreProvider,
-    screen,
-} from '@suite-native/test-utils-store';
+import { renderWithStoreProvider, screen } from '@suite-native/test-utils-store';
+import { getInitializedTradingState } from '@suite-native/trading-fixtures';
 
 import { TradingScreen } from '../TradingScreen';
 
@@ -44,14 +44,22 @@ jest.mock('../../hooks/exchange/useExchangeData', () => ({
 }));
 
 const stateWithEnabledBuy = {
+    device: deviceInitialState,
+    geolocation: geolocationInitialState,
     featureFlags: {
         ...featureFlagsInitialState,
         [FeatureFlag.IsTradingBuyEnabled]: true,
         [FeatureFlag.IsTradingResidenceCheckEnabled]: false,
     },
+    messageSystem: messageSystemInitialState,
+    wallet: {
+        trading: getInitializedTradingState(),
+    },
 };
 
 const stateWithDisabledTrading = {
+    device: deviceInitialState,
+    geolocation: geolocationInitialState,
     featureFlags: {
         ...featureFlagsInitialState,
         [FeatureFlag.IsTradingBuyEnabled]: false,
@@ -90,12 +98,15 @@ const stateWithDisabledTrading = {
             ],
         },
     },
-} as unknown as PreloadedState;
+    wallet: {
+        trading: getInitializedTradingState(),
+    },
+};
 
 describe('TradingScreen', () => {
     let unmount: (() => void) | undefined;
 
-    const renderTradingScreen = (preloadedState?: PreloadedState) => {
+    const renderTradingScreen = (preloadedState?: Record<string, unknown>) => {
         const result = renderWithStoreProvider(<TradingScreen />, { preloadedState });
 
         ({ unmount } = result);

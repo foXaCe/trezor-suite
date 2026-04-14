@@ -3,7 +3,7 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import {
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import { getWalletState } from '@suite-native/trading-fixtures';
@@ -70,7 +70,9 @@ describe('useTradingOutputsReviewScreenControls', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        store = initStore({ wallet: getWalletState({ tradeType: 'exchange' }) }).store;
+        store = createStoreFromPreloadedState({
+            wallet: getWalletState({ tradeType: 'exchange' }),
+        });
     });
 
     it('should return confirmOnTrezorRef', () => {
@@ -118,7 +120,9 @@ describe('useTradingOutputsReviewScreenControls', () => {
         });
 
         it('should navigate to trade detail and report sell analytics', () => {
-            store = initStore({ wallet: getWalletState({ tradeType: 'sell' }) }).store;
+            store = createStoreFromPreloadedState({
+                wallet: getWalletState({ tradeType: 'sell' }),
+            });
             renderUseTradingOutputsReviewScreenControls();
 
             expect(mockSignAndSendTransaction).toHaveBeenCalledWith(
@@ -254,7 +258,9 @@ describe('useTradingOutputsReviewScreenControls', () => {
         });
 
         it('should report cancel for sell', () => {
-            store = initStore({ wallet: getWalletState({ tradeType: 'sell' }) }).store;
+            store = createStoreFromPreloadedState({
+                wallet: getWalletState({ tradeType: 'sell' }),
+            });
             renderUseTradingOutputsReviewScreenControls();
 
             act(() => {

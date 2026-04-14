@@ -1,10 +1,4 @@
-import {
-    type PreloadedState,
-    act,
-    renderWithStoreProvider,
-    screen,
-    userEvent,
-} from '@suite-native/test-utils-store';
+import { act, renderWithStoreProvider, screen, userEvent } from '@suite-native/test-utils-store';
 
 import { SellTabContent } from '../SellTabContent';
 
@@ -27,7 +21,7 @@ describe('SellTabContent', () => {
         }));
     });
 
-    const renderSellTabContent = (preloadedState?: PreloadedState) =>
+    const renderSellTabContent = (preloadedState?: any) =>
         renderWithStoreProvider(<SellTabContent />, { preloadedState });
 
     const expectSkeleton = () => {

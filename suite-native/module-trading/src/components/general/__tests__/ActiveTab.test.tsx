@@ -1,5 +1,5 @@
 import { type TradingType } from '@suite-common/trading';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 
 import { ActiveTab } from '../ActiveTab';
 
@@ -12,7 +12,7 @@ jest.mock('@suite-native/trading-state', () => ({
 }));
 
 describe('ActiveTab', () => {
-    const renderActiveTab = (preloadedState: PreloadedState) =>
+    const renderActiveTab = (preloadedState: any) =>
         renderWithStoreProvider(<ActiveTab />, { preloadedState });
 
     it.each<[TradingType, string]>([

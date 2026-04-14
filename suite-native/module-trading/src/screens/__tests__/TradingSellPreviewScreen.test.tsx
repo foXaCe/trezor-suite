@@ -1,11 +1,6 @@
 import type { TradingTransactionSell } from '@suite-common/trading';
 import { getTranslation } from '@suite-native/intl';
-import {
-    type PreloadedState,
-    act,
-    renderWithStoreProvider,
-    waitFor,
-} from '@suite-native/test-utils-store';
+import { act, renderWithStoreProvider, waitFor } from '@suite-native/test-utils-store';
 import {
     banxaBankTransferSellQuote,
     banxaCreditCardSellQuote,
@@ -60,7 +55,7 @@ jest.mock('@suite-common/device', () => ({
 describe('TradingSellPreviewScreen', () => {
     let unmount: (() => void) | undefined;
 
-    const renderTradingSellPreviewScreen = async (preloadedState?: PreloadedState) => {
+    const renderTradingSellPreviewScreen = async (preloadedState?: any) => {
         const result = renderWithStoreProvider(<TradingSellPreviewScreen />, {
             preloadedState,
         });
@@ -94,7 +89,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should render screen with header and preview view', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         preloadedState.wallet!.trading!.sell!.selectedQuote = banxaCreditCardSellQuote;
@@ -107,7 +102,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should call doBankAccountVerificationCheck on mount', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         preloadedState.wallet!.trading!.sell!.selectedQuote = banxaCreditCardSellQuote;
@@ -119,7 +114,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should use selectedQuote when trade data is not available', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         preloadedState.wallet!.trading!.sell!.selectedQuote = banxaCreditCardSellQuote;
@@ -131,7 +126,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should use trade data when available', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         preloadedState.wallet!.trading!.sell!.selectedQuote = banxaCreditCardSellQuote;
@@ -159,7 +154,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should render SellPreviewContinueButton with correct props', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         preloadedState.wallet!.trading!.sell!.selectedQuote = banxaCreditCardSellQuote;
@@ -172,7 +167,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should call fetchFeesAndCompose when quote has SEND_CRYPTO status on mount', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         const quoteWithSendCryptoStatus = {
@@ -188,7 +183,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should call fetchFeesAndCompose when trade data has SEND_CRYPTO status on mount', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         const trade = getSellTrade({ status: 'SEND_CRYPTO' });
@@ -204,7 +199,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should not call fetchFeesAndCompose when status is not SEND_CRYPTO', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         const quoteWithOtherStatus = {
@@ -219,7 +214,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should call fetchFeesAndCompose only once per orderId', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         const quoteWithSendCryptoStatus = {
@@ -237,7 +232,7 @@ describe('TradingSellPreviewScreen', () => {
     });
 
     it('should render last error message', async () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell' }),
         };
         preloadedState.wallet!.trading!.sell!.lastErrorMessage = 'last error message';

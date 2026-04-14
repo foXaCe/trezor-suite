@@ -5,10 +5,9 @@ import { type AccountKey } from '@suite-common/wallet-types';
 import { events } from '@suite-native/analytics';
 import { Form, useField } from '@suite-native/forms';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHook,
     renderHookWithStoreProvider,
     screen,
@@ -51,11 +50,11 @@ describe('useSellForm', () => {
     const renderUseSellForm = () => renderHookWithStoreProvider(() => useSellForm(), { store });
 
     const getInitializedStore = (bitcoinAmountUnit = PROTO.AmountUnit.BITCOIN) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: getWalletState({ tradeType: 'sell', bitcoinAmountUnit }),
         };
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     beforeEach(() => {

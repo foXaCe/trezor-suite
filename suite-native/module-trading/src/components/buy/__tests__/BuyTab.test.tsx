@@ -1,10 +1,4 @@
-import {
-    type PreloadedState,
-    act,
-    renderWithStoreProvider,
-    screen,
-    userEvent,
-} from '@suite-native/test-utils-store';
+import { act, renderWithStoreProvider, screen, userEvent } from '@suite-native/test-utils-store';
 import { selectIsTradingBuyEnabled } from '@suite-native/trading-state';
 
 import { BuyTab } from '../BuyTab';
@@ -30,7 +24,7 @@ describe('BuyTab', () => {
         (selectIsTradingBuyEnabled as jest.Mock).mockReturnValue(true);
     });
 
-    const renderBuyTab = (preloadedState?: PreloadedState) =>
+    const renderBuyTab = (preloadedState?: any) =>
         renderWithStoreProvider(<BuyTab />, { preloadedState });
 
     const expectSkeleton = () => {

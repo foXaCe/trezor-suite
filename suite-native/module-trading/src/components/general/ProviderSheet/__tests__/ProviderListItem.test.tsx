@@ -1,5 +1,5 @@
 import type { TradingTradeType } from '@suite-common/trading';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import {
     getInitializedTradingStateWithQuotes,
     mockWalletFiatRatesAndSettings,
@@ -10,7 +10,9 @@ import { ProviderListItem, type ProviderListItemProps } from '../ProviderListIte
 describe('ProviderListItem', () => {
     const renderProviderListItem = (
         quote: TradingTradeType,
-        overrides: PreloadedState = {},
+        overrides: Record<string, unknown> & {
+            wallet?: Record<string, unknown>;
+        } = {},
         props?: Partial<ProviderListItemProps<TradingTradeType>>,
     ) =>
         renderWithStoreProvider(

@@ -5,7 +5,6 @@ import { Form, useForm } from '@suite-native/forms';
 import type { UseFormReturn } from '@suite-native/forms';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -39,7 +38,7 @@ describe('TradingCountryOfResidencePicker', () => {
             { preloadedState: residenceCheckDisabledState },
         );
 
-    const renderCountryOfResidencePicker = (preloadedState: PreloadedState) =>
+    const renderCountryOfResidencePicker = (preloadedState: any) =>
         renderWithStoreProvider(<TradingCountryOfResidencePicker testID="testID" context="buy" />, {
             wrapper: ({ children }) => <Form form={form}>{children}</Form>,
             preloadedState,

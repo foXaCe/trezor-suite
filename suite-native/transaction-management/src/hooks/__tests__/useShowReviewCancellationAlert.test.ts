@@ -1,6 +1,6 @@
 import {
     type TestStore,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 
@@ -29,7 +29,7 @@ describe('useShowReviewCancellationAlert', () => {
 
     beforeEach(() => {
         mockShowAlert.mockClear();
-        store = initStore().store;
+        store = createStoreFromPreloadedState();
     });
 
     it('should return stable callback', () => {

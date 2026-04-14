@@ -1,6 +1,5 @@
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -18,7 +17,7 @@ import {
 describe('SellFormFieldErrorBadge', () => {
     let tradingForm: SellFormType;
 
-    const renderUseTradingSellForm = (preloadedState: PreloadedState = {}) => {
+    const renderUseTradingSellForm = (preloadedState: any = {}) => {
         const { result } = renderHookWithStoreProvider(() => useSellForm(), {
             preloadedState,
         });
@@ -26,14 +25,14 @@ describe('SellFormFieldErrorBadge', () => {
         return result.current;
     };
 
-    const getPreloadedState = (bitcoinAmountUnit = PROTO.AmountUnit.BITCOIN): PreloadedState => ({
+    const getPreloadedState = (bitcoinAmountUnit = PROTO.AmountUnit.BITCOIN): any => ({
         wallet: getWalletState({ tradeType: 'sell', bitcoinAmountUnit }),
     });
 
     const renderSellFormFieldErrorBadge = (
         props: SellFormFieldErrorBadgeProps,
         form: SellFormType,
-        preloadedState: PreloadedState = getPreloadedState(),
+        preloadedState: any = getPreloadedState(),
     ) =>
         renderWithStoreProvider(
             <Form form={form}>

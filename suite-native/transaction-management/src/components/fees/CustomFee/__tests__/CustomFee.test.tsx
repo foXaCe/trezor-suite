@@ -2,7 +2,6 @@ import { type NetworkSymbol } from '@suite-common/wallet-config';
 import { type AccountKey, type FormState } from '@suite-common/wallet-types';
 import { Form } from '@suite-native/forms';
 import {
-    type PreloadedState,
     act,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
@@ -43,7 +42,7 @@ describe('CustomFee', () => {
 
     const renderUseFeesForm = (
         accountKey: AccountKey = 'eth-account-1' as AccountKey, // Todo: create properly via `createAccountKey()`
-        preloadedState?: PreloadedState,
+        preloadedState?: any,
         defaultFeePerUnit?: string,
     ) => {
         const { result } = renderHookWithStoreProvider(
@@ -66,7 +65,7 @@ describe('CustomFee', () => {
         props,
     }: {
         form: FeesFormType;
-        preloadedState?: PreloadedState;
+        preloadedState?: any;
         props?: Partial<CustomFeeProps>;
     }) => {
         // Create a mock FormState that matches the expected structure

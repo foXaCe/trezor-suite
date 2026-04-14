@@ -1,12 +1,12 @@
 import type { AccountKey } from '@suite-common/wallet-types';
 import { getTranslation } from '@suite-native/intl';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { eth1NormalAccount, exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import { ExchangeRevokeDetails } from '../ExchangeRevokeDetails';
 
 describe('ExchangeRevokeDetails', () => {
-    let preloadedState: PreloadedState;
+    let preloadedState: any;
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const renderExchangeRevokeDetails = () =>

@@ -1,4 +1,8 @@
-import { type TestStore, initStore, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import {
+    type TestStore,
+    createStoreFromPreloadedState,
+    renderWithStoreProvider,
+} from '@suite-native/test-utils-store';
 import { exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import { RevokeLimitInfoRow } from '../RevokeLimitInfoRow';
@@ -19,7 +23,7 @@ describe('RevokeLimitInfoRow', () => {
             ...exchangeQuotes[0],
             preapprovedStringAmount: '100',
         };
-        ({ store } = initStore(preloadedState));
+        store = createStoreFromPreloadedState(preloadedState);
     });
 
     it('should render that new limit is 0', () => {
@@ -41,7 +45,7 @@ describe('RevokeLimitInfoRow', () => {
             }),
         };
         preloadedState!.wallet!.trading.exchange.preselectedQuote = undefined;
-        ({ store } = initStore(preloadedState));
+        store = createStoreFromPreloadedState(preloadedState);
 
         const { toJSON } = renderRevokeLimitInfoRow();
 

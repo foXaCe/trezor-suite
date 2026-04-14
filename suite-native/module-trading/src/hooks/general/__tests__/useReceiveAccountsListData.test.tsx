@@ -1,6 +1,6 @@
 import { type NetworkSymbol } from '@suite-common/wallet-config';
 import { type Account } from '@suite-common/wallet-types';
-import { type PreloadedState, renderHookWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderHookWithStoreProvider } from '@suite-native/test-utils-store';
 import {
     MOCK_ACCOUNT_DEVICE_SESSION_ID,
     accounts,
@@ -34,7 +34,7 @@ describe('useReceiveAccountsListData', () => {
         initialSymbol: NetworkSymbol,
         initialSelectedAccount: undefined | Account,
         initialMode: ReceiveAccountsListMode,
-        preloadedState: PreloadedState = defaultPreloadedState,
+        preloadedState: any = defaultPreloadedState,
     ) =>
         renderHookWithStoreProvider(
             ({ symbol, selectedAccount, mode }) =>

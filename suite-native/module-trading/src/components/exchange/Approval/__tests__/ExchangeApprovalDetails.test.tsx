@@ -1,6 +1,6 @@
 import type { AccountKey } from '@suite-common/wallet-types';
 import { getTranslation } from '@suite-native/intl';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import { eth1NormalAccount, exchangeQuotes, getWalletState } from '@suite-native/trading-fixtures';
 
 import { ExchangeApprovalDetails } from '../ExchangeApprovalDetails';
@@ -12,7 +12,7 @@ jest.mock('@suite-native/transaction-management', () => ({
 }));
 
 describe('ExchangeApprovalDetails', () => {
-    let preloadedState: PreloadedState;
+    let preloadedState: any;
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const mockOnApprovalTypeChange = jest.fn();
 

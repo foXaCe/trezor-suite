@@ -1,15 +1,11 @@
-import {
-    type PreloadedState,
-    renderWithStoreProvider,
-    userEvent,
-} from '@suite-native/test-utils-store';
+import { renderWithStoreProvider, userEvent } from '@suite-native/test-utils-store';
 
 import { ReviewOutputsFooter, type ReviewOutputsFooterProps } from '../ReviewOutputsFooter';
 
 describe('ReviewOutputsFooter', () => {
     const renderReviewOutputsFooter = (
         props: Partial<ReviewOutputsFooterProps>,
-        preloadedState: PreloadedState = {},
+        preloadedState: any = {},
     ) =>
         renderWithStoreProvider(
             <ReviewOutputsFooter

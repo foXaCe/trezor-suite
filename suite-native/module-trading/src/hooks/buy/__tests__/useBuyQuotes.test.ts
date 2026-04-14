@@ -1,10 +1,9 @@
 import { INVITY_API_RELOAD_QUOTES_AFTER_SECONDS, tradingBuyActions } from '@suite-common/trading';
 import { type Account, type AccountKey } from '@suite-common/wallet-types';
 import {
-    type PreloadedState,
     type TestStore,
     act,
-    initStore,
+    createStoreFromPreloadedState,
     renderHookWithStoreProvider,
 } from '@suite-native/test-utils-store';
 import {
@@ -48,12 +47,12 @@ jest.mock('@suite-common/trading', () => ({
 
 describe('useBuyQuotes', () => {
     const getInitializedStore = () => {
-        const preloadedState: PreloadedState = {
+        const preloadedState: any = {
             wallet: { trading: getInitializedTradingState(), accounts: [getBtcAccount()] },
         };
         preloadedState.wallet!.trading!.buy!.tradingAccountKey = 'btc-account-1' as AccountKey; // Todo: create properly via `createAccountKey()`
 
-        return initStore(preloadedState).store;
+        return createStoreFromPreloadedState(preloadedState);
     };
 
     const renderUseBuyQuotes = (store: TestStore) =>

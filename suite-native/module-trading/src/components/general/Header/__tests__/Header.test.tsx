@@ -1,14 +1,19 @@
+import { combineReducers } from '@reduxjs/toolkit';
+
+import { extraDependenciesCommonMock } from '@suite-common/test-utils';
+import { initialWalletSettingsState } from '@suite-common/wallet-core';
 import { events } from '@suite-native/analytics';
 import { FeatureFlag, featureFlagsInitialState } from '@suite-native/feature-flags';
+import { localeReducer } from '@suite-native/intl';
 import { useAnalytics } from '@suite-native/services';
 import {
-    type PreloadedState,
     type TestStore,
+    createLightStore,
+    createStaticReducer,
     fireEvent,
-    initStore,
     renderWithStoreProvider,
 } from '@suite-native/test-utils-store';
-import { type TradingRootState } from '@suite-native/trading-state';
+import { tradingInitialState, tradingSlice } from '@suite-native/trading-state';
 
 import { Header } from '../Header';
 
@@ -22,6 +27,44 @@ jest.mock('@suite-native/services', () => {
 });
 
 describe('Header', () => {
+    const getMessageSystemState = (
+        buyEnabled: boolean,
+        exchangeEnabled: boolean,
+        sellEnabled: boolean,
+    ) => ({
+        validMessages: {
+            banner: [],
+            context: [],
+            modal: [],
+            feature: ['actionId'],
+        },
+        dismissedMessages: [],
+        config: {
+            actions: [
+                {
+                    message: {
+                        id: 'actionId',
+                        category: ['feature'],
+                        feature: [
+                            {
+                                domain: 'trading.buy',
+                                flag: buyEnabled,
+                            },
+                            {
+                                domain: 'trading.exchange',
+                                flag: exchangeEnabled,
+                            },
+                            {
+                                domain: 'trading.sell',
+                                flag: sellEnabled,
+                            },
+                        ],
+                    },
+                },
+            ],
+        },
+    });
+
     const getFFPreloadedState = ({
         buyEnabled = false,
         sellEnabled = false,
@@ -68,54 +111,64 @@ describe('Header', () => {
         sellEnabled?: boolean;
         exchangeEnabled?: boolean;
         areTradingExchangeDexesEnabled?: boolean;
-        tradingPreloadedState?: TradingRootState | undefined;
+        tradingPreloadedState?: {
+            wallet?: {
+                trading?: Record<string, unknown>;
+            };
+        };
     }) => {
-        const preloadedState: PreloadedState = {
+        const preloadedState = {
             ...getFFPreloadedState({
                 buyEnabled,
                 sellEnabled,
                 exchangeEnabled,
                 areTradingExchangeDexesEnabled,
             }),
-
-            messageSystem: {
-                validMessages: {
-                    banner: [],
-                    context: [],
-                    modal: [],
-                    feature: ['actionId'],
-                },
-                dismissedMessages: [] as any,
-                config: {
-                    actions: [
-                        {
-                            message: {
-                                id: 'actionId',
-                                category: ['feature'],
-                                feature: [
-                                    {
-                                        domain: 'trading.buy',
-                                        flag: buyEnabled,
-                                    },
-                                    {
-                                        domain: 'trading.exchange',
-                                        flag: exchangeEnabled,
-                                    },
-                                    {
-                                        domain: 'trading.sell',
-                                        flag: sellEnabled,
-                                    },
-                                ],
-                            },
-                        },
-                    ],
+            messageSystem: getMessageSystemState(buyEnabled, exchangeEnabled, sellEnabled),
+            wallet: {
+                trading: {
+                    ...tradingInitialState,
+                    ...tradingPreloadedState?.wallet?.trading,
                 },
             },
-            ...tradingPreloadedState,
-        } as unknown as PreloadedState;
+        };
 
         return renderWithStoreProviderWithReportMock(<Header />, { preloadedState });
     };
+
+    const createTestStore = ({
+        buyEnabled = false,
+        sellEnabled = false,
+        exchangeEnabled = false,
+        areTradingExchangeDexesEnabled = true,
+    }: {
+        buyEnabled?: boolean;
+        sellEnabled?: boolean;
+        exchangeEnabled?: boolean;
+        areTradingExchangeDexesEnabled?: boolean;
+    }) =>
+        createLightStore({
+            reducer: {
+                locale: localeReducer,
+                featureFlags: createStaticReducer(featureFlagsInitialState),
+                messageSystem: createStaticReducer(
+                    getMessageSystemState(buyEnabled, exchangeEnabled, sellEnabled),
+                ),
+                wallet: combineReducers({
+                    settings: createStaticReducer(initialWalletSettingsState),
+                    trading: tradingSlice.prepareReducer(extraDependenciesCommonMock),
+                }),
+            },
+            preloadedState: {
+                ...getFFPreloadedState({
+                    buyEnabled,
+                    sellEnabled,
+                    exchangeEnabled,
+                    areTradingExchangeDexesEnabled,
+                }),
+                messageSystem: getMessageSystemState(buyEnabled, exchangeEnabled, sellEnabled),
+            },
+        });
 
     it.each([
         {
@@ -167,12 +220,10 @@ describe('Header', () => {
     });
 
     it('should set state on tab button press', () => {
-        const { store } = initStore(
-            getFFPreloadedState({
-                buyEnabled: true,
-                exchangeEnabled: true,
-            }),
-        );
+        const store = createTestStore({
+            buyEnabled: true,
+            exchangeEnabled: true,
+        });
         const { renderer } = renderWithStoreProviderWithReportMock(<Header />, {
             store,
         });
@@ -205,13 +256,11 @@ describe('Header', () => {
         let store: TestStore;
 
         beforeEach(() => {
-            store = initStore(
-                getFFPreloadedState({
-                    buyEnabled: true,
-                    exchangeEnabled: true,
-                    sellEnabled: true,
-                }),
-            ).store;
+            store = createTestStore({
+                buyEnabled: true,
+                exchangeEnabled: true,
+                sellEnabled: true,
+            });
         });
 
         it('should report TradingNavigate event on tab change', () => {

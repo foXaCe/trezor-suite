@@ -1,5 +1,5 @@
 import type { TradingTransaction } from '@suite-common/trading';
-import { type PreloadedState, renderWithStoreProvider } from '@suite-native/test-utils-store';
+import { renderWithStoreProvider } from '@suite-native/test-utils-store';
 import {
     accounts,
     getBuyTrade,
@@ -14,7 +14,7 @@ import {
     type TradeDetailTransactionInfoProps,
 } from '../TradeDetailTransactionInfo';
 
-const getPreloadedState = (trades: TradingTransaction[]): PreloadedState => ({
+const getPreloadedState = (trades: TradingTransaction[]): any => ({
     device: {
         devices: [],
         selectedDevice: {

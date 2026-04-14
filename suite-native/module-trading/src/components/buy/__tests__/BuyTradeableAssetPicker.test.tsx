@@ -1,9 +1,10 @@
 import { type EnhancedStore } from '@reduxjs/toolkit';
 
+import { featureFlagsInitialState } from '@suite-native/feature-flags';
 import { Form } from '@suite-native/forms';
 import {
+    createStoreFromPreloadedState,
     fireEvent,
-    initStore,
     renderHookWithStoreProvider,
     renderWithStoreProvider,
     screen,
@@ -20,9 +21,10 @@ describe('BuyTradeableAssetPicker', () => {
     let form: BuyFormType;
 
     const initPreloadedStore = (firmwareType: FirmwareType) =>
-        initStore({
+        createStoreFromPreloadedState({
             device: { selectedDevice: { firmwareType } },
             wallet: { trading: getInitializedTradingState() },
+            featureFlags: featureFlagsInitialState,
         });
 
     const renderFormHook = () => {
@@ -47,7 +49,7 @@ describe('BuyTradeableAssetPicker', () => {
 
     describe('with regular firmware', () => {
         beforeEach(() => {
-            store = initPreloadedStore(FirmwareType.Universal).store;
+            store = initPreloadedStore(FirmwareType.Universal);
             form = renderFormHook();
         });
 
@@ -67,7 +69,7 @@ describe('BuyTradeableAssetPicker', () => {
 
     describe('with BTC-only firmware', () => {
         beforeEach(() => {
-            store = initPreloadedStore(FirmwareType.BitcoinOnly).store;
+            store = initPreloadedStore(FirmwareType.BitcoinOnly);
             form = renderFormHook();
         });
 
