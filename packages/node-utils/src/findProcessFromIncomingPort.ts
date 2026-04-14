@@ -44,8 +44,9 @@ export async function findProcessFromIncomingPort(
                     (!filterSelf || !line.includes(` ${process.pid} `)), // Filter out self
             );
             if (processLine) {
+                const parts = processLine.split(/\s+/);
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const name = processLine.split(/\s+/)[0].replace(/\\x\d{2}/g, ' ');
+                const name = parts[0].replace(/\\x\d{2}/g, ' ');
                 const pid = processLine.split(/\s+/)[1];
 
                 if (process.platform === 'darwin') {
@@ -67,8 +68,9 @@ export async function findProcessFromIncomingPort(
                 } else {
                     const fullPathCommand = `cat /proc/${pid}/cmdline`;
                     const fullPathRaw = await spawnAndCollectStdout(fullPathCommand);
+                    const firstSegment = fullPathRaw.split('\0')[0];
                     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                    const fullPath = fullPathRaw.split('\0')[0].trim();
+                    const fullPath = firstSegment.trim();
                     // Binaries can be all over the place on Linux, so we don't check the path
 
                     // @ts-expect-error: indexing with noUncheckedIndexedAccess

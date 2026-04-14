@@ -179,12 +179,13 @@ describe('api/ethereum/Fees', () => {
         const smartLevels = await feeLevels.load(backend, ETH_REQUEST);
 
         expect(smartLevels).toHaveLength(1);
+        const firstLevel = smartLevels?.[0];
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        expect(smartLevels?.[0].label).toBe('normal');
+        expect(firstLevel.label).toBe('normal');
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        expect(smartLevels?.[0].feePerUnit).toBe('5000000000');
+        expect(firstLevel.feePerUnit).toBe('5000000000');
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        expect(smartLevels?.[0].feeLimit).toBe('21000');
+        expect(firstLevel.feeLimit).toBe('21000');
 
         backend.disconnect();
         spy.mockRestore();

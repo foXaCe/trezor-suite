@@ -89,8 +89,9 @@ export default class EthereumGetPublicKey extends AbstractMethod<'ethereumGetPub
         const cmd = this.getDevice().getCommands();
 
         for (let i = 0; i < this.params.length; i++) {
+            const param = this.params[i];
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const { address_n, show_display } = this.params[i].proto;
+            const { address_n, show_display } = param.proto;
 
             const publicKey = await cmd.ethereumGetPublicKey({ address_n, show_display });
 

@@ -135,8 +135,9 @@ describe('Stellar', () => {
             .includeFailed(true)
             .call();
 
+        const lastRecord = txRawResp.records[txRawResp.records.length - 1];
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const expectedCursor = txRawResp.records[txRawResp.records.length - 1].paging_token;
+        const expectedCursor = lastRecord.paging_token;
         const expectedTxs = txRawResp.records.map(record =>
             utils.transformTransaction(record, descriptor, {}),
         );

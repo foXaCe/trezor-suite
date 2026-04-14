@@ -87,8 +87,9 @@ export default class CardanoGetPublicKey extends AbstractMethod<'cardanoGetPubli
         const responses: MethodReturnType<typeof this.name> = [];
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
+            const param = this.params[i];
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const batch = this.params[i].proto;
+            const batch = param.proto;
             const { message } = await cmd.typedCall(
                 'CardanoGetPublicKey',
                 'CardanoPublicKey',

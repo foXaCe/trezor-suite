@@ -32,8 +32,9 @@ const aggregateTransactions = (txs: (Transaction & { blockTime: number })[], gro
     const result: Res['payload'] = [];
     let i = 0;
     while (i < txs.length) {
+        const currentTx = txs[i];
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const time = Math.floor(txs[i].blockTime / groupBy) * groupBy;
+        const time = Math.floor(currentTx.blockTime / groupBy) * groupBy;
         let j = i;
         let received = 0;
         let sent = 0;

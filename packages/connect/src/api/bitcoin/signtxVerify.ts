@@ -134,8 +134,9 @@ export const verifyTx = (
 
     // check outputs scripts
     for (let i = 0; i < outputs.length; i++) {
+        const output = bitcoinTx.outs[i];
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const scriptB = bitcoinTx.outs[i].script;
+        const scriptB = output.script;
 
         const scriptA = outputScripts[i];
         if (scriptA && scriptA.compare(scriptB) !== 0) {

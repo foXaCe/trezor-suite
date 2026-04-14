@@ -559,8 +559,9 @@ describe('http', () => {
             // ... but api.enumerate is still processing
             expect(enumerateSpy).toHaveBeenCalledTimes(1);
             // wait for api.enumerate result and check if it was resolved with failure
+            const firstResult = enumerateSpy.mock.results[0];
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const enumerateResult = await enumerateSpy.mock.results[0].value;
+            const enumerateResult = await firstResult.value;
             expect(enumerateResult.success).toBe(false);
             expect(enumerateResult.error).toContain('Aborted');
 
@@ -623,8 +624,9 @@ describe('http', () => {
             // ... but api.write is still processing
             expect(writeSpy).toHaveBeenCalledTimes(1);
             // wait for api.write result and check if it was resolved with failure
+            const firstWriteResult = writeSpy.mock.results[0];
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const enumerateResult = await writeSpy.mock.results[0].value;
+            const enumerateResult = await firstWriteResult.value;
             expect(enumerateResult.success).toBe(false);
             expect(enumerateResult.error).toContain('Aborted');
             // api.read was never called since read was aborted

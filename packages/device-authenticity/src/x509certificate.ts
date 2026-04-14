@@ -354,12 +354,13 @@ const parseExtensions = (data: Asn1) => {
         if (value.cls !== 0 || value.tag !== 1 || value.contents.length !== 1 || value.structured) {
             throw new Error("This can't be a boolean. Wrong data type.");
         }
+        const firstByte = value.contents[0];
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        if (![0x00, 0xff].includes(value.contents[0])) {
+        if (![0x00, 0xff].includes(firstByte)) {
             throw new Error('Invalid boolean value.');
         }
 
-        return value.contents[0] === 0xff;
+        return firstByte === 0xff;
     };
 
     const readBitString = (uint8Array: Uint8Array) => {
@@ -417,10 +418,12 @@ const parseExtensions = (data: Asn1) => {
             // https://www.alvestrand.no/objectid/2.5.29.19.html
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const fields = derToAsn1List(derToAsn1(extnValue.contents).contents);
+            const firstField = fields[0];
+            const secondField = fields[1];
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const ca = fields.length > 0 && fields[0].tag === 1 ? fields[0] : undefined;
+            const ca = fields.length > 0 && firstField.tag === 1 ? firstField : undefined;
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const len = fields.length > 0 && fields[0].tag === 2 ? fields[0] : fields[1];
+            const len = fields.length > 0 && firstField.tag === 2 ? firstField : secondField;
 
             extensions.push({
                 key: 'basicConstraints',

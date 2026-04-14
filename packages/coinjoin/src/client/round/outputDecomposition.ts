@@ -38,8 +38,9 @@ const getOutputAmounts = async (params: GetOutputAmountsParams) => {
                 input.accountKey === accountKey && compareOutpoint(input.outpoint, i.Coin.Outpoint),
         );
         if (internal) {
+            const firstCredential = internal.confirmedAmountCredentials![0];
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            InternalAmounts.push(internal.confirmedAmountCredentials![0].Value);
+            InternalAmounts.push(firstCredential.Value);
         } else {
             const size = getExternalOutputSize(i.Coin.TxOut.ScriptPubKey);
             const miningFee = Math.floor((size * roundParameters.MiningFeeRate) / 1000);

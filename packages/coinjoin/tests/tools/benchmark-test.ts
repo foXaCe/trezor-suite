@@ -29,8 +29,9 @@ const stripHeaders = () => {
                 ?.split(': ');
 
             if (allowedHeaders) {
+                const allowedHeaderValue = allowedHeaders[1];
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const allowedKeys = allowedHeaders[1].split(';');
+                const allowedKeys = allowedHeaderValue.split(';');
 
                 headers.forEach(line => {
                     const [key, value] = line.split(': ');

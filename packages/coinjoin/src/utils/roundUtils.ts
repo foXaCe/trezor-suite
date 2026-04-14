@@ -217,8 +217,9 @@ export const transformStatus = ({
     const { allowedInputAmounts, coordinationFeeRate } = getDataFromRounds(rounds);
     // coinJoinFeeRateMedians include an array of medians per day, week and month - we take the first (day) median as the recommended fee rate base.
     // The value is converted from kvBytes (kilo virtual bytes) to vBytes (how the value is displayed in UI).
+    const firstMedian = CoinJoinFeeRateMedians[0];
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const feeRateMedian = Math.round(CoinJoinFeeRateMedians[0].MedianFeeRate / 1000);
+    const feeRateMedian = Math.round(firstMedian.MedianFeeRate / 1000);
 
     return {
         rounds,
