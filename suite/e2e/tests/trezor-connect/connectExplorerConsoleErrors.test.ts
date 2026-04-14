@@ -1,4 +1,4 @@
-import { type ConsoleMessage, expect, test } from '@playwright/test';
+import { type ConsoleMessage, expect, type Page, test } from '@playwright/test';
 
 /**
  * Navigates key connect-explorer pages and asserts no console.error messages appear.
@@ -6,7 +6,38 @@ import { type ConsoleMessage, expect, test } from '@playwright/test';
  */
 
 function getConnectExplorerUrl() {
-    return process.env.CONNECT_EXPLORER_URL ?? 'http://localhost:8088/';
+    const connectExplorerUrl = process.env.CONNECT_EXPLORER_URL;
+    if (connectExplorerUrl) {
+        return connectExplorerUrl;
+    }
+
+    const baseUrl = process.env.BASE_URL;
+    if (!baseUrl) {
+        return 'http://localhost:8088/';
+    }
+
+    const branchMatch = baseUrl.match(/suite-web\/(.*?)\/web\/$/);
+    if (!branchMatch) {
+        throw new Error('Could not extract branch from BASE_URL');
+    }
+
+    return getConnectExplorerUrlSldev(branchMatch[1]);
+}
+
+function getConnectExplorerUrlSldev(branch: string = 'develop') {
+    return `https://dev.suite.sldev.cz/connect/${branch}/`;
+}
+
+async function gotoConnectExplorerPage(page: Page, path: string) {
+    try {
+        await page.goto(`${getConnectExplorerUrl()}${path}`, {
+            waitUntil: 'load',
+        });
+    } catch {
+        await page.goto(`${getConnectExplorerUrlSldev()}${path}`, {
+            waitUntil: 'load',
+        });
+    }
 }
 
 const pagesToCheck = [
@@ -38,9 +69,7 @@ test.describe('Connect Explorer - no console errors', { tag: ['@webOnly', '@T3T1
                 }
             });
 
-            await page.goto(`${getConnectExplorerUrl()}${path}`, {
-                waitUntil: 'load',
-            });
+            await gotoConnectExplorerPage(page, path);
 
             // Give time for hydration and any deferred rendering.
             await page.waitForTimeout(2000);
