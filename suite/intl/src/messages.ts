@@ -6382,6 +6382,37 @@ export const messages = defineMessages({
         defaultMessage: 'Change server',
         id: 'TR_LABELING_SERVERS_CHANGE',
     },
+    TR_LABELING_MIGRATION_TITLE: {
+        defaultMessage: 'Migrate legacy labels to Suite Sync',
+        id: 'TR_LABELING_MIGRATION_TITLE',
+    },
+    TR_LABELING_MIGRATION_DESCRIPTION: {
+        defaultMessage:
+            'Select a legacy labeling provider and import labels from all connected wallets. Existing Suite Sync labels will stay unchanged.',
+        id: 'TR_LABELING_MIGRATION_DESCRIPTION',
+    },
+    TR_LABELING_MIGRATION_MODAL_HEADING: {
+        defaultMessage: 'Migrate legacy labels',
+        id: 'TR_LABELING_MIGRATION_MODAL_HEADING',
+    },
+    TR_LABELING_MIGRATION_MODAL_DESCRIPTION: {
+        defaultMessage:
+            'Choose where your legacy labels are stored. Only missing labels will be copied to Suite Sync.',
+        id: 'TR_LABELING_MIGRATION_MODAL_DESCRIPTION',
+    },
+    TR_LABELING_MIGRATION_FAILED: {
+        defaultMessage: 'Migration failed. Try again.',
+        id: 'TR_LABELING_MIGRATION_FAILED',
+    },
+    TR_LABELING_MIGRATION_SUCCESS: {
+        defaultMessage: '{added} labels migrated successfully, {skipped} skipped',
+        id: 'TR_LABELING_MIGRATION_SUCCESS',
+    },
+    TR_LEGACY_LABELING_TURN_ON_SUITE_SYNC_BANNER_DESCRIPTION: {
+        defaultMessage:
+            'Keep your wallet, account, and transaction labels consistent on all your devices.',
+        id: 'TR_LEGACY_LABELING_TURN_ON_SUITE_SYNC_BANNER_DESCRIPTION',
+    },
     TR_TO_MAKE_YOUR_LABELS_PERSISTENT: {
         defaultMessage:
             'To make your labels consistent and available on different devices, connect to a cloud storage provider.',

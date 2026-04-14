@@ -23,6 +23,7 @@ import { selectShouldDisplayDeviceCompromised } from 'src/selectors/suite/suiteA
 import { useResponsiveContext } from 'src/support/suite/ResponsiveContext';
 
 import { Navigation } from './Navigation';
+import { LegacyLabelingNotificationBanner } from './QuickActions/LegacyLabelingNotificationBanner';
 import { QuickActions } from './QuickActions/QuickActions';
 import { UpdateNotificationBanner } from './QuickActions/Update/UpdateNotificationBanner';
 import { useUpdateStatus } from './QuickActions/Update/useUpdateStatus';
@@ -236,6 +237,7 @@ export const Sidebar = ({ showAccounts = true }: SidebarProps) => {
                                         onClose={() => setIsBannerVisible(false)}
                                     />
                                 )}
+                                {!isSidebarCollapsed && <LegacyLabelingNotificationBanner />}
                             </AnimatePresence>
                             <QuickActions
                                 isSidebarCollapsed={isSidebarCollapsed}

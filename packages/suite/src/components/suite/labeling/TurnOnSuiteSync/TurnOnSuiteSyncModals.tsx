@@ -1,7 +1,7 @@
+import { selectSuiteSyncInteraction } from '@suite-common/suite-sync';
 import { type StaticSessionId } from '@trezor/connect';
 import { exhaustive } from '@trezor/type-utils';
 
-import { selectDesktopSuiteSyncInteraction } from 'src/actions/suiteSync/suiteSyncSlice';
 import { useSelector } from 'src/hooks/suite';
 
 import { SuiteSyncFirmwareUpgradeNeededModal } from './SuiteSyncFirmwareUpgradeNeededModal';
@@ -20,7 +20,7 @@ export const TurnOnSuiteSyncModals = ({
     deviceStaticSessionId,
 }: TurnOnSuiteSyncModalsProps) => {
     const suiteSyncInteraction = useSelector(state =>
-        selectDesktopSuiteSyncInteraction(state, deviceStaticSessionId),
+        selectSuiteSyncInteraction(state, deviceStaticSessionId),
     );
 
     if (deviceStaticSessionId === null || suiteSyncInteraction === null) {
