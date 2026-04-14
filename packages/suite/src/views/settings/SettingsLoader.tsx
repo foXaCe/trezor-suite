@@ -8,7 +8,7 @@ import { H3, Spinner, motionEasing } from '@trezor/components';
 import { spacings, spacingsPx } from '@trezor/theme';
 
 const Container = styled(motion.div)`
-    background-color: ${({ theme }) => theme.backgroundTertiaryDefaultOnElevation0};
+    background-color: ${({ theme }) => theme.legacyBackgroundTertiaryDefaultOnElevation0};
     border-radius: 48px;
     display: flex;
     align-items: center;
@@ -16,7 +16,7 @@ const Container = styled(motion.div)`
 `;
 
 const SpinnerContainer = styled.div`
-    background-color: ${({ theme }) => theme.backgroundSurfaceElevation3};
+    background-color: ${({ theme }) => theme.legacyBackgroundSurfaceElevation3};
     border-radius: 50%;
     margin: ${spacingsPx.sm};
     padding: ${spacingsPx.md};
@@ -25,7 +25,7 @@ const Content = styled.div`
     margin: ${spacingsPx.sm};
 `;
 const Description = styled.div`
-    color: ${({ theme }) => theme.textSubdued};
+    color: ${({ theme }) => theme.contentSecondary};
 `;
 
 const getContainerAnimation = (isPresent: boolean) => ({

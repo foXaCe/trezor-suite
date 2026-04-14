@@ -51,7 +51,7 @@ const getCardProps = (isMultishareSelected: boolean) =>
 
 const cardStyle = prepareNativeStyle(utils => ({
     borderWidth: utils.borders.widths.small,
-    borderColor: utils.colors.borderOnElevation1,
+    borderColor: utils.colors.borderNeutral,
     ...utils.boxShadows.none,
 }));
 

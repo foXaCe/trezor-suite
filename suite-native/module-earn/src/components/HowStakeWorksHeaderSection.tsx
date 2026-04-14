@@ -25,7 +25,7 @@ export const HowStakeWorksHeaderSection = ({
                 <Text variant="headline-md">
                     <Translation id="earn.howStakeWorksScreen.title" values={{ displaySymbol }} />
                 </Text>
-                <Text variant="body-sm" color="textSubdued">
+                <Text variant="body-sm" color="contentSecondary">
                     <Translation id="earn.howStakeWorksScreen.subtitle" values={{ networkName }} />
                 </Text>
             </VStack>

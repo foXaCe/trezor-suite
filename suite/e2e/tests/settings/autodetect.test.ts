@@ -16,22 +16,22 @@ const testCases = [
         testName: 'Light English',
         userPreferences: { colorScheme: ColorScheme.Light },
         text: messages['TR_ONBOARDING_DATA_COLLECTION_HEADING'].defaultMessage,
-        textColor: colorVariants.standard.textDefault,
-        bodyBackgroundColor: colorVariants.standard.backgroundSurfaceElevation0,
+        textColor: colorVariants.standard.contentPrimary,
+        bodyBackgroundColor: colorVariants.standard.surfaceFillPage,
     },
     {
         testName: 'Dark English',
         userPreferences: { colorScheme: ColorScheme.Dark },
         text: messages['TR_ONBOARDING_DATA_COLLECTION_HEADING'].defaultMessage,
-        textColor: colorVariants.dark.textDefault,
-        bodyBackgroundColor: colorVariants.dark.backgroundSurfaceElevation0,
+        textColor: colorVariants.dark.contentPrimary,
+        bodyBackgroundColor: colorVariants.dark.surfaceFillPage,
     },
     {
         testName: 'Dark Spanish',
         userPreferences: { locale: 'es-ES', colorScheme: ColorScheme.Dark },
         text: SPANISH_TR_ONBOARDING_DATA_COLLECTION_HEADING,
-        textColor: colorVariants.dark.textDefault,
-        bodyBackgroundColor: colorVariants.dark.backgroundSurfaceElevation0,
+        textColor: colorVariants.dark.contentPrimary,
+        bodyBackgroundColor: colorVariants.dark.surfaceFillPage,
     },
 ];
 

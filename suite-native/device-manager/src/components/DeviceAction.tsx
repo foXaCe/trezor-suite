@@ -17,10 +17,10 @@ const contentStyle = prepareNativeStyle(utils => ({
     paddingVertical: utils.spacings.sp12,
     alignItems: 'center',
     gap: utils.spacings.sp8,
-    backgroundColor: utils.colors.backgroundSurfaceElevation1,
+    backgroundColor: utils.colors.surfaceFillRaised,
     borderWidth: utils.borders.widths.small,
     borderRadius: utils.borders.radii.r12,
-    borderColor: utils.colors.borderElevation1,
+    borderColor: utils.colors.borderNeutral,
 }));
 
 const pressableStyle = prepareNativeStyle<{ showAsFullWidth: boolean; flex: number | undefined }>(
