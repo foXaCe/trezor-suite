@@ -8,6 +8,7 @@ import {
 } from '@suite-common/wallet-types';
 import { ErrorMessage, VStack } from '@suite-native/atoms';
 import { Translation } from '@suite-native/intl';
+import type { ExchangeFlowType } from '@suite-native/navigation';
 
 import { ReviewOutputItem } from './ReviewOutputItem';
 import { ReviewOutputSummaryItem } from './ReviewOutputSummaryItem';
@@ -25,12 +26,14 @@ export type ReviewOutputItemListProps = {
     prefix: FormDraftWithSendKeyPrefix;
     accountKey: AccountKey;
     tokenContract?: TokenAddress;
+    flowType?: ExchangeFlowType;
 };
 
 export const ReviewOutputItemList = ({
     prefix,
     accountKey,
     tokenContract,
+    flowType,
 }: ReviewOutputItemListProps) => {
     const isTransactionAlreadySigned = useSelector(selectIsTransactionAlreadySigned);
     const activeStep = useSelector((state: TransactionReviewOutputsState) =>
@@ -69,6 +72,7 @@ export const ReviewOutputItemList = ({
                             reviewOutput={output}
                             onLayout={event => handleReadListItemHeight(event, index)}
                             tokenContract={tokenContract}
+                            flowType={flowType}
                         />
                     ))}
                     <ReviewOutputSummaryItem
@@ -77,6 +81,7 @@ export const ReviewOutputItemList = ({
                         symbol={accountSymbol}
                         tokenContract={tokenContract}
                         onLayout={event => handleReadListItemHeight(event, reviewOutputs.length)}
+                        flowType={flowType}
                     />
                 </VStack>
             )}
