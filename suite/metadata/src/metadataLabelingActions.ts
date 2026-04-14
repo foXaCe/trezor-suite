@@ -501,7 +501,7 @@ export const setDeviceMetadataKey =
                 });
             }
 
-            const stateAddress = device.state.staticSessionId.split('@')[0] ?? ''; // address@device_id:instance
+            const { walletDescriptor } = parseDeviceStaticSessionId(device.state.staticSessionId);
             const metaKey = metadataUtils.deriveMetadataKey(result.payload.value, stateAddress);
             const fileName = metadataUtils.deriveFilenameForLabeling(metaKey, encryptionVersion);
             const aesKey = metadataUtils.deriveAesKey(metaKey);
