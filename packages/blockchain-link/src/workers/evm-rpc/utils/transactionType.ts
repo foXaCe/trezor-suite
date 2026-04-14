@@ -35,9 +35,11 @@ export const getTransferAddressesFromLog = (
     const fromTopic = topics[1];
     const toTopic = topics[2];
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const from = `0x${fromTopic.slice(26)}`.toLowerCase();
+    const fromSlice = fromTopic.slice(26);
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const to = `0x${toTopic.slice(26)}`.toLowerCase();
+    const toSlice = toTopic.slice(26);
+    const from = `0x${fromSlice}`.toLowerCase();
+    const to = `0x${toSlice}`.toLowerCase();
 
     return { from, to };
 };

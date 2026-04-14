@@ -80,7 +80,8 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
             if (!this.params[i].network) {
                 const param = this.params[i];
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const slip44 = getSlip44ByPath(param.proto.address_n);
+                const addressN = param.proto.address_n;
+                const slip44 = getSlip44ByPath(addressN);
 
                 const definitions = await getEthereumDefinitions({ slip44 });
 
