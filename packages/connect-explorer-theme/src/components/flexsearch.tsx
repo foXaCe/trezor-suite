@@ -188,7 +188,7 @@ export function Flexsearch({ className }: { className?: string }): ReactElement 
                 const { doc } = sectionResult;
                 const isMatchingTitle = doc.display !== undefined;
                 if (isMatchingTitle) {
-                    pageTitleMatches[i] = (pageTitleMatches[i] ?? 0) + 1;
+                    pageTitleMatches[i]!++; // this exists, it has already been set to 0
                 }
                 const { url, title } = doc;
                 const content = doc.display || doc.content;
