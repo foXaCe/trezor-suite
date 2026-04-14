@@ -2,9 +2,11 @@ import { type ReactElement } from 'react';
 
 import styled from 'styled-components';
 
-import { clamp } from '@suite-common/trading';
+import { INVITY_API_RELOAD_QUOTES_AFTER_SECONDS, clamp } from '@suite-common/trading';
 import { Paragraph, ProgressPie, Spinner } from '@trezor/components';
 import { spacingsPx, typography } from '@trezor/theme';
+
+import { useTradingRefetchCountdown } from 'src/hooks/wallet/trading/useTradingRefetchCountdown';
 
 const Wrapper = styled.div`
     display: flex;
@@ -34,19 +36,12 @@ const RefreshTime = styled.div`
 
 interface TradingRefreshTimeProps {
     isLoading: boolean;
-    seconds: number;
-    refetchInterval: number;
     label: ReactElement;
 }
 
-export const TradingRefreshTime = ({
-    isLoading,
-    seconds,
-    refetchInterval,
-    label,
-}: TradingRefreshTimeProps) => {
-    const remaining = Math.max(refetchInterval - seconds, 0);
-    const progress = refetchInterval > 0 ? clamp((remaining / refetchInterval) * 100, 0, 100) : 0;
+export const TradingRefreshTime = ({ isLoading, label }: TradingRefreshTimeProps) => {
+    const remaining = useTradingRefetchCountdown();
+    const progress = clamp((remaining / INVITY_API_RELOAD_QUOTES_AFTER_SECONDS) * 100, 0, 100);
 
     return (
         <>

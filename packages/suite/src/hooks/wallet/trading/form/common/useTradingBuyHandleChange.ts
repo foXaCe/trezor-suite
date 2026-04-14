@@ -8,17 +8,17 @@ import {
     buyThunks,
     getTradingPaymentMethods,
     isCountrySubdivisionEmpty,
+    tradingActions,
 } from '@suite-common/trading';
 import { type Network } from '@suite-common/wallet-config';
-import { type Timer } from '@trezor/react-utils';
 
 import { useDispatch } from 'src/hooks/suite';
+import { useTradingRefetchScheduler } from 'src/hooks/wallet/trading/useTradingRefetchScheduler';
 import { useAnalytics } from 'src/support/useAnalytics';
 
 type TradingBuyUseHandleChangeProps = {
     formValues: TradingBuyFormProps;
     network: Network;
-    timer: Timer;
     shouldSendInSats: boolean | undefined;
 
     setValue: UseFormSetValue<TradingBuyFormProps>;
@@ -35,7 +35,6 @@ type PromiseType = {
 export const useTradingBuyHandleChange = ({
     formValues,
     network,
-    timer,
     shouldSendInSats,
     setValue,
 }: TradingBuyUseHandleChangeProps) => {
@@ -60,7 +59,6 @@ export const useTradingBuyHandleChange = ({
             buyThunks.handleRequestThunk({
                 formValues,
                 network,
-                timer,
                 shouldSendInSats,
             }),
         );
@@ -98,7 +96,9 @@ export const useTradingBuyHandleChange = ({
         } catch (error) {
             console.warn('Request was aborted:', error.message);
         }
-    }, [dispatch, formValues, network, timer, shouldSendInSats, analytics, setValue]);
+    }, [dispatch, formValues, network, shouldSendInSats, analytics, setValue]);
+
+    useTradingRefetchScheduler(handleChange);
 
     // cleanup signal
     useEffect(
@@ -106,8 +106,9 @@ export const useTradingBuyHandleChange = ({
             if (previousPromise.current) {
                 previousPromise.current.abort('Request is canceled - page is unmounted.');
             }
+            dispatch(tradingActions.setStopRefetchInterval());
         },
-        [],
+        [dispatch],
     );
 
     return { handleChange };

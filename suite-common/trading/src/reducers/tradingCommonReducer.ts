@@ -52,6 +52,14 @@ export interface TradingPrefilledFromAccount {
     key: AccountKey | undefined;
 }
 
+export const REFETCH_INTERVAL_MAX_COUNT = 40;
+
+export interface RefetchInterval {
+    remainingRefetches: number;
+    lastFetchTimestamp: number | undefined;
+    status: 'running' | 'stopped';
+}
+
 export interface TradingState {
     info: TradingInfo;
     buy: TradingBuyState;
@@ -69,6 +77,7 @@ export interface TradingState {
     settings: TradingSettingsState;
     currentProviderMetadata?: ProviderMetadata;
     favouriteAssets: Record<CryptoId, true>;
+    refetchInterval: RefetchInterval;
 }
 
 export type TradingRootState = {
@@ -100,6 +109,11 @@ export const initialState: TradingState = {
     verifiedAddress: undefined,
     settings: settingsInitialState,
     favouriteAssets: {},
+    refetchInterval: {
+        remainingRefetches: REFETCH_INTERVAL_MAX_COUNT,
+        lastFetchTimestamp: undefined,
+        status: 'stopped',
+    },
 };
 
 const tradingCommonSlice = createSlice({
@@ -170,6 +184,22 @@ const tradingCommonSlice = createSlice({
             { payload }: PayloadAction<ProviderMetadata | undefined>,
         ) => {
             state.currentProviderMetadata = payload;
+        },
+        setStopRefetchInterval: state => {
+            state.refetchInterval.status = 'stopped';
+            state.refetchInterval.remainingRefetches = REFETCH_INTERVAL_MAX_COUNT;
+            state.refetchInterval.lastFetchTimestamp = undefined;
+        },
+        setRefetchIntervalTimestamp: state => {
+            state.refetchInterval.remainingRefetches -= 1;
+            state.refetchInterval.status =
+                state.refetchInterval.remainingRefetches <= 0 ? 'stopped' : 'running';
+            state.refetchInterval.lastFetchTimestamp = Date.now();
+        },
+        setResetRefetchInterval: state => {
+            state.refetchInterval.remainingRefetches = REFETCH_INTERVAL_MAX_COUNT;
+            state.refetchInterval.status = 'stopped';
+            state.refetchInterval.lastFetchTimestamp = undefined;
         },
     },
 });
