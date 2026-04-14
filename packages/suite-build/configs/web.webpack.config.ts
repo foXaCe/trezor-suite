@@ -49,6 +49,12 @@ const config: webpack.Configuration = {
                 }))
                 .concat([
                     {
+                        from: path.join(__dirname, '../../connect-web/src/iframe'),
+                        to: path.join(baseDir, 'build/connect-popup'),
+                    },
+                ])
+                .concat([
+                    {
                         from: path.join(
                             __dirname,
                             '../../../',
