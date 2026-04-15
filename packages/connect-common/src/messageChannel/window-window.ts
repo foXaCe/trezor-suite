@@ -36,7 +36,8 @@ export class WindowWindowChannel<
         super({
             channel,
             sendFn: (message: any) => {
-                windowPeer()?.postMessage(message, origin);
+                console.log('WindowWindowChannel sendFn', message, origin);
+                windowPeer()?.postMessage(message, '*');
             },
             logger,
         });

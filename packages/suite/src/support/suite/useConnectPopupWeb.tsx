@@ -88,9 +88,11 @@ export const useConnectPopupWeb = () => {
             channelRef.current = null;
             // TODO: show warning to user
             console.warn('Connect-popup handshakeTimeout');
-        }, 3000);
+        }, 300000);
 
         const onMessage = (event: MessageEvent) => {
+            console.warn('Connect-popup onMessage', event.data, event.origin);
+
             const { data } = event;
             if (!data?.type) return;
 
@@ -132,7 +134,8 @@ export const useConnectPopupWeb = () => {
         window.addEventListener('beforeunload', onBeforeUnload);
 
         return () => {
-            broadcastChannel.removeEventListener('message', onMessage);
+            console.warn('Connect-popup removing event listeners');
+            // broadcastChannel.removeEventListener('message', onMessage);
             window.removeEventListener('beforeunload', onBeforeUnload);
         };
     }, []);

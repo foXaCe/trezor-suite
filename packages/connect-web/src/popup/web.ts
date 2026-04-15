@@ -52,6 +52,8 @@ export class WebPopup extends Popup {
             return Promise.resolve();
         }
 
+        console.log('iframe created:', popupUrl, this.channel);
+
         if (!this.channel.isConnected) {
             this.channel.connect();
         }
