@@ -2,25 +2,25 @@ import { useState } from 'react';
 
 import { Translation } from '@suite/intl';
 import { selectDeviceStaticSessionId } from '@suite-common/device';
-import { selectIsSuiteSyncFeatureAvailable } from '@suite-common/suite-sync';
+import { selectSuiteSyncInteraction } from '@suite-common/suite-sync';
 import { Button, Column, Icon, Row, Text, TextButton } from '@trezor/components';
 import { HELP_CENTER_LABELING } from '@trezor/urls';
 
 import { selectIsLegacyLabelingVisible } from 'src/actions/labels/selectIsLegacyLabelingVisible';
 import { useSelector } from 'src/hooks/suite';
-import { type AppState } from 'src/reducers/store';
 
 import { TurnOnSuiteSyncModals } from '../../../../labeling/TurnOnSuiteSync/TurnOnSuiteSyncModals';
 import { SidebarBanner } from '../SidebarBanner';
-
-export const selectShouldDisplayLegacyLabelingSuiteSyncBanner = (state: AppState) =>
-    selectIsSuiteSyncFeatureAvailable(state) && selectIsLegacyLabelingVisible(state);
 
 export const LegacyLabelingNotificationBanner = () => {
     const [isTurnOnSuiteSyncModalVisible, setIsTurnOnSuiteSyncModalVisible] = useState(false);
 
     const deviceStaticSessionId = useSelector(selectDeviceStaticSessionId);
-    const shouldDisplayBanner = useSelector(selectShouldDisplayLegacyLabelingSuiteSyncBanner);
+    const isLegacyLabelingVisible = useSelector(selectIsLegacyLabelingVisible);
+    const suiteSyncInteraction = useSelector(state =>
+        selectSuiteSyncInteraction(state, deviceStaticSessionId),
+    );
+    const shouldDisplayBanner = isLegacyLabelingVisible && suiteSyncInteraction !== 'unsupported';
 
     if (!shouldDisplayBanner) {
         return null;
