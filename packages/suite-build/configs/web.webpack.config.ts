@@ -25,6 +25,10 @@ const config: webpack.Configuration = {
             // Use importScripts-based chunk loading so vendor/runtime chunks load in a worker context
             chunkLoading: 'import-scripts',
         },
+        // 'connect-popup': {
+        //     filename: 'connect-popup/[name].js',
+        //     import: path.resolve(__dirname, '../../connect-web/src/iframe/iframe.js'),
+        // },
     },
     output: {
         path: path.join(baseDir, 'build'),
@@ -97,6 +101,19 @@ const config: webpack.Configuration = {
                     filename: path.join(baseDir, 'build', route.pattern, 'index.html'),
                 }),
         ),
+        // new HtmlWebpackPlugin({
+        //     chunks: ['connect-popup'],
+        //     minify: false,
+        //     templateParameters: {
+        //         assetPrefix,
+        //         isOnionLocation: FLAGS.ONION_LOCATION_META,
+        //     },
+        //     inject: 'body' as const,
+        //     scriptLoading: 'blocking' as const,
+        //     template: path.resolve(__dirname, '../../connect-web/src/iframe/iframe.html'),
+        //     filename: path.join(baseDir, 'build/connect-popup/iframe.html'),
+        // }),
+
         ...(!isDev ? [new CssMinimizerPlugin()] : []),
     ],
 };

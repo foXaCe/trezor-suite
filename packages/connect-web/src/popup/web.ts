@@ -25,14 +25,14 @@ export class WebPopup extends Popup {
     }
 
     protected async open(): Promise<void> {
-        // const url = this.buildPopupUrl(this.popupSrc);
-        const url =
-            'https://dev.suite.sldev.cz/suite-web/feat/connect-web-iframe-2/web/connect-popup';
+        const url = this.buildPopupUrl(this.popupSrc);
+        // const url = 'https://dev.suite.sldev.cz/suite-web/feat/connect-web-iframe-2/web/connect-popup';
         const query = `connect-popup-req=${this.channelId}`;
         const iframeUrl = `${url}/iframe.html?${query}`;
         const popupUrl = `${url}/?${query}`;
 
         const windowResult = window.open(popupUrl, 'modal');
+        // const windowResult = window.open('about:blank', 'connect-popup-' + this.channelId);
 
         console.log('Popup window opened:', popupUrl);
 
@@ -51,6 +51,10 @@ export class WebPopup extends Popup {
 
             return Promise.resolve();
         }
+
+        this.iframe
+            .get()
+            ?.contentWindow?.postMessage({ type: 'connect-popup-open', url: popupUrl }, '*');
 
         console.log('iframe created:', popupUrl, this.channel);
 
