@@ -1,0 +1,75 @@
+name: "[Test] Suite Native Unit Tests - Performance"
+
+on:
+  push:
+    branches:
+      - juriczech/native-test-perf
+
+env:
+  NODE_OPTIONS: "--max-old-space-size=8192"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  test-native-develop:
+    name: "Native Unit Tests (develop)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: develop
+          submodules: true
+      - name: "Minimal yarn install"
+        uses: ./.github/actions/minimal-yarn-install
+      - name: Run all suite-native unit tests
+        run: |
+          yarn nx run-many \
+            --target=test:unit \
+            --exclude='@trezor/*,@suite/*,@suite-common/*' \
+            --parallel=1 \
+            --output-style=stream \
+            -- \
+            --no-cache \
+            --forceExit \
+            --logHeapUsage \
+            --verbose 2>&1 | tee ${{ runner.temp }}/test-output-develop.txt
+      - name: Upload develop test output
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-output-develop
+          path: ${{ runner.temp }}/test-output-develop.txt
+
+  test-native-branch:
+    name: "Native Unit Tests (branch)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          submodules: true
+      - name: "Minimal yarn install"
+        uses: ./.github/actions/minimal-yarn-install
+      - name: Run all suite-native unit tests
+        run: |
+          yarn nx run-many \
+            --target=test:unit \
+            --exclude='@trezor/*,@suite/*,@suite-common/*' \
+            --parallel=1 \
+            --output-style=stream \
+            -- \
+            --no-cache \
+            --forceExit \
+            --logHeapUsage \
+            --verbose 2>&1 | tee ${{ runner.temp }}/test-output-branch.txt
+      - name: Upload branch test output
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-output-branch
+          path: ${{ runner.temp }}/test-output-branch.txt
