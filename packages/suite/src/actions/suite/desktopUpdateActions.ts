@@ -1,27 +1,11 @@
 import { AppUpdateEventStatus, asTypedDesktopAnalytics, events } from '@suite/analytics';
+import { DESKTOP_UPDATE, type DesktopUpdateAction, UpdateState } from '@suite/upgrade';
 import { type ExtraDependencies } from '@suite-common/redux-utils';
 import { notificationsActions } from '@suite-common/toast-notifications';
 import { type UpdateInfo, type UpdateProgress, desktopApi } from '@trezor/suite-desktop-api';
 
-import { DESKTOP_UPDATE } from 'src/actions/suite/constants';
-import { UpdateState } from 'src/reducers/suite/desktopUpdateReducer';
 import { type Dispatch, type GetState } from 'src/types/suite';
 import { getAppUpdatePayload } from 'src/utils/suite/analytics';
-
-export type DesktopUpdateAction =
-    | { type: typeof DESKTOP_UPDATE.CHECKING }
-    | { type: typeof DESKTOP_UPDATE.AVAILABLE; payload: UpdateInfo }
-    | { type: typeof DESKTOP_UPDATE.NOT_AVAILABLE; payload?: UpdateInfo }
-    | { type: typeof DESKTOP_UPDATE.DOWNLOAD }
-    | { type: typeof DESKTOP_UPDATE.DOWNLOADING; payload: UpdateProgress }
-    | { type: typeof DESKTOP_UPDATE.READY; payload: UpdateInfo }
-    | { type: typeof DESKTOP_UPDATE.MODAL_VISIBILITY; payload: boolean }
-    | { type: typeof DESKTOP_UPDATE.VERSION_INFO_MODAL_VISIBILITY; payload: boolean }
-    | { type: typeof DESKTOP_UPDATE.OPEN_EARLY_ACCESS_ENABLE }
-    | { type: typeof DESKTOP_UPDATE.OPEN_EARLY_ACCESS_DISABLE }
-    | { type: typeof DESKTOP_UPDATE.ALLOW_PRERELEASE; payload: boolean }
-    | { type: typeof DESKTOP_UPDATE.SET_AUTOMATIC_UPDATES; payload: { isEnabled: boolean } }
-    | { type: typeof DESKTOP_UPDATE.JUST_UPDATED };
 
 export const checking = (): DesktopUpdateAction => ({ type: DESKTOP_UPDATE.CHECKING });
 

@@ -1,6 +1,7 @@
 import { type JSX, useCallback, useEffect } from 'react';
 
 import { AppUpdateEventStatus, asTypedDesktopAnalytics, events } from '@suite/analytics';
+import { UpdateState, selectDesktopUpdate } from '@suite/upgrade';
 import { desktopApi } from '@trezor/suite-desktop-api';
 import { isArrayMember } from '@trezor/utils';
 
@@ -17,7 +18,6 @@ import {
     setIsVersionInfoModalVisible,
 } from 'src/actions/suite/desktopUpdateActions';
 import { useDispatch, useSelector } from 'src/hooks/suite';
-import { UpdateState, selectDesktopUpdate } from 'src/reducers/suite/desktopUpdateReducer';
 import { useAnalytics } from 'src/support/useAnalytics';
 import { getAppUpdatePayload } from 'src/utils/suite/analytics';
 

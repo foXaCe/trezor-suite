@@ -6,6 +6,7 @@ import { metadataReducer } from '@suite/metadata';
 import { modalReducer as modal } from '@suite/modal';
 import { routerReducer } from '@suite/router';
 import { prepareSuiteSettingsReducer } from '@suite/settings';
+import { desktopUpdateReducer } from '@suite/upgrade';
 import { prepareAnalyticsReducer } from '@suite-common/analytics-redux';
 import { prepareConnectPopupReducer } from '@suite-common/connect-popup';
 import { logsSlice } from '@suite-common/logger';
@@ -16,7 +17,6 @@ import { prepareWalletConnectReducer } from '@suite-common/walletconnect';
 import { deviceSlice } from 'src/actions/device/deviceSlice';
 import { extraDependencies } from 'src/support/extraDependencies';
 
-import desktopUpdate from './desktopUpdateReducer';
 import guide from './guideReducer';
 import protocol from './protocolReducer';
 import suite from './suiteReducer';
@@ -44,7 +44,7 @@ export default {
     window,
     analytics,
     metadata: metadataReducer,
-    desktopUpdate,
+    desktopUpdate: desktopUpdateReducer,
     messageSystem,
     guide,
     protocol,

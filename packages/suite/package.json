@@ -96,6 +96,7 @@
         "@suite/suite-sync": "workspace:*",
         "@suite/trading": "workspace:*",
         "@suite/tx-simulation": "workspace:^",
+        "@suite/upgrade": "workspace:*",
         "@tanstack/react-query": "5.90.21",
         "@testing-library/jest-dom": "6.9.1",
         "@trezor/address-validator": "workspace:*",

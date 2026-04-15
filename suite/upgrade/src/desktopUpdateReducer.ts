@@ -1,10 +1,13 @@
 import { produce } from 'immer';
 
 import { DesktopAppUpdateState as UpdateState } from '@suite-common/suite-constants';
-import { type UpdateInfo, type UpdateProgress } from '@trezor/suite-desktop-api';
+import {
+    type HandshakeElectron,
+    type UpdateInfo,
+    type UpdateProgress,
+} from '@trezor/suite-desktop-api';
 
-import { DESKTOP_UPDATE, SUITE } from 'src/actions/suite/constants';
-import { type Action } from 'src/types/suite';
+import * as DESKTOP_UPDATE from './desktopUpdateConstants';
 
 export { DesktopAppUpdateState as UpdateState } from '@suite-common/suite-constants';
 
@@ -34,6 +37,29 @@ export type DesktopUpdateRootState = {
     desktopUpdate: DesktopUpdateState;
 };
 
+// TODO: Move the desktop handshake action to @suite/desktop-handshake.
+const DESKTOP_HANDSHAKE = '@suite/desktop-handshake' as const;
+
+type DesktopHandshakeAction = {
+    type: typeof DESKTOP_HANDSHAKE;
+    payload: HandshakeElectron;
+};
+
+export type DesktopUpdateAction =
+    | { type: typeof DESKTOP_UPDATE.CHECKING }
+    | { type: typeof DESKTOP_UPDATE.AVAILABLE; payload: UpdateInfo }
+    | { type: typeof DESKTOP_UPDATE.NOT_AVAILABLE; payload?: UpdateInfo }
+    | { type: typeof DESKTOP_UPDATE.DOWNLOAD }
+    | { type: typeof DESKTOP_UPDATE.DOWNLOADING; payload: UpdateProgress }
+    | { type: typeof DESKTOP_UPDATE.READY; payload: UpdateInfo }
+    | { type: typeof DESKTOP_UPDATE.MODAL_VISIBILITY; payload: boolean }
+    | { type: typeof DESKTOP_UPDATE.VERSION_INFO_MODAL_VISIBILITY; payload: boolean }
+    | { type: typeof DESKTOP_UPDATE.OPEN_EARLY_ACCESS_ENABLE }
+    | { type: typeof DESKTOP_UPDATE.OPEN_EARLY_ACCESS_DISABLE }
+    | { type: typeof DESKTOP_UPDATE.ALLOW_PRERELEASE; payload: boolean }
+    | { type: typeof DESKTOP_UPDATE.SET_AUTOMATIC_UPDATES; payload: { isEnabled: boolean } }
+    | { type: typeof DESKTOP_UPDATE.JUST_UPDATED };
+
 const initialState: DesktopUpdateState = {
     enabled: false,
     state: UpdateState.NotAvailable,
@@ -47,13 +73,13 @@ const initialState: DesktopUpdateState = {
 
 export const desktopUpdateInitialState = initialState;
 
-const desktopUpdateReducer = (
+export const desktopUpdateReducer = (
     state: DesktopUpdateState = initialState,
-    action: Action,
+    action: DesktopUpdateAction | DesktopHandshakeAction,
 ): DesktopUpdateState =>
     produce(state, draft => {
         switch (action.type) {
-            case SUITE.DESKTOP_HANDSHAKE:
+            case DESKTOP_HANDSHAKE:
                 if (action.payload.desktopUpdate) {
                     draft.enabled = true;
                     draft.allowPrerelease = action.payload.desktopUpdate.allowPrerelease;
@@ -119,5 +145,3 @@ export const selectDesktopUpdateEnabled = (state: DesktopUpdateRootState) =>
 
 export const selectDesktopUpdateAllowPrerelease = (state: DesktopUpdateRootState) =>
     state.desktopUpdate.allowPrerelease;
-
-export default desktopUpdateReducer;

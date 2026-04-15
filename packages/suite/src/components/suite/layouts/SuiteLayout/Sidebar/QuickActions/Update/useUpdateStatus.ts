@@ -1,12 +1,8 @@
+import { type DesktopUpdateState, UpdateState, selectDesktopUpdate } from '@suite/upgrade';
 import { getSuiteVersion } from '@trezor/env-utils';
 import { versionUtils } from '@trezor/utils';
 
 import { useDevice, useSelector } from 'src/hooks/suite';
-import {
-    type DesktopUpdateState,
-    UpdateState,
-    selectDesktopUpdate,
-} from 'src/reducers/suite/desktopUpdateReducer';
 
 import {
     type UpdateStatus,

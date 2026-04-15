@@ -181,6 +181,7 @@
         { "path": "../../suite/suite-sync" },
         { "path": "../../suite/trading" },
         { "path": "../../suite/tx-simulation" },
+        { "path": "../../suite/upgrade" },
         { "path": "../address-validator" },
         { "path": "../analytics-uploader" },
         { "path": "../blockchain-link" },

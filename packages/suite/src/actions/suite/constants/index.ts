@@ -1,6 +1,6 @@
 import * as ROUTER from '@suite/router';
+import * as DESKTOP_UPDATE from '@suite/upgrade';
 
-import * as DESKTOP_UPDATE from './desktopUpdateConstants';
 import * as GUIDE from './guideConstants';
 import * as PROTOCOL from './protocolConstants';
 import * as STORAGE from './storageConstants';

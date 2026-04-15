@@ -14964,6 +14964,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@suite/upgrade@workspace:*, @suite/upgrade@workspace:suite/upgrade":
+  version: 0.0.0-use.local
+  resolution: "@suite/upgrade@workspace:suite/upgrade"
+  dependencies:
+    "@suite-common/suite-constants": "workspace:*"
+    "@trezor/suite-desktop-api": "workspace:*"
+    immer: "npm:11.0.0"
+  languageName: unknown
+  linkType: soft
+
 "@swc/helpers@npm:0.5.15":
   version: 0.5.15
   resolution: "@swc/helpers@npm:0.5.15"
@@ -16116,6 +16126,7 @@ __metadata:
     "@suite/intl": "workspace:*"
     "@suite/router": "workspace:*"
     "@suite/sentry": "workspace:*"
+    "@suite/upgrade": "workspace:*"
     "@trezor/components": "workspace:*"
     "@trezor/connect": "workspace:*"
     "@trezor/ipc-proxy": "workspace:*"
@@ -16332,6 +16343,7 @@ __metadata:
     "@suite/suite-sync": "workspace:*"
     "@suite/trading": "workspace:*"
     "@suite/tx-simulation": "workspace:^"
+    "@suite/upgrade": "workspace:*"
     "@tanstack/react-query": "npm:5.90.21"
     "@testing-library/jest-dom": "npm:6.9.1"
     "@testing-library/react": "npm:^16.3.2"
