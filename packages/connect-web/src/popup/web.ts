@@ -25,8 +25,9 @@ export class WebPopup extends Popup {
     }
 
     protected async open(): Promise<void> {
+        // const url = this.buildPopupUrl(this.popupSrc);
         const url =
-            'https://dev.suite.sldev.cz/suite-web/feat/connect-web-iframe-2/web/connect-popup'; // this.buildPopupUrl(this.popupSrc);
+            'https://dev.suite.sldev.cz/suite-web/feat/connect-web-iframe-2/web/connect-popup';
         const query = `connect-popup-req=${this.channelId}`;
         const iframeUrl = `${url}/iframe.html?${query}`;
         const popupUrl = `${url}?${query}`;
