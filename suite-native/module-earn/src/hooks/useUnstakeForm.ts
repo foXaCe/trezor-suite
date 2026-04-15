@@ -15,6 +15,7 @@ import { BigNumber } from '@trezor/utils';
 import { NETWORK_FEE_WARNING_MULTIPLIER } from '../constants';
 import { type EarnFormValues } from '../earnFormSchema';
 import { unstakeFormValidationSchema } from '../unstakeFormSchema';
+import { useApproximateInstantUnstakeAmount } from './useApproximateInstantUnstakeAmount';
 
 export const useUnstakeForm = (accountKey: AccountKey) => {
     const { translate } = useTranslate();
@@ -40,6 +41,11 @@ export const useUnstakeForm = (accountKey: AccountKey) => {
 
     const amountValue = useWatch({ control: form.control, name: 'amount' });
 
+    const approximatedInstantEthAmount = useApproximateInstantUnstakeAmount(
+        accountKey,
+        amountValue,
+    );
+
     if (!account) return null;
 
     const limits = getStakingLimitsByNetworkSymbol(account.symbol);
@@ -52,5 +58,5 @@ export const useUnstakeForm = (accountKey: AccountKey) => {
         new BigNumber(amountValue).gt(0) &&
         new BigNumber(amountValue).lt(networkFeeWarningThreshold);
 
-    return { form, amountValue, showNetworkFeeWarning };
+    return { form, amountValue, showNetworkFeeWarning, approximatedInstantEthAmount };
 };

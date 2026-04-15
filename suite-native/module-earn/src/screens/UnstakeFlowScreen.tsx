@@ -12,6 +12,7 @@ import {
 } from '@suite-native/navigation';
 
 import { EarnOutputFields } from '../components/EarnOutputFields';
+import { InstantlyAvailableRow } from '../components/InstantlyAvailableRow';
 import { UnstakeFlowScreenHeader } from '../components/UnstakeFlowScreenHeader';
 import { UnstakingTimelineCard } from '../components/UnstakingTimelineCard';
 import { useUnstakeForm } from '../hooks/useUnstakeForm';
@@ -26,7 +27,7 @@ export const UnstakeFlowScreen = () => {
 
     if (!unstakeForm) return null;
 
-    const { form, amountValue, showNetworkFeeWarning } = unstakeForm;
+    const { form, amountValue, showNetworkFeeWarning, approximatedInstantEthAmount } = unstakeForm;
     const {
         formState: { isValid },
     } = form;
@@ -70,6 +71,12 @@ export const UnstakeFlowScreen = () => {
                         isWithdrawalFeesBannerVisible={false}
                     />
                 </Form>
+            </Box>
+            <Box marginTop="sp16">
+                <InstantlyAvailableRow
+                    accountKey={accountKey}
+                    approximatedAmount={approximatedInstantEthAmount}
+                />
             </Box>
             {showNetworkFeeWarning && (
                 <Box marginTop="sp16">

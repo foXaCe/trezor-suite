@@ -2462,6 +2462,12 @@ export const messages = {
             stakeMoreButton: 'Stake more',
             stakingHistory: 'Staking history',
             pendingActions: 'Pending actions',
+            instantUnstakeBanner: {
+                title: '{amount} {symbol} unstaked instantly',
+                descriptionWithDays:
+                    "You've received {amount} {symbol} instantly. The remaining is paid out within {days, plural, one {# day} other {# days}}.",
+                descriptionWithoutDays: "You've received {amount} {symbol} instantly.",
+            },
             claim: {
                 readyToClaim: '{amount} unstaked, ready to be claimed',
                 claimButton: 'Claim',
@@ -2586,6 +2592,14 @@ export const messages = {
                 amountIsZero: 'Amount must be greater than 0.',
                 insufficientBalance: "You don't have enough staked balance to unstake this amount.",
                 tooManyDecimals: 'Too many decimals.',
+            },
+        },
+        unstakeFlowScreen: {
+            instantlyAvailable: {
+                label: 'Instantly available (est.)',
+                infoTitle: 'Instantly available (estimate)',
+                infoDescription:
+                    'The liquidity of the staking pool can allow for instant unstake of some funds. The remaining funds will follow the unstaking period.',
             },
         },
         earnScreen: {
