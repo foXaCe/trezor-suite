@@ -279,12 +279,15 @@ const parseSubjectPublicKeyInfo = (asn1: Asn1) => {
         throw new Error('Bad SubjectPublicKeyInfo. Wrong number of child objects.');
     }
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const algorithmPiece: Asn1 = pieces[0];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const bitsPiece: Asn1 = pieces[1];
+
     return {
         asn1,
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        algorithm: parseAlgorithmIdentifier(pieces[0]),
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        bits: derBitStringValue(pieces[1].contents),
+        algorithm: parseAlgorithmIdentifier(algorithmPiece),
+        bits: derBitStringValue(bitsPiece.contents),
     };
 };
 
