@@ -41,10 +41,12 @@ describe('LimitPicker', () => {
             }),
         };
 
-        preloadedState!.wallet!.trading.exchange.preselectedQuote = exchangeQuotes[0];
+        const quote = { ...exchangeQuotes[0], approvalStringAmount: '100' };
+
+        preloadedState!.wallet!.trading.exchange.preselectedQuote = quote;
 
         store = initStore(preloadedState).store;
-        store.dispatch(tradingExchangeActions.saveSelectedQuote(exchangeQuotes[0]));
+        store.dispatch(tradingExchangeActions.saveSelectedQuote(quote));
     });
 
     it('should render limit by default', () => {
@@ -58,6 +60,51 @@ describe('LimitPicker', () => {
                 getTranslation('moduleTrading.exchangeApprovalLimitSheet.limitedCard.info'),
             ),
         ).toBeOnTheScreen();
+    });
+
+    it('should not render previous amount arrow when not increasing', () => {
+        const { getByTestId, queryByTestId } = renderLimitPicker();
+
+        const picker = getByTestId('ExchangeApproval/LimitPicker');
+
+        expect(within(picker).getByText('100 USDC')).toBeOnTheScreen();
+        expect(queryByTestId('Icon/arrowRight')).not.toBeOnTheScreen();
+    });
+
+    it('should render previous amount and arrow when increasing allowance', () => {
+        const quote = selectTradingExchangeActiveQuote(store.getState());
+        store.dispatch(
+            tradingExchangeActions.saveSelectedQuote({
+                ...quote!,
+                preapprovedStringAmount: '50',
+                approvalStringAmount: '100',
+            }),
+        );
+
+        const { getByTestId } = renderLimitPicker();
+
+        const picker = getByTestId('ExchangeApproval/LimitPicker');
+
+        expect(within(picker).getByText('50 USDC')).toBeOnTheScreen();
+        expect(within(picker).getByText('100 USDC')).toBeOnTheScreen();
+    });
+
+    it('should not render previous amount arrow when preapprovedStringAmount is "0"', () => {
+        const quote = selectTradingExchangeActiveQuote(store.getState());
+        store.dispatch(
+            tradingExchangeActions.saveSelectedQuote({
+                ...quote!,
+                preapprovedStringAmount: '0',
+                approvalStringAmount: '100',
+            }),
+        );
+
+        const { getByTestId, queryByTestId } = renderLimitPicker();
+
+        const picker = getByTestId('ExchangeApproval/LimitPicker');
+
+        expect(within(picker).getByText('100 USDC')).toBeOnTheScreen();
+        expect(queryByTestId('Icon/arrowRight')).not.toBeOnTheScreen();
     });
 
     it('should render Unlimited when selected by user', async () => {

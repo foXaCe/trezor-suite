@@ -40,9 +40,10 @@ export const LimitPicker = ({ onApprovalTypeChange }: LimitPickerProps) => {
         return null;
     }
 
-    const { send, sendStringAmount } = quote;
+    const { send, preapprovedStringAmount, approvalStringAmount } = quote;
     const { network, contractAddress } = cryptoIdToNetworkAndContractAddress(send);
     const isInfinite = approvalType === 'INFINITE';
+    const isIncreasing = preapprovedStringAmount && preapprovedStringAmount !== '0';
 
     return (
         <>
@@ -60,13 +61,24 @@ export const LimitPicker = ({ onApprovalTypeChange }: LimitPickerProps) => {
                                     size="extraSmall"
                                 />
                             )}
+                            {isIncreasing && (
+                                <>
+                                    <TradingCoinAmountFormatter
+                                        amount={preapprovedStringAmount}
+                                        cryptoId={send}
+                                        variant="body-sm-strong"
+                                        color="textDefault"
+                                    />
+                                    <Icon name="arrowRight" size="medium" color="iconSubdued" />
+                                </>
+                            )}
                             {isInfinite ? (
                                 <Text variant="body-sm-strong">
                                     <Translation id="moduleTrading.tradingExchangeApprovalScreen.unlimitedLabel" />
                                 </Text>
                             ) : (
                                 <TradingCoinAmountFormatter
-                                    amount={sendStringAmount}
+                                    amount={approvalStringAmount}
                                     cryptoId={send}
                                     variant="body-sm-strong"
                                     color="textDefault"
