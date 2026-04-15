@@ -2,7 +2,10 @@ import { useState } from 'react';
 
 import { Translation } from '@suite/intl';
 import { selectDeviceStaticSessionId } from '@suite-common/device';
-import { selectSuiteSyncInteraction } from '@suite-common/suite-sync';
+import {
+    selectIsSuiteSyncDebugEnabled,
+    selectSuiteSyncInteraction,
+} from '@suite-common/suite-sync';
 import { Button, Column, Icon, Row, Text, TextButton } from '@trezor/components';
 import { HELP_CENTER_LABELING } from '@trezor/urls';
 
@@ -16,11 +19,18 @@ export const LegacyLabelingNotificationBanner = () => {
     const [isTurnOnSuiteSyncModalVisible, setIsTurnOnSuiteSyncModalVisible] = useState(false);
 
     const deviceStaticSessionId = useSelector(selectDeviceStaticSessionId);
+
+    // Todo: remove for the 26.6 release when we want to start advertising for Suite Sync
+    const isSuiteSyncDebugEnabled = useSelector(selectIsSuiteSyncDebugEnabled);
+
     const isLegacyLabelingVisible = useSelector(selectIsLegacyLabelingVisible);
     const suiteSyncInteraction = useSelector(state =>
         selectSuiteSyncInteraction(state, deviceStaticSessionId),
     );
-    const shouldDisplayBanner = isLegacyLabelingVisible && suiteSyncInteraction !== 'unsupported';
+    const shouldDisplayBanner =
+        isSuiteSyncDebugEnabled &&
+        isLegacyLabelingVisible &&
+        suiteSyncInteraction !== 'unsupported';
 
     if (!shouldDisplayBanner) {
         return null;
