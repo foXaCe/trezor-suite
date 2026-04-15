@@ -91,21 +91,30 @@ export const handleExchangeRequestThunk = createThunk<
         });
 
         if (!requestData) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
 
             return rejectWithValue('Invalid request data');
         }
 
-        const allQuotes = await getQuotesRequest({ requestData, signal });
+        let allQuotes: ExchangeTrade[] = [];
+        let requestSucceeded = false;
+        try {
+            allQuotes = (await getQuotesRequest({ requestData, signal })) ?? [];
+            requestSucceeded = true;
+        } finally {
+            if (!requestSucceeded) {
+                dispatch(tradingActions.stopRefetchQuotes());
+            }
+        }
 
         if (signal.aborted) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
 
             return rejectWithValue('Request was aborted');
         }
 
         if (!Array.isArray(allQuotes) || allQuotes.length === 0) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
             dispatch(tradingExchangeActions.saveQuotes([]));
 
             return fulfillWithValue([]);
@@ -134,7 +143,7 @@ export const handleExchangeRequestThunk = createThunk<
             composeRequestCallback();
         }
 
-        dispatch(tradingActions.setRefetchIntervalTimestamp());
+        dispatch(tradingActions.setRefetchQuotesTimestamp());
 
         return fulfillWithValue(successQuotes);
     },

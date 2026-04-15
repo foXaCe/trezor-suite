@@ -56,7 +56,7 @@ export const selectBuyQuoteThunk = createThunk(
         }
 
         dispatch(tradingBuyActions.saveSelectedQuote(quote));
-        dispatch(tradingActions.setStopRefetchInterval());
+        dispatch(tradingActions.stopRefetchQuotes());
         nextStep();
     },
 );

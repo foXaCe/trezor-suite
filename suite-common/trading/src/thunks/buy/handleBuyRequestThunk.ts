@@ -106,24 +106,30 @@ export const handleBuyRequestThunk = createThunk<
         });
 
         if (!requestData) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
 
             return rejectWithValue('Invalid request data');
         }
 
-        const allQuotes = await getQuotesRequest({
-            requestData,
-            signal,
-        });
+        let allQuotes: BuyTrade[] = [];
+        let requestSucceeded = false;
+        try {
+            allQuotes = (await getQuotesRequest({ requestData, signal })) ?? [];
+            requestSucceeded = true;
+        } finally {
+            if (!requestSucceeded) {
+                dispatch(tradingActions.stopRefetchQuotes());
+            }
+        }
 
         if (signal.aborted) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
 
             return rejectWithValue('Request was aborted');
         }
 
         if (!Array.isArray(allQuotes) || allQuotes.length === 0) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
 
             const quotesSuccess: BuyTrade[] = [];
             dispatch(tradingBuyActions.setAmountLimits(undefined));
@@ -155,7 +161,7 @@ export const handleBuyRequestThunk = createThunk<
         dispatch(tradingBuyActions.saveQuotes(quotesSuccess));
         dispatch(tradingBuyActions.saveQuoteRequest(requestData));
         dispatch(tradingActions.savePaymentMethods(paymentMethodsFromQuotes));
-        dispatch(tradingActions.setRefetchIntervalTimestamp());
+        dispatch(tradingActions.setRefetchQuotesTimestamp());
 
         return fulfillWithValue(quotesSuccess);
     },

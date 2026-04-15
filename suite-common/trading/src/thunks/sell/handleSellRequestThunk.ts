@@ -112,21 +112,30 @@ export const handleSellRequestThunk = createThunk<
         });
 
         if (!requestData) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
 
             return rejectWithValue('Invalid request data');
         }
 
-        const allQuotes = await getQuotesRequest({ requestData, signal });
+        let allQuotes: SellFiatTrade[] = [];
+        let requestSucceeded = false;
+        try {
+            allQuotes = (await getQuotesRequest({ requestData, signal })) ?? [];
+            requestSucceeded = true;
+        } finally {
+            if (!requestSucceeded) {
+                dispatch(tradingActions.stopRefetchQuotes());
+            }
+        }
 
         if (signal.aborted) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
 
             return rejectWithValue('Request was aborted');
         }
 
         if (!Array.isArray(allQuotes) || allQuotes.length === 0) {
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
 
             const quotesSuccess: SellFiatTrade[] = [];
             dispatch(tradingSellActions.setAmountLimits(undefined));
@@ -169,7 +178,7 @@ export const handleSellRequestThunk = createThunk<
             composeRequestCallback();
         }
 
-        dispatch(tradingActions.setRefetchIntervalTimestamp());
+        dispatch(tradingActions.setRefetchQuotesTimestamp());
 
         return fulfillWithValue(successQuotes);
     },

@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 
 import {
     INVITY_API_RELOAD_QUOTES_AFTER_SECONDS,
-    selectTradingRefetchInterval,
+    selectTradingRefetchQuotes,
 } from '@suite-common/trading';
 
 import { useSelector } from 'src/hooks/suite';
 
 export const useTradingRefetchCountdown = () => {
-    const { lastFetchTimestamp, status } = useSelector(selectTradingRefetchInterval);
+    const { lastFetchTimestamp, status } = useSelector(selectTradingRefetchQuotes);
     const [remaining, setRemaining] = useState(INVITY_API_RELOAD_QUOTES_AFTER_SECONDS);
 
     useEffect(() => {

@@ -29,7 +29,7 @@ export const selectExchangeQuoteThunk = createThunk(
             dispatch(tradingExchangeActions.saveSelectedQuote(quote));
         }
 
-        dispatch(tradingActions.setStopRefetchInterval());
+        dispatch(tradingActions.stopRefetchQuotes());
         nextStep();
     },
 );

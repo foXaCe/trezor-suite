@@ -117,7 +117,7 @@ export const useTradingSellHandleChange = ({
             if (previousPromise.current) {
                 previousPromise.current.abort('Request is canceled - page is unmounted.');
             }
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
         },
         [dispatch],
     );

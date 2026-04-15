@@ -86,7 +86,11 @@ export const useTradingExchangeHandleChange = ({
         analytics,
     ]);
 
-    useTradingRefetchScheduler(handleChange, () => setIsScheduledQuotesRefresh?.(true));
+    const onBeforeRefetch = useCallback(() => {
+        setIsScheduledQuotesRefresh?.(true);
+    }, [setIsScheduledQuotesRefresh]);
+
+    useTradingRefetchScheduler(handleChange, onBeforeRefetch);
 
     // cleanup signal
     useEffect(
@@ -94,7 +98,7 @@ export const useTradingExchangeHandleChange = ({
             if (previousPromise.current) {
                 previousPromise.current.abort('Request is canceled - page is unmounted.');
             }
-            dispatch(tradingActions.setStopRefetchInterval());
+            dispatch(tradingActions.stopRefetchQuotes());
         },
         [dispatch],
     );

@@ -868,5 +868,5 @@ export const selectTradingLastErrorMessageByTradeType = (
 export const selectTradingProviderMetadata = (state: TradingRootState) =>
     state.wallet.trading.currentProviderMetadata;
 
-export const selectTradingRefetchInterval = (state: TradingRootState) =>
-    state.wallet.trading.refetchInterval;
+export const selectTradingRefetchQuotes = (state: TradingRootState) =>
+    state.wallet.trading.refetchQuotes;

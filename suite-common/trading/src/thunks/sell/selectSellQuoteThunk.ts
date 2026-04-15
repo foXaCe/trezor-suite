@@ -25,7 +25,7 @@ export const selectSellQuoteThunk = createThunk(
         if (!quotesRequest || !provider || !quote.cryptoCurrency) return;
 
         dispatch(tradingSellActions.saveSelectedQuote(quote));
-        dispatch(tradingActions.setStopRefetchInterval());
+        dispatch(tradingActions.stopRefetchQuotes());
         nextStep();
     },
 );

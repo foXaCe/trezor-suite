@@ -52,9 +52,10 @@ export interface TradingPrefilledFromAccount {
     key: AccountKey | undefined;
 }
 
-export const REFETCH_INTERVAL_MAX_COUNT = 40;
+// Maximum number of refetch attempts before the interval automatically stops */
+export const REFETCH_QUOTES_MAX_COUNT = 40;
 
-export interface RefetchInterval {
+export interface RefetchQuotesState {
     remainingRefetches: number;
     lastFetchTimestamp: number | undefined;
     status: 'running' | 'stopped';
@@ -77,7 +78,7 @@ export interface TradingState {
     settings: TradingSettingsState;
     currentProviderMetadata?: ProviderMetadata;
     favouriteAssets: Record<CryptoId, true>;
-    refetchInterval: RefetchInterval;
+    refetchQuotes: RefetchQuotesState;
 }
 
 export type TradingRootState = {
@@ -109,8 +110,8 @@ export const initialState: TradingState = {
     verifiedAddress: undefined,
     settings: settingsInitialState,
     favouriteAssets: {},
-    refetchInterval: {
-        remainingRefetches: REFETCH_INTERVAL_MAX_COUNT,
+    refetchQuotes: {
+        remainingRefetches: REFETCH_QUOTES_MAX_COUNT,
         lastFetchTimestamp: undefined,
         status: 'stopped',
     },
@@ -185,21 +186,19 @@ const tradingCommonSlice = createSlice({
         ) => {
             state.currentProviderMetadata = payload;
         },
-        setStopRefetchInterval: state => {
-            state.refetchInterval.status = 'stopped';
-            state.refetchInterval.remainingRefetches = REFETCH_INTERVAL_MAX_COUNT;
-            state.refetchInterval.lastFetchTimestamp = undefined;
+        stopRefetchQuotes: state => {
+            state.refetchQuotes.status = 'stopped';
+            state.refetchQuotes.remainingRefetches = REFETCH_QUOTES_MAX_COUNT;
+            state.refetchQuotes.lastFetchTimestamp = undefined;
         },
-        setRefetchIntervalTimestamp: state => {
-            state.refetchInterval.remainingRefetches -= 1;
-            state.refetchInterval.status =
-                state.refetchInterval.remainingRefetches <= 0 ? 'stopped' : 'running';
-            state.refetchInterval.lastFetchTimestamp = Date.now();
-        },
-        setResetRefetchInterval: state => {
-            state.refetchInterval.remainingRefetches = REFETCH_INTERVAL_MAX_COUNT;
-            state.refetchInterval.status = 'stopped';
-            state.refetchInterval.lastFetchTimestamp = undefined;
+        setRefetchQuotesTimestamp: state => {
+            if (state.refetchQuotes.status === 'stopped') {
+                return;
+            }
+            state.refetchQuotes.remainingRefetches -= 1;
+            state.refetchQuotes.status =
+                state.refetchQuotes.remainingRefetches <= 0 ? 'stopped' : 'running';
+            state.refetchQuotes.lastFetchTimestamp = Date.now();
         },
     },
 });
