@@ -4,7 +4,6 @@ import { action } from 'storybook/actions';
 import { Box, Button } from '@suite-native/atoms';
 
 import { type Alert } from '../alertsAtoms';
-import { AlertRenderer } from '../components/AlertRenderer';
 import { useAlert } from '../useAlert';
 
 type AlertSheetArgs = {
@@ -61,7 +60,6 @@ const meta: Meta<AlertSheetArgs> = {
         return (
             <Box>
                 <Button onPress={handleShowAlert}>Show Alert</Button>
-                <AlertRenderer />
             </Box>
         );
     },
