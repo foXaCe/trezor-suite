@@ -218,4 +218,23 @@ describe('ExchangeConfirmation', () => {
         expect(queryByText('Activate')).toBeNull();
         expect(queryByText('Continue')).toBeTruthy();
     });
+
+    it('should not render Revoke button, when canProceed is false', () => {
+        mockQuote.isDex = true;
+        mockQuote.preapprovedStringAmount = '100';
+        mockQuote.status = 'APPROVAL_REQ';
+        mockQuote.send = 'ethereum--0xdac17f958d2ee523a2206206994597c13d831ec7' as CryptoId;
+
+        mockUseExchangeSelectQuote.mockReturnValue({
+            canProceed: false,
+            selectQuote: jest.fn(),
+            isConsentRequested: false,
+            giveConsent: jest.fn(),
+            cancelConsent: jest.fn(),
+        });
+
+        renderConfirmation();
+
+        expect(queryRevokeButton()).toBeNull();
+    });
 });
