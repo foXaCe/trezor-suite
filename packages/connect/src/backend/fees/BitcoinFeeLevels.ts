@@ -35,7 +35,8 @@ export class BitcoinFeeLevels extends MiscFeeLevels {
 
                 const trimmedFeePerUnit = Math.min(maxFee, Math.max(minFee, feePerB));
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                this.levels[index].feePerUnit = trimmedFeePerUnit.toString();
+                const level = this.levels[index];
+                level.feePerUnit = trimmedFeePerUnit.toString();
             });
             this.wasFetchedSuccessfully = true;
         } catch {

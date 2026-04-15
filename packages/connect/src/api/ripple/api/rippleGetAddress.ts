@@ -68,22 +68,23 @@ export default class RippleGetAddress extends AbstractMethod<'rippleGetAddress',
     get info() {
         // set info
         if (this.params.length === 1) {
-            return `Export Ripple address for account #${
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                fromHardened(this.params[0].proto.address_n[2]) + 1
-            }`;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param = this.params[0];
+
+            return `Export Ripple address for account #${fromHardened(param.proto.address_n[2]) + 1}`;
         }
 
         return 'Export multiple Ripple addresses';
     }
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param = this.params[this.progress];
+
             return {
                 type: 'address' as const,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(param.proto.address_n),
+                address: param.address || 'not-set',
             };
         }
     }

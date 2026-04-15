@@ -67,12 +67,13 @@ export default class TronGetAddress extends AbstractMethod<'tronGetAddress', Par
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param = this.params[this.progress];
+
             return {
                 type: 'address' as const,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(param.proto.address_n),
+                address: param.address || 'not-set',
             };
         }
     }
@@ -80,13 +81,15 @@ export default class TronGetAddress extends AbstractMethod<'tronGetAddress', Par
     get confirmation() {
         return {
             view: 'export-address' as const,
-            label:
-                this.params.length > 1
-                    ? 'Export multiple Tron addresses'
-                    : `Export Tron address for account #${
-                          // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                          fromHardened(this.params[0].proto.address_n[2]) + 1
-                      }`,
+            label: (() => {
+                if (this.params.length > 1) {
+                    return 'Export multiple Tron addresses';
+                }
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                const param = this.params[0];
+
+                return `Export Tron address for account #${fromHardened(param.proto.address_n[2]) + 1}`;
+            })(),
         };
     }
 

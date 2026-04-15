@@ -77,22 +77,18 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
         for (let i = 0; i < this.params.length; i++) {
             // network was maybe already set from 'well-known' definition in init method.
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            if (!this.params[i].network) {
-                const param = this.params[i];
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const addressN = param.proto.address_n;
-                const slip44 = getSlip44ByPath(addressN);
+            const param = this.params[i];
+            if (!param.network) {
+                const slip44 = getSlip44ByPath(param.proto.address_n);
 
                 const definitions = await getEthereumDefinitions({ slip44 });
 
                 const decoded = decodeEthereumDefinition(definitions);
                 if (decoded.network) {
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                    this.params[i].network = ethereumNetworkInfoFromDefinition(decoded.network);
+                    param.network = ethereumNetworkInfoFromDefinition(decoded.network);
                 }
                 if (definitions.encoded_network) {
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                    this.params[i].proto.encoded_network = definitions.encoded_network;
+                    param.proto.encoded_network = definitions.encoded_network;
                 }
             }
         }
@@ -101,7 +97,9 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
     get info() {
         if (this.params.length === 1) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            return getNetworkLabel('Export #NETWORK address', this.params[0].network);
+            const param = this.params[0];
+
+            return getNetworkLabel('Export #NETWORK address', param.network);
         }
         const requestedNetworks = this.params.map(b => b.network);
         const uniqNetworks = getUniqueNetworks(requestedNetworks);
@@ -114,12 +112,13 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const progressParam = this.params[this.progress];
+
             return {
                 type: 'address' as const,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(progressParam.proto.address_n),
+                address: progressParam.address || 'not-set',
             };
         }
     }

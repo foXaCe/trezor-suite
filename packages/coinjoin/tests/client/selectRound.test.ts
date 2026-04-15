@@ -501,7 +501,8 @@ describe('selectRound', () => {
 
         ['AA', 'AB', 'AC', 'CA'].forEach((outpoint, index) => {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            expect(result!.inputs[index].outpoint).toEqual(outpoint);
+            const input = result!.inputs[index];
+            expect(input.outpoint).toEqual(outpoint);
         });
 
         expect(result).toMatchObject({

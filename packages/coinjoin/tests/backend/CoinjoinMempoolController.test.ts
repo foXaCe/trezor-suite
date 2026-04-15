@@ -94,7 +94,8 @@ describe('CoinjoinMempoolController', () => {
         expect(mempool.getTransactions()).toEqual(TXS);
 
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        mempool.removeTransactions([TXS[0].txid, TXS[2].txid, 'unknown', TXS[4].txid]);
+        const TXSItem = TXS[0];
+        mempool.removeTransactions([TXSItem.txid, TXS[2].txid, 'unknown', TXS[4].txid]);
         expect(mempool.getTransactions()).toEqual([TXS[1], TXS[3], TXS[5]]);
     });
 

@@ -139,7 +139,8 @@ export function p2wpkh(a: Payment, opts?: PaymentOpts): Payment {
             if (!bscript.isCanonicalScriptSignature(a.witness[0]))
                 throw new TypeError('Witness has invalid signature');
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            if (!ecc.isPoint(a.witness[1]) || a.witness[1].length !== 33)
+            const witnessPubkey = a.witness[1];
+            if (!ecc.isPoint(witnessPubkey) || witnessPubkey.length !== 33)
                 throw new TypeError('Witness has invalid pubkey');
 
             // @ts-expect-error: indexing with noUncheckedIndexedAccess

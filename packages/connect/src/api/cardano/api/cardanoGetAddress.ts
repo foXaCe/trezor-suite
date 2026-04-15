@@ -79,10 +79,10 @@ export default class CardanoGetAddress extends AbstractMethod<'cardanoGetAddress
 
     get info() {
         if (this.params.length === 1) {
-            return `Export Cardano address for account #${
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                fromHardened(this.params[0].proto.address_parameters.address_n[2]) + 1
-            }`;
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param = this.params[0];
+
+            return `Export Cardano address for account #${fromHardened(param.proto.address_parameters.address_n[2]) + 1}`;
         }
 
         return 'Export multiple Cardano addresses';
@@ -90,14 +90,13 @@ export default class CardanoGetAddress extends AbstractMethod<'cardanoGetAddress
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param = this.params[this.progress];
+
             return {
                 type: 'address' as const,
-                serializedPath: getSerializedPath(
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                    this.params[this.progress].proto.address_parameters.address_n,
-                ),
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(param.proto.address_parameters.address_n),
+                address: param.address || 'not-set',
             };
         }
     }

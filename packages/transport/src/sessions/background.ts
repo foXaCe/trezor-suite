@@ -231,9 +231,11 @@ export class SessionsBackground
 
     private releaseDone(payload: ReleaseDoneRequest) {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        this.descriptors[payload.path].session = null;
+        const descriptor = this.descriptors[payload.path];
+        descriptor.session = null;
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        this.descriptors[payload.path].sessionOwner = undefined;
+        const descriptor = this.descriptors[payload.path];
+        descriptor.sessionOwner = undefined;
 
         this.clearLock();
 
@@ -278,7 +280,8 @@ export class SessionsBackground
         const lock = this.locksQueue[0];
         if (lock) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            this.locksQueue[0].dfd.resolve(undefined);
+            const locksQueueItem = this.locksQueue[0];
+            locksQueueItem.dfd.resolve(undefined);
             this.locksQueue.shift();
             clearTimeout(this.locksTimeoutQueue[0]);
             this.locksTimeoutQueue.shift();

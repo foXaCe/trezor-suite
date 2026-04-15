@@ -96,7 +96,9 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
         // set info
         if (this.params.length === 1) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            return getLabel('Export #NETWORK address', this.params[0].coinInfo);
+            const param = this.params[0];
+
+            return getLabel('Export #NETWORK address', param.coinInfo);
         }
         const requestedNetworks = this.params.map(b => b.coinInfo);
         const uniqNetworks = getUniqueNetworks(requestedNetworks);
@@ -109,12 +111,13 @@ export default class GetAddress extends AbstractMethod<'getAddress', Params[]> {
 
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param = this.params[this.progress];
+
             return {
                 type: 'address' as const,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                serializedPath: getSerializedPath(this.params[this.progress].proto.address_n),
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                address: this.params[this.progress].address || 'not-set',
+                serializedPath: getSerializedPath(param.proto.address_n),
+                address: param.address || 'not-set',
             };
         }
     }

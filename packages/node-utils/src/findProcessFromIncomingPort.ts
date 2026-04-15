@@ -46,7 +46,8 @@ export async function findProcessFromIncomingPort(
             if (processLine) {
                 const parts = processLine.split(/\s+/);
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const name = parts[0].replace(/\\x\d{2}/g, ' ');
+                const part = parts[0];
+                const name = part.replace(/\\x\d{2}/g, ' ');
                 const pid = processLine.split(/\s+/)[1];
 
                 if (process.platform === 'darwin') {

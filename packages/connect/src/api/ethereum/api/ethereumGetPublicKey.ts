@@ -65,7 +65,9 @@ export default class EthereumGetPublicKey extends AbstractMethod<'ethereumGetPub
         // set info
         if (this.params.length === 1) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            return getNetworkLabel('Export #NETWORK public key', this.params[0].network);
+            const param = this.params[0];
+
+            return getNetworkLabel('Export #NETWORK public key', param.network);
         }
         const requestedNetworks = this.params.map(b => b.network);
         const uniqNetworks = getUniqueNetworks(requestedNetworks);

@@ -115,11 +115,11 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
 
     get confirmation() {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        if (this.params.length === 1 && !this.params[0].path && !this.params[0].descriptor) {
+        const param = this.params[0];
+        if (this.params.length === 1 && !param.path && !param.descriptor) {
             return {
                 view: 'export-account-info' as const,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                label: `Export info for ${this.params[0].coinInfo.label} account of your selection`,
+                label: `Export info for ${param.coinInfo.label} account of your selection`,
                 customConfirmButton: {
                     label: 'Proceed to account selection',
                     className: 'not-empty-css',
@@ -137,7 +137,8 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                     };
                 }
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                keys[b.coinInfo.label].values.push(b.descriptor || b.address_n);
+                const key = keys[b.coinInfo.label];
+                key.values.push(b.descriptor || b.address_n);
             });
 
             // prepare html for popup
@@ -178,10 +179,11 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
         const invalid = [];
         for (let i = 0; i < this.params.length; i++) {
             // set FW range for current batch
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param = this.params[i];
             this.firmwareRange = getFirmwareRange(
                 this.name,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                this.params[i].coinInfo,
+                param.coinInfo,
                 DEFAULT_FIRMWARE_RANGE,
             );
             const exception = super.checkFirmwareRange();
@@ -189,8 +191,7 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
                 invalid.push({
                     index: i,
                     exception,
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                    coin: this.params[i].coin,
+                    coin: param.coin,
                 });
             }
         }
@@ -203,7 +204,8 @@ export default class GetAccountInfo extends AbstractMethod<'getAccountInfo', Req
     async run(context: MethodContext) {
         // address_n and descriptor are not set. use discovery
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        if (this.params.length === 1 && !this.params[0].path && !this.params[0].descriptor) {
+        const param = this.params[0];
+        if (this.params.length === 1 && !param.path && !param.descriptor) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
             return this.discover(this.params[0], context);
         }

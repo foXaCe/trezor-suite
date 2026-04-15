@@ -133,7 +133,8 @@ export const onCodeChange = (value: string) => (dispatch: Dispatch, getState: Ge
                 if (value) {
                     for (let i = field.items.length; i < value.length; i++) {
                         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                        dispatch(onBatchAdd(field, field.batch[0].fields));
+                        const batchItem = field.batch[0];
+                        dispatch(onBatchAdd(field, batchItem.fields));
                     }
                     for (let i = field.items.length; i > value.length; i--) {
                         dispatch(onBatchRemove(field, field.items[i - 1]));

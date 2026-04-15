@@ -204,7 +204,8 @@ export const inputRegistration = async (
             result.forEach((r, i) => {
                 if (r.status !== 'fulfilled') {
                     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                    inputs[i].setError(r.reason);
+                    const input = inputs[i];
+                    input.setError(r.reason);
                 }
             }),
     );

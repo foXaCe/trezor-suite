@@ -70,7 +70,8 @@ export const enhanceTrezorInputs = (
             const refTx = rawTxs.find(t => t.getId() === input.prev_hash);
             if (refTx && refTx.outs[input.prev_index]) {
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                input.amount = refTx.outs[input.prev_index].value;
+                const out = refTx.outs[input.prev_index];
+                input.amount = out.value;
             }
         }
     });

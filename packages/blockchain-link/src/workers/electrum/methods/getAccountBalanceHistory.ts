@@ -41,7 +41,8 @@ const aggregateTransactions = (txs: (Transaction & { blockTime: number })[], gro
         let sent = 0;
         let sentToSelf = 0;
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        while (j < txs.length && txs[j].blockTime < time + groupBy) {
+        const tx = txs[j];
+        while (j < txs.length && tx.blockTime < time + groupBy) {
             const {
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 type,

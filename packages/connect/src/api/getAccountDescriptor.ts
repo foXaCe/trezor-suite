@@ -88,7 +88,8 @@ export default class GetAccountDescriptor extends AbstractMethod<
                 };
             }
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            keys[b.coinInfo.label].values.push(b.address_n);
+            const key = keys[b.coinInfo.label];
+            key.values.push(b.address_n);
         });
 
         // prepare html for popup
@@ -123,10 +124,11 @@ export default class GetAccountDescriptor extends AbstractMethod<
         const invalid = [];
         for (let i = 0; i < this.params.length; i++) {
             // set FW range for current batch
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param = this.params[i];
             this.firmwareRange = getFirmwareRange(
                 this.name,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                this.params[i].coinInfo,
+                param.coinInfo,
                 DEFAULT_FIRMWARE_RANGE,
             );
             const exception = super.checkFirmwareRange();
@@ -134,8 +136,7 @@ export default class GetAccountDescriptor extends AbstractMethod<
                 invalid.push({
                     index: i,
                     exception,
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                    coin: this.params[i].coin,
+                    coin: param.coin,
                 });
             }
         }
