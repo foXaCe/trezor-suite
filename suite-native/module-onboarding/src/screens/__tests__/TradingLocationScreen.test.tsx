@@ -41,7 +41,14 @@ const defaultMessageSystem = {
 describe('TradingLocationOnboardingScreen', () => {
     const renderTradingLocationScreen = () =>
         renderWithStoreProvider(<TradingLocationScreen />, {
-            preloadedState: { messageSystem: defaultMessageSystem },
+            preloadedState: {
+                messageSystem: defaultMessageSystem,
+                wallet: {
+                    trading: { residence: { country: null, wasOnboardingVisited: false } },
+                },
+                device: { selectedDevice: undefined, devices: [] },
+                featureFlags: {},
+            },
         });
 
     beforeEach(() => {

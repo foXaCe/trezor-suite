@@ -6,6 +6,8 @@ const getMockPreloadedState = (areTestnetsEnabled: boolean) => ({
     appSettings: {
         areTestnetsEnabled,
     },
+    device: { selectedDevice: undefined, devices: [] },
+    featureFlags: {},
 });
 
 describe('SelectableNetworkList', () => {

@@ -48,6 +48,7 @@ describe('AccountLabel', () => {
                 reducer,
                 preloadedState: {
                     wallet: {
+                        settings: initialWalletSettingsState,
                         accounts: [ethAccount],
                     },
                 } satisfies DeepPartial<StateFromReducersMapObject<typeof reducer>>,

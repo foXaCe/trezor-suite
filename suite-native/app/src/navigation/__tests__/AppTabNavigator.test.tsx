@@ -8,6 +8,17 @@ jest.mock('@suite-common/tx-simulation', () => ({}));
 const defaultPreloadedState = {
     featureFlags: featureFlagsInitialState,
     bluetooth: { permissionStatus: 'unavailable' },
+    device: { selectedDevice: undefined, devices: [], persistentDeviceData: {} },
+    wallet: {
+        accounts: [],
+        trading: { residence: { country: null, wasOnboardingVisited: false } },
+    },
+    appSettings: { shouldShowAutoEjectAlert: false, hasAutoEjectAlertBeenDisplayed: false },
+    messageSystem: {
+        config: { actions: [] },
+        validMessages: { banner: [], context: [], modal: [], feature: [] },
+        dismissedMessages: [],
+    },
 };
 
 describe('AppTabNavigator', () => {

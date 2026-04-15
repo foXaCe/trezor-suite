@@ -15,9 +15,15 @@ jest.mock('@suite-native/trading-state', () => ({
     selectIsTradingEnabled: () => mockIsTradingEnabled,
 }));
 
+const defaultPreloadedState = {
+    device: { selectedDevice: undefined, devices: [] },
+};
+
 describe('FaqCard', () => {
     const renderFaqCard = (preloadedState = {}) =>
-        renderWithStoreProvider(<FaqCard />, { preloadedState });
+        renderWithStoreProvider(<FaqCard />, {
+            preloadedState: { ...defaultPreloadedState, ...preloadedState },
+        });
 
     beforeEach(() => {
         mockIsTradingEnabled = true;
