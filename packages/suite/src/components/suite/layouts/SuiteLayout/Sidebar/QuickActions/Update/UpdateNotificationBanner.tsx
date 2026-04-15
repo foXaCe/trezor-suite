@@ -1,10 +1,6 @@
-import { type MouseEvent } from 'react';
-
-import { type Variants, motion } from 'framer-motion';
-
 import { Translation, type TranslationKey } from '@suite/intl';
 import { selectHasRunningDiscovery } from '@suite-common/wallet-core';
-import { Card, Column, ElevationContext, IconButton, Row, Text } from '@trezor/components';
+import { Text } from '@trezor/components';
 
 import { useDispatch, useSelector } from 'src/hooks/suite';
 
@@ -15,6 +11,7 @@ import {
     mapDeviceUpdateToClick,
     mapSuiteUpdateToClick,
 } from './updateQuickActionTypes';
+import { SidebarBanner } from '../../SidebarBanner';
 
 type UpdateNotificationBannerProps = {
     updateStatusDevice: UpdateStatusDevice;
@@ -81,69 +78,19 @@ export const UpdateNotificationBanner = ({
         }
     };
 
-    const handleOnClose = (e: MouseEvent<HTMLButtonElement>) => {
-        e.stopPropagation();
-        onClose();
-    };
-
-    const variants: Variants = {
-        initial: { y: 32, opacity: 0 },
-        exit: { y: 32, opacity: 0 },
-        drop: {
-            y: 0,
-            opacity: 1,
-            transition: {
-                type: 'spring',
-                mass: 1,
-                stiffness: 266.7,
-                damping: 10,
-            },
-        },
-        shake: {
-            rotate: [0, -1, 1, 0],
-            x: [0, -4, 4, 0],
-            transition: {
-                duration: 1.2,
-                ease: 'easeInOut',
-                delay: 10,
-            },
-        },
-    };
-
     return (
-        <ElevationContext baseElevation={0}>
-            <motion.div
-                variants={variants}
-                initial="initial"
-                exit="exit"
-                animate={['drop', 'shake']}
-            >
-                <Card
-                    onClick={handleOnClick}
-                    data-testid="@notification/update-notification-banner"
-                    margin={12}
-                    paddingType="small"
-                    width="auto"
-                >
-                    <Row gap={12}>
-                        <Column flex="1" alignItems="start">
-                            <Text>
-                                <Translation id={translationHeader} />
-                            </Text>
-                            <Text intent="brand">
-                                <Translation id={translationCallToAction} />
-                            </Text>
-                        </Column>
-                        <IconButton
-                            intent="neutral"
-                            priority="secondary"
-                            icon="x"
-                            size="small"
-                            onClick={handleOnClose}
-                        />
-                    </Row>
-                </Card>
-            </motion.div>
-        </ElevationContext>
+        <SidebarBanner
+            animate={['drop', 'shake']}
+            onClick={handleOnClick}
+            onClose={onClose}
+            data-testid="@notification/update-notification-banner"
+        >
+            <Text>
+                <Translation id={translationHeader} />
+            </Text>
+            <Text intent="brand">
+                <Translation id={translationCallToAction} />
+            </Text>
+        </SidebarBanner>
     );
 };

@@ -23,6 +23,7 @@ import { selectShouldDisplayDeviceCompromised } from 'src/selectors/suite/suiteA
 import { useResponsiveContext } from 'src/support/suite/ResponsiveContext';
 
 import { Navigation } from './Navigation';
+import { DeviceSelector } from '../DeviceSelector/DeviceSelector';
 import { LegacyLabelingNotificationBanner } from './QuickActions/LegacyLabelingNotificationBanner';
 import { QuickActions } from './QuickActions/QuickActions';
 import { UpdateNotificationBanner } from './QuickActions/Update/UpdateNotificationBanner';
@@ -33,7 +34,6 @@ import {
     SIDEBAR_MAX_WIDTH,
     SIDEBAR_MIN_WIDTH,
 } from './consts';
-import { DeviceSelector } from '../DeviceSelector/DeviceSelector';
 
 const Container = styled.nav<{ $elevation: Elevation }>`
     overflow-x: hidden;
@@ -176,9 +176,9 @@ export const Sidebar = ({ showAccounts = true }: SidebarProps) => {
 
         if (autoCollapsed) {
             const delta = Math.max(0, lastManualSidebarWidth - SIDEBAR_MIN_WIDTH);
-            const uncollapseThreshold = SIDEBAR_AUTO_COLLAPSE_BREAKPOINT + delta;
+            const expandThreshold = SIDEBAR_AUTO_COLLAPSE_BREAKPOINT + delta;
 
-            if (contentWidth > uncollapseThreshold) {
+            if (contentWidth > expandThreshold) {
                 setAutoCollapsed(false);
                 if (typeof forcedSidebarWidth === 'number') {
                     setForcedSidebarWidth(undefined);
