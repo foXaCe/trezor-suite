@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { type LayoutChangeEvent, View } from 'react-native';
 
 import {
@@ -26,7 +27,7 @@ const OutputLabel = ({
 }: {
     type: ReviewOutputType;
     flowType?: ExchangeFlowType;
-}) => {
+}): ReactNode => {
     switch (type) {
         case 'address':
         case 'regular_legacy':

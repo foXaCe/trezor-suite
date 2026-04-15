@@ -257,6 +257,38 @@ describe('ReviewOutputItem', () => {
             ).toBeTruthy();
             expect(within(content).getByText('Ethereum')).toBeTruthy();
         });
+
+        it('should not render Chain row for type "approve_data" when value2 is absent', () => {
+            const { getByTestId } = renderReviewOutputItem({
+                reviewOutput: {
+                    state: undefined,
+                    token: {
+                        balance: '33.231005',
+                        contract: '0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c',
+                        decimals: 6,
+                        name: 'Aave Ethereum USDC',
+                        standard: 'ERC20',
+                        symbol: 'aEthUSDC',
+                    },
+                    type: 'approve_data',
+                    value: '20000000',
+                },
+                flowType: 'approve',
+            });
+
+            const content = getByTestId('review-output-card/content');
+
+            expect(
+                within(content).getByText(
+                    getTranslation('transactionManagement.review.outputs.amountAllowanceLabel'),
+                ),
+            ).toBeTruthy();
+            expect(
+                within(content).queryByText(
+                    getTranslation('transactionManagement.review.outputs.chainLabel'),
+                ),
+            ).toBeNull();
+        });
     });
 
     describe('exchange revoke flow', () => {
@@ -332,6 +364,38 @@ describe('ReviewOutputItem', () => {
                 ),
             ).toBeTruthy();
             expect(within(content).getByText('Ethereum')).toBeTruthy();
+        });
+
+        it('should not render Chain row for type "approve_data" when value2 is absent', () => {
+            const { getByTestId } = renderReviewOutputItem({
+                reviewOutput: {
+                    state: undefined,
+                    token: {
+                        balance: '33.231005',
+                        contract: '0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c',
+                        decimals: 6,
+                        name: 'Aave Ethereum USDC',
+                        standard: 'ERC20',
+                        symbol: 'aEthUSDC',
+                    },
+                    type: 'approve_data',
+                    value: '20000000',
+                },
+                flowType: 'revoke',
+            });
+
+            const content = getByTestId('review-output-card/content');
+
+            expect(
+                within(content).getByText(
+                    getTranslation('transactionManagement.review.outputs.tokenLabel'),
+                ),
+            ).toBeTruthy();
+            expect(
+                within(content).queryByText(
+                    getTranslation('transactionManagement.review.outputs.chainLabel'),
+                ),
+            ).toBeNull();
         });
     });
 });

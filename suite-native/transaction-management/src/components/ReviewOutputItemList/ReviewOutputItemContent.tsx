@@ -113,12 +113,14 @@ export const ReviewOutputItemContent = ({
                                 isDiscreetText={false}
                             />
                         </HStack>
-                        <HStack justifyContent="space-between">
-                            <Text variant="body-sm">
-                                <Translation id="transactionManagement.review.outputs.chainLabel" />
-                            </Text>
-                            <Text variant="body-sm">{value2}</Text>
-                        </HStack>
+                        {!!value2 && (
+                            <HStack justifyContent="space-between">
+                                <Text variant="body-sm">
+                                    <Translation id="transactionManagement.review.outputs.chainLabel" />
+                                </Text>
+                                <Text variant="body-sm">{value2}</Text>
+                            </HStack>
+                        )}
                     </VStack>
                 );
             }
@@ -131,12 +133,14 @@ export const ReviewOutputItemContent = ({
                             </Text>
                             <Text variant="body-sm">{token.symbol}</Text>
                         </HStack>
-                        <HStack justifyContent="space-between">
-                            <Text variant="body-sm">
-                                <Translation id="transactionManagement.review.outputs.chainLabel" />
-                            </Text>
-                            <Text variant="body-sm">{value2}</Text>
-                        </HStack>
+                        {!!value2 && (
+                            <HStack justifyContent="space-between">
+                                <Text variant="body-sm">
+                                    <Translation id="transactionManagement.review.outputs.chainLabel" />
+                                </Text>
+                                <Text variant="body-sm">{value2}</Text>
+                            </HStack>
+                        )}
                     </VStack>
                 );
             }
