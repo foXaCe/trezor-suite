@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 import {
+    type ApprovalStatus,
     type TradingRootState,
     exchangeThunks,
     getApprovalStatus,
@@ -77,7 +78,7 @@ export const useExchangeSelectQuote = (form: ExchangeFormType) => {
 
     const dispatchSelectQuote = async (
         analyticsAction: 'continue' | 'revoke',
-        nextStep: (approvalStatus: ReturnType<typeof getApprovalStatus>) => void,
+        nextStep: (approvalStatus: ApprovalStatus) => void,
     ) => {
         if (!candidateQuote || isLoading || isCandidateQuotePrefetchBlocked) {
             return;
@@ -135,27 +136,24 @@ export const useExchangeSelectQuote = (form: ExchangeFormType) => {
 
     const selectQuoteForRevoke = () =>
         dispatchSelectQuote('revoke', approvalStatus => {
-            if (
-                approvalStatus === 'not_needed' ||
-                approvalStatus === 'needs_approval' ||
-                approvalStatus === null
-            ) {
-                return;
+            switch (approvalStatus) {
+                case 'not_needed':
+                case 'needs_approval':
+                case null:
+                    return;
+
+                case 'needs_increase':
+                case 'needs_revoke':
+                case 'approved':
+                    dispatch(tradingExchangeActions.savePreselectedQuote(candidateQuote));
+
+                    return navigation.navigate(TradingStackRoutes.TradingExchangeRevoke, {
+                        shouldIncreaseLimit: false,
+                    });
+
+                default:
+                    return exhaustive(approvalStatus);
             }
-
-            dispatch(tradingExchangeActions.savePreselectedQuote(candidateQuote));
-
-            if (
-                approvalStatus === 'needs_increase' ||
-                approvalStatus === 'needs_revoke' ||
-                approvalStatus === 'approved'
-            ) {
-                return navigation.navigate(TradingStackRoutes.TradingExchangeRevoke, {
-                    shouldIncreaseLimit: false,
-                });
-            }
-
-            return exhaustive(approvalStatus);
         });
 
     return {
