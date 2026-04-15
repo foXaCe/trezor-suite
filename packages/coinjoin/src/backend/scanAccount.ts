@@ -36,7 +36,8 @@ export const scanAccount = async (
     const { checkpoints } = params;
 
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const addresses = new CoinjoinAddressController(xpub, network, checkpoints[0], params.cache);
+    const firstCheckpoint: ScanAccountCheckpoint = checkpoints[0];
+    const addresses = new CoinjoinAddressController(xpub, network, firstCheckpoint, params.cache);
 
     let [checkpoint] = checkpoints;
     const checkpointCooldown = createCooldown(CHECKPOINT_COOLDOWN);

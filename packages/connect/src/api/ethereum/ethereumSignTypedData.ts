@@ -184,10 +184,12 @@ export function getFieldType(
     }
 
     if (typeName in types) {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const typeFields: (typeof types)[string] = types[typeName];
+
         return {
             data_type: PROTO.EthereumDataType.STRUCT,
-            // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            size: types[typeName].length,
+            size: typeFields.length,
             struct_name: typeName,
         };
     }

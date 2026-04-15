@@ -30,7 +30,8 @@ export const getRoundParameters = (round: Round) => {
     if (events.length < 1) return;
 
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const [{ RoundParameters }] = events;
+    const firstEvent: (typeof events)[number] = events[0];
+    const { RoundParameters } = firstEvent;
 
     return RoundParameters;
 };
@@ -284,13 +285,14 @@ export const getBroadcastedTxDetails = ({
     const sequence = 4294967295;
 
     transactionData.inputs.forEach((input, index) => {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const witnessHex: string = Witnesses[index];
         tx.ins.push({
             hash: reverseBuffer(Buffer.from(input.hash, 'hex')),
             index: input.index,
             script: Buffer.allocUnsafe(0), // script is not used in calculation
             sequence,
-            // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            witness: new BufferReader(Buffer.from(Witnesses[index], 'hex')).readVector(),
+            witness: new BufferReader(Buffer.from(witnessHex, 'hex')).readVector(),
         });
     });
 

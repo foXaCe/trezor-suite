@@ -78,7 +78,8 @@ export class CoinjoinAddressController implements AddressControllerShape {
 
         for (let i = 0; i < derived.length; ++i) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const txs = getTxs(derived[i]);
+            const derivedAddress: AccountAddress = derived[i];
+            const txs = getTxs(derivedAddress);
             if (txs.length) {
                 onTxs?.(txs);
                 const missing = lookout + i + 1 - derived.length;

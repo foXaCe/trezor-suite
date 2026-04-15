@@ -62,15 +62,21 @@ export default class SolanaGetPublicKey extends AbstractMethod<
     }
 
     get confirmation() {
+        if (this.params.length > 1) {
+            return {
+                view: 'export-xpub' as const,
+                label: 'Export multiple Solana public keys',
+            };
+        }
+
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const firstParam: (typeof this.params)[number] = this.params[0];
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const accountIndex: number = firstParam.address_n[2];
+
         return {
             view: 'export-xpub' as const,
-            label:
-                this.params.length > 1
-                    ? 'Export multiple Solana public keys'
-                    : `Export Solana public key for account #${
-                          // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                          fromHardened(this.params[0].address_n[2]) + 1
-                      }`,
+            label: `Export Solana public key for account #${fromHardened(accountIndex) + 1}`,
         };
     }
 

@@ -44,7 +44,7 @@ export const createAddressCache = (network: Network | undefined) => {
             }
 
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const cacheItem = cache[key];
+            const cacheItem: AddressInfo[] = cache[key];
 
             return cacheItem.slice(from, from + count);
         };

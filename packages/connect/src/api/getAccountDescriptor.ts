@@ -88,7 +88,7 @@ export default class GetAccountDescriptor extends AbstractMethod<
                 };
             }
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const key = keys[b.coinInfo.label];
+            const key: (typeof keys)[string] = keys[b.coinInfo.label];
             key.values.push(b.address_n);
         });
 
@@ -125,7 +125,7 @@ export default class GetAccountDescriptor extends AbstractMethod<
         for (let i = 0; i < this.params.length; i++) {
             // set FW range for current batch
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const param = this.params[i];
+            const param: (typeof this.params)[number] = this.params[i];
             this.firmwareRange = getFirmwareRange(
                 this.name,
                 param.coinInfo,

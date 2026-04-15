@@ -64,8 +64,11 @@ function validateStaticSessionId(input: unknown): StaticSessionId {
             'Method_InvalidParameter',
             'DeviceState: invalid staticSessionId: ' + input,
         );
-    const [firstTestnetAddress, rest] = input.split('@');
+    const parts = input.split('@');
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const firstTestnetAddress: string = parts[0];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const rest: string = parts[1];
     const [deviceId, instance] = rest.split(':');
     if (
         typeof firstTestnetAddress === 'string' &&
@@ -196,13 +199,13 @@ export abstract class AbstractMethod<Name extends CallMethodPayload['method'], P
         params: { address?: string; proto: { show_display?: boolean } }[],
         useEventListener: boolean | undefined,
     ) {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const firstParam: (typeof params)[number] = params[0];
         const notUseUi =
             useEventListener &&
             params.length === 1 &&
-            // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            typeof params[0].address === 'string' &&
-            // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            params[0].proto.show_display;
+            typeof firstParam.address === 'string' &&
+            firstParam.proto.show_display;
 
         return !notUseUi;
     }

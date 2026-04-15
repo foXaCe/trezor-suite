@@ -276,10 +276,12 @@ const prepareResponse = (parent: HTMLElement, response: any, isError = false) =>
     if (otherResponses.length > 0) {
         if (otherResponses.length >= 3) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            parent.removeChild(otherResponses[2]);
+            const thirdResponse: Element = otherResponses[2];
+            parent.removeChild(thirdResponse);
         }
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        parent.insertBefore(div, otherResponses[0]);
+        const firstResponse: Element = otherResponses[0];
+        parent.insertBefore(div, firstResponse);
     } else {
         parent.appendChild(div);
     }

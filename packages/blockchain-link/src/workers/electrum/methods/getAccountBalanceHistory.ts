@@ -32,8 +32,8 @@ const aggregateTransactions = (txs: (Transaction & { blockTime: number })[], gro
     const result: Res['payload'] = [];
     let i = 0;
     while (i < txs.length) {
-        const currentTx = txs[i];
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const currentTx: Transaction & { blockTime: number } = txs[i];
         const { blockTime } = currentTx;
         const time = Math.floor(blockTime / groupBy) * groupBy;
         let j = i;
@@ -41,18 +41,16 @@ const aggregateTransactions = (txs: (Transaction & { blockTime: number })[], gro
         let sent = 0;
         let sentToSelf = 0;
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const tx = txs[j];
+        const tx: Transaction & { blockTime: number } = txs[j];
         while (j < txs.length && tx.blockTime < time + groupBy) {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const currentJTx: Transaction & { blockTime: number } = txs[j];
             const {
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 type,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 amount,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 fee,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 details: { vin, vout, totalInput, totalOutput },
-            } = txs[j];
+            } = currentJTx;
             if (type === 'recv') received += Number.parseInt(amount, 10);
             else if (type === 'sent')
                 sent += Number.parseInt(amount, 10) + Number.parseInt(fee, 10);
@@ -62,11 +60,9 @@ const aggregateTransactions = (txs: (Transaction & { blockTime: number })[], gro
                 received += Number.parseInt(totalOutput, 10);
             } else if (type === 'joint') {
                 const myTotalInput = new BigNumber(
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     vin.filter(vin => vin.isAccountOwned).reduce(sumVinVout, 0),
                 ).toNumber();
                 const myTotalOutput = new BigNumber(
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     vout.filter(vout => vout.isAccountOwned).reduce(sumVinVout, 0),
                 ).toNumber();
                 sent += myTotalInput;

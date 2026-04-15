@@ -66,9 +66,12 @@ export function getResult<
         return total;
     }, new BN(result.fee));
 
-    const max =
+    let max: string | undefined;
+    if (sendMaxOutputIndex >= 0) {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        sendMaxOutputIndex >= 0 ? result.outputs[sendMaxOutputIndex].value.toString() : undefined;
+        const sendMaxOutput: (typeof result.outputs)[number] = result.outputs[sendMaxOutputIndex];
+        max = sendMaxOutput.value.toString();
+    }
     const bytes = transactionBytes(result.inputs, result.outputs);
     const feePerByte = result.fee / bytes;
 

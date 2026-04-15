@@ -101,8 +101,8 @@ export const transformTransaction = (
         return baseTx;
     }
 
-    const rawOp = parsedTx.operations[0];
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const rawOp: Operation = parsedTx.operations[0];
     const opSource = rawOp.source || rawTx.source_account;
     const fromAddress = extractBaseAddress(opSource);
 
@@ -111,7 +111,6 @@ export const transformTransaction = (
     let isTokenTransfer = false;
     let tokenInfo: { assetCode: string; assetIssuer: string; amount: string } | undefined;
 
-    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     switch (rawOp.type) {
         case 'createAccount':
             toAddress = extractBaseAddress(rawOp.destination);

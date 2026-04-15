@@ -58,24 +58,31 @@ export const getFields = (fields: Field<any>[], props: Props) => {
     );
 };
 
-const getArray = (field: FieldWithBundle<any>, props: Props) => (
-    <ArrayWrapper
-        key={field.name}
-        field={field}
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        onAdd={() => props.actions.onBatchAdd(field, field.batch[0].fields)}
-    >
-        {field.items?.map((batch, index) => {
-            const key = `${field.name}-${index}`;
+const getArray = (field: FieldWithBundle<any>, props: Props) => {
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const firstBatch: (typeof field.batch)[number] = field.batch[0];
 
-            return (
-                <BatchWrapper key={key} onRemove={() => props.actions.onBatchRemove(field, batch)}>
-                    {getFields(batch, props)}
-                </BatchWrapper>
-            );
-        })}
-    </ArrayWrapper>
-);
+    return (
+        <ArrayWrapper
+            key={field.name}
+            field={field}
+            onAdd={() => props.actions.onBatchAdd(field, firstBatch.fields)}
+        >
+            {field.items?.map((batch, index) => {
+                const key = `${field.name}-${index}`;
+
+                return (
+                    <BatchWrapper
+                        key={key}
+                        onRemove={() => props.actions.onBatchRemove(field, batch)}
+                    >
+                        {getFields(batch, props)}
+                    </BatchWrapper>
+                );
+            })}
+        </ArrayWrapper>
+    );
+};
 
 const getUnion = (field: FieldWithUnion<any>, props: Props) => (
     <UnionWrapper

@@ -120,6 +120,9 @@ export const ApiPlayground = ({ options }: ApiPlaygroundProps) => {
         }
     }, [options]);
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const selectedOptionItem: (typeof options)[number] = options[selectedOption];
+
     return (
         <ApiPlaygroundWrapper $elevation={elevation}>
             <CollapsibleBox
@@ -136,8 +139,7 @@ export const ApiPlayground = ({ options }: ApiPlaygroundProps) => {
                                         label="Select method"
                                         value={{
                                             value: selectedOption,
-                                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                                            label: options[selectedOption].title,
+                                            label: selectedOptionItem.title,
                                         }}
                                         onChange={option => setSelectedOption(option.value)}
                                         options={options.map((option, index) => ({

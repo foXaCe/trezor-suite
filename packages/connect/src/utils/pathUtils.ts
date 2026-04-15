@@ -12,8 +12,12 @@ import type {
 export const HD_HARDENED = 0x80000000;
 export const toHardened = (n: number) => (n | HD_HARDENED) >>> 0;
 export const fromHardened = (n: number) => (n & ~HD_HARDENED) >>> 0;
-// @ts-expect-error: indexing with noUncheckedIndexedAccess
-export const getSlip44ByPath = (path: number[]) => fromHardened(path[1]);
+export const getSlip44ByPath = (path: number[]) => {
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const slip44: number = path[1];
+
+    return fromHardened(slip44);
+};
 
 const PATH_NOT_VALID = ERRORS.TypedError('Method_InvalidParameter', 'Not a valid path');
 const PATH_NEGATIVE_VALUES = ERRORS.TypedError(
@@ -74,7 +78,8 @@ export const getScriptType = (
     if (!Array.isArray(path) || path.length < 1) return undefined;
 
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const p1 = fromHardened(path[0]);
+    const pathEl0: number = path[0];
+    const p1 = fromHardened(pathEl0);
     switch (p1) {
         case 44:
             return 'SPENDADDRESS';
@@ -84,7 +89,8 @@ export const getScriptType = (
             if (path.length < 4) return undefined;
 
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const p3 = fromHardened(path[3]);
+            const pathEl3: number = path[3];
+            const p3 = fromHardened(pathEl3);
 
             switch (p3) {
                 case 0:
@@ -117,7 +123,8 @@ export const getOutputScriptType = (path?: number[]): PROTO.ChangeOutputScriptTy
     if (!Array.isArray(path) || path.length < 1) return undefined;
 
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const p = fromHardened(path[0]);
+    const outputPathEl0: number = path[0];
+    const p = fromHardened(outputPathEl0);
 
     switch (p) {
         case 44:
@@ -128,7 +135,8 @@ export const getOutputScriptType = (path?: number[]): PROTO.ChangeOutputScriptTy
             if (path.length < 4) return undefined;
 
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const p3 = fromHardened(path[3]);
+            const outputPathEl3: number = path[3];
+            const p3 = fromHardened(outputPathEl3);
             switch (p3) {
                 case 0:
                     return 'PAYTOMULTISIG';

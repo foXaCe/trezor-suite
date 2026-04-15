@@ -105,7 +105,8 @@ export function validateParams<P extends Record<string, any>>(params: P, schema:
 
 export const validateCoinPath = (path: number[], coinInfo?: CoinInfo) => {
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    if (coinInfo && coinInfo.slip44 !== fromHardened(path[1])) {
+    const slip44Path: number = path[1];
+    if (coinInfo && coinInfo.slip44 !== fromHardened(slip44Path)) {
         throw invalidParameter('Parameters "path" and "coin" do not match.');
     }
 };

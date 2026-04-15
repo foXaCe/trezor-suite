@@ -85,7 +85,7 @@ describe('outputRegistration', () => {
             expect(response.length).toBe(f.result.length);
             response.forEach((r, i) => {
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const resultItem = f.result[i];
+                const resultItem: (typeof f.result)[number] = f.result[i];
                 expect(r.outputs.length).toBe(resultItem.outputs.length);
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 expect(r).toMatchObject(f.result[i]);

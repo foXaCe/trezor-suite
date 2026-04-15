@@ -251,8 +251,14 @@ const findCredentialsForTarget = (
         })
         .find(pair => pair.length === 2);
 
+    if (!candidate) return undefined;
+
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    return candidate ? [candidate[0], candidate[1]] : undefined;
+    const first: middleware.Credentials = candidate[0];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const second: middleware.Credentials = candidate[1];
+
+    return [first, second];
 };
 
 export interface Bob {
@@ -434,7 +440,8 @@ export const outputDecomposition = async (
     const outputAmounts = await Promise.all(
         Object.values(groupInputsByAccount).map(inputs => {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const { accountKey, inputSize, outputSize } = inputs[0]; // all inputs belongs to the same account (key, size)
+            const firstInput: CoinjoinRoundShape['inputs'][number] = inputs[0]; // all inputs belongs to the same account (key, size)
+            const { accountKey, inputSize, outputSize } = firstInput;
             const allVsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials!);
             // limit available vsize if it's bigger than available change addresses
             // prevent from creating amounts which cannot be assigned to address
@@ -464,16 +471,16 @@ export const outputDecomposition = async (
             if (!outputAmounts[index]) throw new Error(`Missing amounts at index ${index}`);
 
             logger.info(`Create outputs: ${outputAmounts[index].join(',')}`);
-            const inputs = groupInputsByAccount[accountKey];
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const inputs: CoinjoinRoundShape['inputs'][number][] = groupInputsByAccount[accountKey];
             const amountCredentials = inputs.flatMap(i => i.confirmedAmountCredentials!);
-            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             const vsizeCredentials = inputs.flatMap(i => i.confirmedVsizeCredentials!);
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const firstInput: CoinjoinRoundShape['inputs'][number] = inputs[0];
             const result = createOutputsCredentials({
                 round,
                 accountKey,
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                outputSize: inputs[0].outputSize, // all inputs are using same script type (size),
+                outputSize: firstInput.outputSize, // all inputs are using same script type (size),
                 amounts: outputAmounts[index],
                 amountCredentials,
                 vsizeCredentials,

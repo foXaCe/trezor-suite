@@ -141,11 +141,17 @@ export const getTransactions = async (
     */
     const getSpent = () => false;
     const getTx = (txid: string) => origTxs[txid] || prevTxs[txid];
-    // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const getVout = (txid: string, vout: number) => getTx(txid).vout[vout];
+    const getVout = (txid: string, vout: number) => {
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const tx: TransactionVerbose = getTx(txid);
+
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const output: TransactionVerbose['vout'][number] = tx.vout[vout];
+
+        return output;
+    };
 
     const currentHeight = client.getInfo()?.block?.height || 0;
 
-    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     return Object.values(origTxs).map(formatTransaction(getVout, getSpent, currentHeight));
 };

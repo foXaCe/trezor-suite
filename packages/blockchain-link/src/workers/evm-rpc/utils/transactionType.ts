@@ -32,11 +32,11 @@ export const getTransferAddressesFromLog = (
 
     // Topics are padded to 32 bytes, addresses are 20 bytes
     // Remove '0x' and take last 40 characters (20 bytes)
-    const fromTopic = topics[1];
-    const toTopic = topics[2];
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const fromTopic: string = topics[1];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const toTopic: string = topics[2];
     const fromSlice = fromTopic.slice(26);
-    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     const toSlice = toTopic.slice(26);
     const from = `0x${fromSlice}`.toLowerCase();
     const to = `0x${toSlice}`.toLowerCase();

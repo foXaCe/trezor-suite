@@ -32,7 +32,9 @@ export const getOrInitFeeLevels = (coinInfo: CoinInfo): MiscFeeLevels => {
     }
 
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    return instancesPerCoin[shortcut];
+    const instance: MiscFeeLevels = instancesPerCoin[shortcut];
+
+    return instance;
 };
 
 export const getOrInitBitcoinFeeLevels = (coinInfo: BitcoinNetworkInfo) =>

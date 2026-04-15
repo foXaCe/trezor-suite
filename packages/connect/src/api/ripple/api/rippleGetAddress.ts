@@ -69,9 +69,11 @@ export default class RippleGetAddress extends AbstractMethod<'rippleGetAddress',
         // set info
         if (this.params.length === 1) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const param = this.params[0];
+            const param: (typeof this.params)[number] = this.params[0];
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const accountIndex: number = param.proto.address_n[2];
 
-            return `Export Ripple address for account #${fromHardened(param.proto.address_n[2]) + 1}`;
+            return `Export Ripple address for account #${fromHardened(accountIndex) + 1}`;
         }
 
         return 'Export multiple Ripple addresses';
@@ -79,7 +81,7 @@ export default class RippleGetAddress extends AbstractMethod<'rippleGetAddress',
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const param = this.params[this.progress];
+            const param: (typeof this.params)[number] = this.params[this.progress];
 
             return {
                 type: 'address' as const,

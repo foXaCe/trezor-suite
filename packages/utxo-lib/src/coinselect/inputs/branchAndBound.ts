@@ -83,12 +83,10 @@ function search(
             // Continue down this branch
             // Remove this utxo from the remaining utxo amount
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const effectiveUtxo = effectiveUtxos[depth];
+            const effectiveUtxo: (typeof effectiveUtxos)[number] = effectiveUtxos[depth];
             remaining = remaining.sub(effectiveUtxo.effectiveValue);
             // Inclusion branch first (Largest First Exploration)
             selected[depth] = true;
-            // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const effectiveUtxo = effectiveUtxos[depth];
             selectedAccum = selectedAccum.add(effectiveUtxo.effectiveValue);
             depth++;
         }
@@ -101,7 +99,7 @@ function search(
             // Walk backwards to find the first utxo which has not has its second branch traversed
             while (!selected[depth]) {
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const effectiveUtxo = effectiveUtxos[depth];
+                const effectiveUtxo: (typeof effectiveUtxos)[number] = effectiveUtxos[depth];
                 remaining = remaining.add(effectiveUtxo.effectiveValue);
 
                 // Step back one
@@ -117,7 +115,7 @@ function search(
             // Now traverse the second branch of the utxo we have arrived at.
             selected[depth] = false;
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const effectiveUtxo = effectiveUtxos[depth];
+            const effectiveUtxo: (typeof effectiveUtxos)[number] = effectiveUtxos[depth];
             selectedAccum = selectedAccum.sub(effectiveUtxo.effectiveValue);
             depth++;
         }
@@ -197,7 +195,7 @@ export const branchAndBound: CoinSelectAlgorithm = (
         for (let i = 0; i < effectiveUtxos.length; i++) {
             if (selected[i]) {
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const effectiveUtxo = effectiveUtxos[i];
+                const effectiveUtxo: (typeof effectiveUtxos)[number] = effectiveUtxos[i];
                 inputs.push(effectiveUtxo.utxo);
             }
         }

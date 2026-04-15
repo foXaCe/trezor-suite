@@ -164,11 +164,11 @@ export const transformTokenInfo = (
         };
         if (acc[token.contract] != null) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            acc[token.contract].balance = new BigNumber(acc[token.contract].balance || '0')
+            const existingToken: TokenInfo = acc[token.contract];
+            existingToken.balance = new BigNumber(existingToken.balance || '0')
                 .plus(token.balance || '0')
                 .toString();
-            // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            acc[token.contract].accounts!.push({
+            existingToken.accounts!.push({
                 publicKey: token.address,
                 balance: token.balance || '0',
             });
@@ -438,9 +438,11 @@ export const getDetails = (
         )
         .filter(({ address }) => !(txType === 'self' && address === accountAddress));
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const firstSignature: string = transaction.transaction.signatures[0];
+
     const getVin = ({ address, amount }: { address: string; amount?: BigNumber }, i: number) => ({
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        txid: transaction.transaction.signatures[0].toString(),
+        txid: firstSignature.toString(),
         version: transaction.version?.toString(),
         isAddress: true,
         isAccountOwned: address === accountAddress,
@@ -741,10 +743,12 @@ export const transformTransaction = (
 
     const details = getDetails(tx, nativeEffects, accountAddress, type);
 
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const txFirstSignature: string = tx.transaction.signatures[0];
+
     return {
         type: txType,
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        txid: tx.transaction.signatures[0].toString(),
+        txid: txFirstSignature.toString(),
         blockTime: tx.blockTime == null ? undefined : Number(tx.blockTime),
         blockHeight: tx.slot == null ? undefined : Number(tx.slot),
         amount,

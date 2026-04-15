@@ -58,7 +58,10 @@ const xor = (a: Buffer, b: Buffer) => {
     const result = Buffer.alloc(a.length);
     for (let i = 0; i < a.length; i++) {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        result[i] = a[i] ^ b[i];
+        const aByte: number = a[i];
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const bByte: number = b[i];
+        result[i] = aByte ^ bByte;
     }
 
     return result;

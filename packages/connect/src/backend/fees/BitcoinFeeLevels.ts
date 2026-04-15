@@ -1,6 +1,6 @@
 // origin: https://github.com/trezor/connect/blob/develop/src/js/core/methods/tx/Fees.js
 
-import type { BitcoinNetworkInfo } from '@trezor/connect-common';
+import type { BitcoinNetworkInfo, FeeLevel } from '@trezor/connect-common';
 import { BigNumber } from '@trezor/utils/src/bigNumber';
 
 import type { Blockchain } from '../Blockchain';
@@ -35,7 +35,7 @@ export class BitcoinFeeLevels extends MiscFeeLevels {
 
                 const trimmedFeePerUnit = Math.min(maxFee, Math.max(minFee, feePerB));
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const level = this.levels[index];
+                const level: FeeLevel = this.levels[index];
                 level.feePerUnit = trimmedFeePerUnit.toString();
             });
             this.wasFetchedSuccessfully = true;

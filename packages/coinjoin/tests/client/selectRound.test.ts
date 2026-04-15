@@ -501,7 +501,7 @@ describe('selectRound', () => {
 
         ['AA', 'AB', 'AC', 'CA'].forEach((outpoint, index) => {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const input = result!.inputs[index];
+            const input: NonNullable<typeof result>['inputs'][number] = result!.inputs[index];
             expect(input.outpoint).toEqual(outpoint);
         });
 

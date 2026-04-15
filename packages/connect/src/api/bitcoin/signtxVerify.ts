@@ -22,7 +22,9 @@ const derivePubKeyHash = async (getHDNode: GetHDNode, address_n: number[], netwo
         const node = bip32.fromBase58(response.xpub, network);
 
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        return node.derive(address_n[address_n.length - 1]);
+        const lastIndex: number = address_n[address_n.length - 1];
+
+        return node.derive(lastIndex);
     }
     // custom address_n
     const response = await getHDNode(address_n);
@@ -122,11 +124,11 @@ export const verifyTx = (
     outputs.forEach((output, i) => {
         if (output.amount) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            if (output.amount.toString() !== bitcoinTx.outs[i].value) {
+            const txOut: (typeof bitcoinTx.outs)[number] = bitcoinTx.outs[i];
+            if (output.amount.toString() !== txOut.value) {
                 throw ERRORS.TypedError(
                     'Runtime',
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                    `verifyTx: Wrong output amount at output ${i}. Requested: ${output.amount}, signed: ${bitcoinTx.outs[i].value}`,
+                    `verifyTx: Wrong output amount at output ${i}. Requested: ${output.amount}, signed: ${txOut.value}`,
                 );
             }
         }

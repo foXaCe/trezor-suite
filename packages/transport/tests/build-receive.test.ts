@@ -250,7 +250,7 @@ describe('createChunks', () => {
         const result = createChunks(Buffer.alloc(63).fill(0x12), chunkHeader, 64);
         expect(result.length).toBe(1);
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const resultItem = result[0];
+        const resultItem: Buffer = result[0];
         expect(resultItem.toString('hex')).toBe('12'.repeat(63) + '00');
     });
 
@@ -264,11 +264,9 @@ describe('createChunks', () => {
         expect(result.length).toBe(2);
         // header + last byte from data
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const resultItem = result[1];
+        const resultItem: Buffer = result[1];
         expect(resultItem.subarray(0, 2).toString('hex')).toBe('3f61');
         // the rest is filled with 00
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const resultItem = result[1];
         expect(resultItem.subarray(2).toString('hex')).toBe('00'.repeat(62));
     });
 
@@ -289,10 +287,8 @@ describe('createChunks', () => {
         );
         expect(result.length).toBe(3);
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const resultItem = result[2];
+        const resultItem: Buffer = result[2];
         expect(resultItem.subarray(0, 8).toString('hex')).toBe('7373737373737312');
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const resultItem = result[2];
         expect(resultItem.subarray(8).toString('hex')).toBe('00'.repeat(64 - 8));
     });
 
@@ -300,7 +296,7 @@ describe('createChunks', () => {
         const result = createChunks(Buffer.alloc(128).fill(0x12), Buffer.alloc(7).fill(0x73), 0);
         expect(result.length).toBe(1);
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const resultItem = result[0];
+        const resultItem: Buffer = result[0];
         expect(resultItem.byteLength).toBe(128);
     });
 });

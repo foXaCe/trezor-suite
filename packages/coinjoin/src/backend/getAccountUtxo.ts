@@ -6,9 +6,12 @@ type AddressPaths = {
     [address: string]: string;
 };
 
-const isCoinbaseUtxo = (tx: Transaction) =>
+const isCoinbaseUtxo = (tx: Transaction) => {
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    tx.details.vin.length === 1 && !tx.details.vin[0].isAddress && !tx.details.vin[0].txid;
+    const firstVin: VinVout = tx.details.vin[0];
+
+    return tx.details.vin.length === 1 && !firstVin.isAddress && !firstVin.txid;
+};
 
 const getHeightData = (tx: Transaction) =>
     tx.blockHeight && tx.blockHeight > 0

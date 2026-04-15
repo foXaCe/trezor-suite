@@ -1,4 +1,4 @@
-import type { CoinInfo } from '@trezor/connect-common';
+import type { CoinInfo, FeeLevel } from '@trezor/connect-common';
 
 import { MiscFeeLevels } from '../MiscFeeLevels';
 
@@ -57,15 +57,15 @@ describe('MiscFeeLevels – Solana', () => {
         const feeMin = new MiscFeeLevels(SOL_COIN_INFO);
         await feeMin.load(makeBackend(TOO_LOW_RESPONSE), REQUEST);
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const level = feeMin.levels[0];
-        expect(level.feePerUnit).toBe(SOL_COIN_INFO.minFee.toString());
+        const levelMin: FeeLevel = feeMin.levels[0];
+        expect(levelMin.feePerUnit).toBe(SOL_COIN_INFO.minFee.toString());
 
         // maxFee clamp
         const feeMax = new MiscFeeLevels(SOL_COIN_INFO);
         await feeMax.load(makeBackend(TOO_HIGH_RESPONSE), REQUEST);
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const level = feeMax.levels[0];
-        expect(level.feePerUnit).toBe(SOL_COIN_INFO.maxFee.toString());
+        const levelMax: FeeLevel = feeMax.levels[0];
+        expect(levelMax.feePerUnit).toBe(SOL_COIN_INFO.maxFee.toString());
     });
 
     it('keeps default levels when backend throws', async () => {

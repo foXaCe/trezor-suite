@@ -94,7 +94,7 @@ export default class GetPublicKey extends AbstractMethod<'getPublicKey', Params[
 
     get confirmation() {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const param = this.params[0];
+        const param: (typeof this.params)[number] = this.params[0];
 
         return {
             view: 'export-xpub' as const,

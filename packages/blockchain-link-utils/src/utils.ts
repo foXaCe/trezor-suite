@@ -53,10 +53,12 @@ export const sortTxsFromLatest = (transactions: Transaction[]) => {
     let from = 0;
     while (from < txs.length - 1) {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const fromHeight = adjustHeight(txs[from]);
+        const fromTx: Transaction = txs[from];
+        const fromHeight = adjustHeight(fromTx);
         let to = from + 1;
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        if (fromHeight === adjustHeight(txs[to])) {
+        const toTx: Transaction = txs[to];
+        if (fromHeight === adjustHeight(toTx)) {
             do {
                 to++;
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess

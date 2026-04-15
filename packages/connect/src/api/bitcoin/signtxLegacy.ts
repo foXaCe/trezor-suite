@@ -21,11 +21,15 @@ const requestPrevTxInfo = ({
     }
     if (request_type === 'TXINPUT') {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        return { inputs: [tx.inputs[details.request_index]] };
+        const input: (typeof tx.inputs)[number] = tx.inputs[details.request_index];
+
+        return { inputs: [input] };
     }
     if (request_type === 'TXOUTPUT') {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        return { bin_outputs: [tx.bin_outputs[details.request_index]] };
+        const binOutput: (typeof tx.bin_outputs)[number] = tx.bin_outputs[details.request_index];
+
+        return { bin_outputs: [binOutput] };
     }
     if (request_type === 'TXEXTRADATA') {
         if (typeof details.extra_data_len !== 'number') {
@@ -79,11 +83,15 @@ const requestSignedTxInfo = ({
 }: SignTxHelperProps): PROTO.TxAckResponse => {
     if (request_type === 'TXINPUT') {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        return { inputs: [inputs[details.request_index]] };
+        const input: (typeof inputs)[number] = inputs[details.request_index];
+
+        return { inputs: [input] };
     }
     if (request_type === 'TXOUTPUT') {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        return { outputs: [outputs[details.request_index]] };
+        const output: (typeof outputs)[number] = outputs[details.request_index];
+
+        return { outputs: [output] };
     }
     if (request_type === 'TXMETA') {
         throw ERRORS.TypedError(

@@ -357,8 +357,8 @@ const parseExtensions = (data: Asn1) => {
         if (value.cls !== 0 || value.tag !== 1 || value.contents.length !== 1 || value.structured) {
             throw new Error("This can't be a boolean. Wrong data type.");
         }
-        const firstByte = value.contents[0];
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const firstByte: number = value.contents[0];
         if (![0x00, 0xff].includes(firstByte)) {
             throw new Error('Invalid boolean value.');
         }

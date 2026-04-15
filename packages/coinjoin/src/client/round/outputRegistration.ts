@@ -95,9 +95,10 @@ const registerOutput = async (
                         return tryToRegisterOutput(false);
                     }
                     if (error.errorCode === WabiSabiProtocolErrorCode.NotEnoughFunds) {
+                        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                        const firstCredential: middleware.Credentials = amountCredentials[0];
                         logger.error(
-                            // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                            `NotEnoughFunds. Amount: ${amountCredentials[0].Value} Delta: ${outputAmountCredentials.CredentialsRequest.Delta} FeeRate: ${roundParameters.MiningFeeRate}`,
+                            `NotEnoughFunds. Amount: ${firstCredential.Value} Delta: ${outputAmountCredentials.CredentialsRequest.Delta} FeeRate: ${roundParameters.MiningFeeRate}`,
                         );
                     }
                 }

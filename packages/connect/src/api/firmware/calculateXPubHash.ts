@@ -13,7 +13,8 @@ export const calculateXPubHashes = (xpubs: Record<string, string>): XPubHashesPe
     const hashes: XPubHashesPerBip43Path = {};
     Object.keys(xpubs).forEach(path => {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        hashes[path] = calculateXPubHash(xpubs[path]);
+        const xpub: string = xpubs[path];
+        hashes[path] = calculateXPubHash(xpub);
     });
 
     return hashes;

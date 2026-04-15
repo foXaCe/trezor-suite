@@ -70,15 +70,21 @@ export default class CardanoGetPublicKey extends AbstractMethod<'cardanoGetPubli
     }
 
     get confirmation() {
+        if (this.params.length > 1) {
+            return {
+                view: 'export-xpub' as const,
+                label: 'Export multiple Cardano public keys',
+            };
+        }
+
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const firstParam: (typeof this.params)[number] = this.params[0];
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const accountIndex: number = firstParam.proto.address_n[2];
+
         return {
             view: 'export-xpub' as const,
-            label:
-                this.params.length > 1
-                    ? 'Export multiple Cardano public keys'
-                    : `Export Cardano public key for account #${
-                          // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                          fromHardened(this.params[0].proto.address_n[2]) + 1
-                      }`,
+            label: `Export Cardano public key for account #${fromHardened(accountIndex) + 1}`,
         };
     }
 
@@ -87,8 +93,8 @@ export default class CardanoGetPublicKey extends AbstractMethod<'cardanoGetPubli
         const responses: MethodReturnType<typeof this.name> = [];
         const cmd = this.getDevice().getCommands();
         for (let i = 0; i < this.params.length; i++) {
-            const param = this.params[i];
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const param: (typeof this.params)[number] = this.params[i];
             const batch = param.proto;
             const { message } = await cmd.typedCall(
                 'CardanoGetPublicKey',

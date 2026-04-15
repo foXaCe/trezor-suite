@@ -42,7 +42,9 @@ export const txListener = (worker: BaseWorker<ElectrumAPI>) => {
         const history = await api().request('blockchain.scripthash.get_history', scripthash);
         const recent = history.reduce<HistoryTx | undefined>(mostRecent, undefined);
         if (!recent) return;
-        const [tx] = await getTransactions(api(), [recent]);
+        const txs = await getTransactions(api(), [recent]);
+        // @ts-expect-error: indexing with noUncheckedIndexedAccess
+        const tx: Parameters<typeof transformTransaction>[0] = txs[0];
         worker.post({
             id: -1,
             type: RESPONSES.NOTIFICATION,
@@ -50,7 +52,6 @@ export const txListener = (worker: BaseWorker<ElectrumAPI>) => {
                 type: 'notification',
                 payload: {
                     descriptor,
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     tx: transformTransaction(tx, addresses ?? descriptor),
                 },
             },

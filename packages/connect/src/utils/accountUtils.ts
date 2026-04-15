@@ -48,9 +48,11 @@ export const getAccountAddressN = (
 export const getAccountLabel = (path: number[], coinInfo: CoinInfo) => {
     if (coinInfo.type === 'bitcoin') {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const accountType = fromHardened(path[0]);
+        const p0: number = path[0];
+        const accountType = fromHardened(p0);
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const account = fromHardened(path[2]);
+        const p2: number = path[2];
+        const account = fromHardened(p2);
         let prefix = '';
 
         if (accountType === 48) {
@@ -64,7 +66,8 @@ export const getAccountLabel = (path: number[], coinInfo: CoinInfo) => {
         return `${prefix} account #${account + 1}`;
     }
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const account = fromHardened(path[4]);
+    const p4: number = path[4];
+    const account = fromHardened(p4);
 
     return `account #${account + 1}`;
 };
@@ -80,9 +83,11 @@ export const getPublicKeyLabel = (path: number[], coinInfo?: BitcoinNetworkInfo)
     }
 
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    const p1 = fromHardened(path[0]);
+    const pathEl0: number = path[0];
+    const p1 = fromHardened(pathEl0);
     // @ts-expect-error: indexing with noUncheckedIndexedAccess
-    let account = path.length >= 3 ? fromHardened(path[2]) : -1;
+    const pathEl2: number = path[2];
+    let account = path.length >= 3 ? fromHardened(pathEl2) : -1;
     let realAccountId = account + 1;
     let prefix = 'Export public key';
     let accountType = '';
@@ -90,9 +95,11 @@ export const getPublicKeyLabel = (path: number[], coinInfo?: BitcoinNetworkInfo)
     // Copay id
     if (p1 === 45342) {
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const p2 = fromHardened(path[1]);
+        const pathEl1: number = path[1];
+        const p2 = fromHardened(pathEl1);
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        account = fromHardened(path[3]);
+        const pathEl3: number = path[3];
+        account = fromHardened(pathEl3);
         realAccountId = account + 1;
         prefix = 'Export Copay ID of';
         if (p2 === 48) {

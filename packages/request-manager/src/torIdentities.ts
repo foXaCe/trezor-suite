@@ -60,7 +60,7 @@ export class TorIdentities {
     public removeIdentity(user: string) {
         // looks like destroy does nothing, but just in case
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const identitie = this.identities[user];
+        const identitie: SocksProxyAgent = this.identities[user];
         identitie.destroy();
         delete this.identities[user];
         delete this.passwords[user];

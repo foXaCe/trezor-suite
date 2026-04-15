@@ -401,25 +401,29 @@ export const selectInputsForRound = async ({
 
     // get index of Round with maximum possible utxos
     const roundIndex = sumUtxosInRounds.findIndex(count => count === maxUtxosInRound);
-    const selectedRound = normalRounds[roundIndex];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const selectedRound: (typeof normalRounds)[number] = normalRounds[roundIndex];
 
     // setup new Round
     accountCandidates.forEach((account, accountIndex) => {
         // find utxos assigned to this Round and Account
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const utxoIndexes = utxoSelection[roundIndex][accountIndex];
+        const roundUtxoSelection: number[][] = utxoSelection[roundIndex];
         // @ts-expect-error: indexing with noUncheckedIndexedAccess
-        const selectedUtxos = utxoIndexes.map(utxoIndex => account.utxos[utxoIndex]);
+        const utxoIndexes: number[] = roundUtxoSelection[accountIndex];
+        const selectedUtxos = utxoIndexes.map(utxoIndex => {
+            // @ts-expect-error: indexing with noUncheckedIndexedAccess
+            const utxo: (typeof account.utxos)[number] = account.utxos[utxoIndex];
+
+            return utxo;
+        });
 
         // Temporary workaround for middleware issue: https://github.com/zkSNACKs/WalletWasabi/issues/10759
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const feeRate = selectedRound.roundParameters.MiningFeeRate;
         const inputFee = Math.floor((getInputSize(account.scriptType) * feeRate) / 1000);
         const outputFee = Math.floor((getOutputSize(account.scriptType) * feeRate) / 1000);
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const totalValue = selectedUtxos.reduce((a, b) => a + b.amount, 0);
         const effectiveValue = totalValue - outputFee - selectedUtxos.length * inputFee;
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         if (effectiveValue < selectedRound.roundParameters.AllowedOutputAmounts.Min) {
             // skip round if effective value is too low
             // https://github.com/zkSNACKs/WalletWasabi/issues/10759
@@ -428,24 +432,20 @@ export const selectInputsForRound = async ({
             // skip round if selected utxo value is greater than maxSuggestedAmount
             // https://github.com/zkSNACKs/WalletWasabi/blob/23e4ec0971303b4502372332ecaffe4ff5d08917/WalletWasabi/WabiSabi/Client/CoinJoinClient.cs#L156
             selectedUtxos.some(
-                // @ts-expect-error: indexing with noUncheckedIndexedAccess
                 utxo => utxo.amount > selectedRound.roundParameters.MaxSuggestedAmount,
             )
         ) {
             logger.info('Skipping the round for more optimal mixing.');
         } else {
             // create new Alice(s) and add it to CoinjoinRound
-            // @ts-expect-error: indexing with noUncheckedIndexedAccess
             selectedRound.inputs.push(
                 ...selectedUtxos.map(utxo =>
-                    // @ts-expect-error: indexing with noUncheckedIndexedAccess
                     aliceGenerator(account.accountKey, account.scriptType, utxo),
                 ),
             );
         }
     });
 
-    // @ts-expect-error: indexing with noUncheckedIndexedAccess
     return selectedRound.inputs.length > 0 ? selectedRound : undefined;
 };
 

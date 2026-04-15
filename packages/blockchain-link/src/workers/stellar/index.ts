@@ -23,20 +23,21 @@ const fetchLatestLedger = async (api: Horizon.Server) => {
         throw new CustomError('worker_invalid_horizon_response');
     }
 
-    return latestLedgerInfo.records[0];
+    // @ts-expect-error: indexing with noUncheckedIndexedAccess
+    const record: Horizon.ServerApi.LedgerRecord = latestLedgerInfo.records[0];
+
+    return record;
 };
 
 const getInfo = async (request: Request<MessageTypes.GetInfo>, isTestnet: boolean) => {
     const api = await request.connect();
     const horizonServerInfo = await api.root();
+    const latestLedger = await fetchLatestLedger(api);
     const {
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         sequence: blockHeight,
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         hash: blockHash,
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         base_reserve_in_stroops: baseReserveInStroops,
-    } = await fetchLatestLedger(api);
+    } = latestLedger;
 
     utils.BASE_INFO.BASE_RESERVE = new BigNumber(baseReserveInStroops);
     utils.BASE_INFO.MINIMUM_RESERVE = utils.BASE_INFO.BASE_RESERVE.times(2);
@@ -201,7 +202,6 @@ const subscribeBlock = async ({ state, connect, post }: Context) => {
     const api = await connect();
 
     const fetchBlock = async () => {
-        // @ts-expect-error: indexing with noUncheckedIndexedAccess
         const { sequence: blockHeight, hash: blockHash } = await fetchLatestLedger(api);
         post({
             id: -1,

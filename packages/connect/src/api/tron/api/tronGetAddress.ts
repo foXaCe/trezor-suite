@@ -68,7 +68,7 @@ export default class TronGetAddress extends AbstractMethod<'tronGetAddress', Par
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const param = this.params[this.progress];
+            const param: (typeof this.params)[number] = this.params[this.progress];
 
             return {
                 type: 'address' as const,
@@ -86,9 +86,11 @@ export default class TronGetAddress extends AbstractMethod<'tronGetAddress', Par
                     return 'Export multiple Tron addresses';
                 }
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const param = this.params[0];
+                const param: (typeof this.params)[number] = this.params[0];
+                // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                const accountIndex: number = param.proto.address_n[2];
 
-                return `Export Tron address for account #${fromHardened(param.proto.address_n[2]) + 1}`;
+                return `Export Tron address for account #${fromHardened(accountIndex) + 1}`;
             })(),
         };
     }

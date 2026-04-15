@@ -46,7 +46,7 @@ export async function findProcessFromIncomingPort(
             if (processLine) {
                 const parts = processLine.split(/\s+/);
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-                const part = parts[0];
+                const part: string = parts[0];
                 const name = part.replace(/\\x\d{2}/g, ' ');
                 const pid = processLine.split(/\s+/)[1];
 

@@ -77,7 +77,7 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
         for (let i = 0; i < this.params.length; i++) {
             // network was maybe already set from 'well-known' definition in init method.
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const param = this.params[i];
+            const param: (typeof this.params)[number] = this.params[i];
             if (!param.network) {
                 const slip44 = getSlip44ByPath(param.proto.address_n);
 
@@ -97,7 +97,7 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
     get info() {
         if (this.params.length === 1) {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const param = this.params[0];
+            const param: (typeof this.params)[number] = this.params[0];
 
             return getNetworkLabel('Export #NETWORK address', param.network);
         }
@@ -113,7 +113,7 @@ export default class EthereumGetAddress extends AbstractMethod<'ethereumGetAddre
     getButtonRequestData(code: string) {
         if (code === 'ButtonRequest_Address') {
             // @ts-expect-error: indexing with noUncheckedIndexedAccess
-            const progressParam = this.params[this.progress];
+            const progressParam: (typeof this.params)[number] = this.params[this.progress];
 
             return {
                 type: 'address' as const,

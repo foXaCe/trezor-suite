@@ -76,8 +76,9 @@ export class EthereumFeeLevels extends MiscFeeLevels {
                 this.levels = levels.filter(level => level) as FeeLevel[];
             } else {
                 // @ts-expect-error: indexing with noUncheckedIndexedAccess
+                const currentLevel: FeeLevel = this.levels[0];
                 this.levels[0] = {
-                    ...this.levels[0],
+                    ...currentLevel,
                     ...response,
                     feePerUnit,
                 };
