@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
+import { selectDesktopUpdateEnabled } from '@suite/desktop-upgrade';
 import { Translation } from '@suite/intl';
 import { SettingsAnchor } from '@suite/router';
-import { selectDesktopUpdateEnabled } from '@suite/upgrade';
 import { Switch } from '@trezor/components';
 import { ActionColumn, TextColumn } from '@trezor/product-components';
 import { desktopApi } from '@trezor/suite-desktop-api';

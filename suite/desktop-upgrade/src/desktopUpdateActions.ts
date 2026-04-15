@@ -1,16 +1,27 @@
+import { type AnyAction } from 'redux';
+import { type ThunkDispatch } from 'redux-thunk';
+
 import { AppUpdateEventStatus, asTypedDesktopAnalytics, events } from '@suite/analytics';
-import { DESKTOP_UPDATE, type DesktopUpdateAction, UpdateState } from '@suite/upgrade';
 import { type ExtraDependencies } from '@suite-common/redux-utils';
 import { notificationsActions } from '@suite-common/toast-notifications';
 import { type UpdateInfo, type UpdateProgress, desktopApi } from '@trezor/suite-desktop-api';
 
-import { type Dispatch, type GetState } from 'src/types/suite';
-import { getAppUpdatePayload } from 'src/utils/suite/analytics';
+import { getAppUpdatePayload } from './appUpdateAnalytics';
+import * as DESKTOP_UPDATE from './desktopUpdateConstants';
+import {
+    type DesktopUpdateAction,
+    type DesktopUpdateRootState,
+    UpdateState,
+} from './desktopUpdateReducer';
+
+type Dispatch = ThunkDispatch<DesktopUpdateRootState, ExtraDependencies, AnyAction>;
+type GetState = () => DesktopUpdateRootState;
 
 export const checking = (): DesktopUpdateAction => ({ type: DESKTOP_UPDATE.CHECKING });
 
 export const available =
     (info: UpdateInfo) => (dispatch: Dispatch, getState: GetState, extra: ExtraDependencies) => {
+        // eslint-disable-next-line no-restricted-syntax
         const { allowPrerelease } = getState().desktopUpdate;
 
         const payload = getAppUpdatePayload({
@@ -39,6 +50,7 @@ export const notAvailable = (info: UpdateInfo) => (dispatch: Dispatch) => {
 
 export const download =
     () => (dispatch: Dispatch, getState: GetState, extra: ExtraDependencies) => {
+        // eslint-disable-next-line no-restricted-syntax
         const { latest, allowPrerelease } = getState().desktopUpdate;
 
         const payload = getAppUpdatePayload({
@@ -67,10 +79,9 @@ export const justUpdated = (): DesktopUpdateAction => ({
 
 export const ready =
     (info: UpdateInfo) => (dispatch: Dispatch, getState: GetState, extra: ExtraDependencies) => {
+        // eslint-disable-next-line no-restricted-syntax
         const { latest, allowPrerelease } = getState().desktopUpdate;
 
-        // update can fail even if it was downloaded successfully
-        // TODO: Update successful status from electron layer
         const payload = getAppUpdatePayload({
             status: AppUpdateEventStatus.Downloaded,
             earlyAccessProgram: allowPrerelease,
@@ -89,6 +100,7 @@ export const ready =
 export const installUpdate =
     ({ installNow }: { installNow: boolean }) =>
     (_: Dispatch, getState: GetState, extra: ExtraDependencies) => {
+        // eslint-disable-next-line no-restricted-syntax
         const { desktopUpdate } = getState();
 
         const payload = getAppUpdatePayload({
@@ -105,20 +117,17 @@ export const installUpdate =
             payload,
         });
 
-        // auto-updater is by default configured to update on quit 'autoUpdater.autoInstallOnAppQuit = true'
         if (installNow) {
             desktopApi.installUpdate();
         } else {
-            // To make sure, the update is installed on quit as it may have been disabled
-            // by switching off the auto-update (silent-update)
             desktopApi.setAutoInstallOnAppQuit();
         }
     };
 
 export const error = () => (dispatch: Dispatch, getState: GetState, extra: ExtraDependencies) => {
+    // eslint-disable-next-line no-restricted-syntax
     const { state, latest, allowPrerelease } = getState().desktopUpdate;
 
-    // Ignore displaying errors while checking
     if (state !== UpdateState.Checking) {
         dispatch(notificationsActions.addToast({ type: 'auto-updater-error', state }));
 
@@ -154,7 +163,7 @@ export const openEarlyAccessSetup = (earlyAccessEnabled: boolean): DesktopUpdate
         : DESKTOP_UPDATE.OPEN_EARLY_ACCESS_ENABLE,
 });
 
-export const allowPrerelease = (allowPrerelease: boolean): DesktopUpdateAction => ({
+export const allowPrereleaseAction = (allowPrerelease: boolean): DesktopUpdateAction => ({
     type: DESKTOP_UPDATE.ALLOW_PRERELEASE,
     payload: allowPrerelease,
 });

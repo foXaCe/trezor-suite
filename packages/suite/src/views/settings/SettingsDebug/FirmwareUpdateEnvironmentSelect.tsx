@@ -1,4 +1,4 @@
-import { selectDesktopUpdateAllowPrerelease } from '@suite/upgrade';
+import { selectDesktopUpdateAllowPrerelease } from '@suite/desktop-upgrade';
 import { firmwareActions, selectEffectiveFirmwareChannel } from '@suite-common/firmware';
 import { Column, Text } from '@trezor/components';
 import { type FirmwareChannel } from '@trezor/connect-common/src/types/firmware';

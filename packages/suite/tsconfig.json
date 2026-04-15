@@ -153,6 +153,7 @@
         },
         { "path": "../../suite/analytics" },
         { "path": "../../suite/backup" },
+        { "path": "../../suite/upgrade" },
         { "path": "../../suite/device" },
         { "path": "../../suite/experimental" },
         {
@@ -181,7 +182,6 @@
         { "path": "../../suite/suite-sync" },
         { "path": "../../suite/trading" },
         { "path": "../../suite/tx-simulation" },
-        { "path": "../../suite/upgrade" },
         { "path": "../address-validator" },
         { "path": "../analytics-uploader" },
         { "path": "../blockchain-link" },

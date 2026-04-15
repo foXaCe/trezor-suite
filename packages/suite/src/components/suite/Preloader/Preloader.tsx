@@ -1,6 +1,6 @@
 import { type FC, type PropsWithChildren, useEffect } from 'react';
 
-import { selectDesktopUpdateAllowPrerelease } from '@suite/upgrade';
+import { selectDesktopUpdateAllowPrerelease } from '@suite/desktop-upgrade';
 import { selectIsAnalyticsConfirmed } from '@suite-common/analytics-redux';
 import { useReportDeviceCompromised } from '@suite-common/firmware-authenticity';
 import { Card } from '@trezor/components';

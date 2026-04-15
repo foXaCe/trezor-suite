@@ -2,6 +2,7 @@ import type { Store as ReduxStore } from 'redux';
 import type { ThunkAction as TAction, ThunkDispatch } from 'redux-thunk';
 
 import type { backupActions } from '@suite/backup';
+import type { DesktopUpdateAction } from '@suite/desktop-upgrade';
 import { type featureFeedbackSlice } from '@suite/feature-feedback';
 import type { flagsActions } from '@suite/flags';
 import type { LockAction } from '@suite/locks';
@@ -10,7 +11,6 @@ import type { ModalAction } from '@suite/modal';
 import type { recoveryActions } from '@suite/recovery';
 import { type Route, type RouterAction } from '@suite/router';
 import { type suiteSettingsActions } from '@suite/settings';
-import type { DesktopUpdateAction } from '@suite/upgrade';
 import { type analyticsActions } from '@suite-common/analytics-redux';
 import { type bluetoothActions } from '@suite-common/bluetooth';
 import { type deviceActions } from '@suite-common/device';

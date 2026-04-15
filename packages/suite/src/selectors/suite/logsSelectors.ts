@@ -1,4 +1,8 @@
 import {
+    type DesktopUpdateRootState,
+    selectDesktopUpdateAllowPrerelease,
+} from '@suite/desktop-upgrade';
+import {
     type MetadataRootState,
     selectLabelingDataForWallet,
     selectSelectedLabelsProviderType,
@@ -11,7 +15,6 @@ import {
     selectTheme,
     selectTorOnionLinks,
 } from '@suite/settings';
-import { type DesktopUpdateRootState, selectDesktopUpdateAllowPrerelease } from '@suite/upgrade';
 import {
     type LogsApplicationInfoRootState,
     REDACTED_REPLACEMENT,

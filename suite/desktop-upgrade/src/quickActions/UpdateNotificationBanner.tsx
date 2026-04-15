@@ -1,13 +1,14 @@
 import { type MouseEvent } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { type Dispatch } from '@reduxjs/toolkit';
 import { type Variants, motion } from 'framer-motion';
 
 import { Translation, type TranslationKey } from '@suite/intl';
 import { selectHasRunningDiscovery } from '@suite-common/wallet-core';
 import { Card, Column, ElevationContext, IconButton, Row, Text } from '@trezor/components';
 
-import { useDispatch, useSelector } from 'src/hooks/suite';
-
+import { type DesktopUpgradeQuickActionsRootState } from './quickActionsRootState';
 import {
     type UpdateStatus,
     type UpdateStatusDevice,
@@ -52,8 +53,10 @@ export const UpdateNotificationBanner = ({
     updateStatusSuite,
     onClose,
 }: UpdateNotificationBannerProps) => {
-    const dispatch = useDispatch();
-    const discoveryInProgress = useSelector(selectHasRunningDiscovery);
+    const dispatch = useDispatch<Dispatch>();
+    const discoveryInProgress = useSelector((state: DesktopUpgradeQuickActionsRootState) =>
+        selectHasRunningDiscovery(state),
+    );
 
     const translationHeader =
         updateStatusSuite !== 'up-to-date'

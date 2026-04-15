@@ -1,25 +1,26 @@
 import { type JSX, useCallback, useEffect } from 'react';
 
 import { AppUpdateEventStatus, asTypedDesktopAnalytics, events } from '@suite/analytics';
-import { UpdateState, selectDesktopUpdate } from '@suite/upgrade';
-import { desktopApi } from '@trezor/suite-desktop-api';
-import { isArrayMember } from '@trezor/utils';
-
 import {
-    allowPrerelease,
+    UpdateState,
+    allowPrereleaseAction,
     available,
     checking,
     downloading,
     error,
+    getAppUpdatePayload,
     notAvailable,
     ready,
+    selectDesktopUpdate,
     setAutomaticUpdates,
     setIsUpdateModalVisible,
     setIsVersionInfoModalVisible,
-} from 'src/actions/suite/desktopUpdateActions';
+} from '@suite/desktop-upgrade';
+import { desktopApi } from '@trezor/suite-desktop-api';
+import { isArrayMember } from '@trezor/utils';
+
 import { useDispatch, useSelector } from 'src/hooks/suite';
 import { useAnalytics } from 'src/support/useAnalytics';
-import { getAppUpdatePayload } from 'src/utils/suite/analytics';
 
 import { Available } from './DesktopUpdater/Available';
 import { Downloading } from './DesktopUpdater/Downloading';
@@ -46,7 +47,7 @@ export const DesktopUpdater = () => {
     const desktopUpdateState = desktopUpdate.state;
 
     useEffect(() => {
-        desktopApi.on('update/allow-prerelease', params => dispatch(allowPrerelease(params)));
+        desktopApi.on('update/allow-prerelease', params => dispatch(allowPrereleaseAction(params)));
         desktopApi.on('update/set-automatic-update-enabled', isEnabled =>
             dispatch(setAutomaticUpdates({ isEnabled })),
         );

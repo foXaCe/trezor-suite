@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 import { events } from '@suite/analytics';
+import { UpdateState } from '@suite/desktop-upgrade';
 import { Translation } from '@suite/intl';
-import { UpdateState } from '@suite/upgrade';
 import { selectSelectedDevice } from '@suite-common/device';
 import { isDevEnv } from '@suite-common/suite-utils';
 import { Icon, Image, Paragraph } from '@trezor/components';

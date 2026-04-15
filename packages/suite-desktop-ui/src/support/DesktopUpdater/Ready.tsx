@@ -1,8 +1,8 @@
+import { installUpdate } from '@suite/desktop-upgrade';
 import { Translation } from '@suite/intl';
 import { Column, H3, Modal, Paragraph } from '@trezor/components';
 import { spacings } from '@trezor/theme';
 
-import { installUpdate } from 'src/actions/suite/desktopUpdateActions';
 import { useDispatch } from 'src/hooks/suite';
 
 interface ReadyProps {

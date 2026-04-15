@@ -1,10 +1,10 @@
+import { download } from '@suite/desktop-upgrade';
 import { selectFlags, setFlag } from '@suite/flags';
 import { Translation } from '@suite/intl';
 import { Card, Checkbox, Column, H4, Modal, Paragraph } from '@trezor/components';
 import { type UpdateInfo, desktopApi } from '@trezor/suite-desktop-api';
 import { spacings } from '@trezor/theme';
 
-import { download } from 'src/actions/suite/desktopUpdateActions';
 import { MarkdownWithComponents } from 'src/components/suite';
 import { useDispatch, useSelector } from 'src/hooks/suite';
 

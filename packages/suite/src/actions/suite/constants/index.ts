@@ -1,5 +1,5 @@
+import * as DESKTOP_UPDATE from '@suite/desktop-upgrade';
 import * as ROUTER from '@suite/router';
-import * as DESKTOP_UPDATE from '@suite/upgrade';
 
 import * as GUIDE from './guideConstants';
 import * as PROTOCOL from './protocolConstants';

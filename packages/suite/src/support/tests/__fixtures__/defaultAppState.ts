@@ -1,10 +1,10 @@
 import type { BackupState } from '@suite/backup';
+import { desktopUpdateInitialState } from '@suite/desktop-upgrade';
 import { initialState as featureFeedbackInitialState } from '@suite/feature-feedback';
 import { flagsInitialState } from '@suite/flags';
 import { locksInitialState } from '@suite/locks';
 import { type RouterState } from '@suite/router';
 import { suiteSettingsInitialState } from '@suite/settings';
-import { desktopUpdateInitialState } from '@suite/upgrade';
 import { type FirmwareUpdateState } from '@suite-common/firmware';
 import { messageSystemInitialState } from '@suite-common/message-system';
 import { type MetadataState } from '@suite-common/metadata-types';

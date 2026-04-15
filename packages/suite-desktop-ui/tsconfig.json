@@ -7,11 +7,11 @@
     "include": ["."],
     "references": [
         { "path": "../../suite/analytics" },
+        { "path": "../../suite/upgrade" },
         { "path": "../../suite/flags" },
         { "path": "../../suite/intl" },
         { "path": "../../suite/router" },
         { "path": "../../suite/sentry" },
-        { "path": "../../suite/upgrade" },
         { "path": "../components" },
         { "path": "../connect" },
         { "path": "../ipc-proxy" },

@@ -1,13 +1,14 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { type Dispatch } from '@reduxjs/toolkit';
+
+import { selectSelectedDevice } from '@suite-common/device';
 import { selectHasRunningDiscovery } from '@suite-common/wallet-core';
 import { isDesktop } from '@trezor/env-utils';
-import { mapTrezorModelToIcon } from '@trezor/product-components';
+import { QuickActionButton, mapTrezorModelToIcon } from '@trezor/product-components';
 
-import { useDevice, useSelector } from 'src/hooks/suite';
-
-import { QuickActionButton } from '../QuickActionButton';
 import { UpdateTooltip } from './UpdateTooltip';
+import { type DesktopUpgradeQuickActionsRootState } from './quickActionsRootState';
 import {
     mapDeviceUpdateToClick,
     mapSuiteUpdateToClick,
@@ -24,11 +25,15 @@ export const UpdateStatusActionBarIcon = ({
     hideUpdateQuickAction,
 }: UpdateStatusActionBarIconProps) => {
     const { updateStatus, updateStatusDevice, updateStatusSuite } = useUpdateStatus();
-    const discoveryInProgress = useSelector(selectHasRunningDiscovery);
+    const discoveryInProgress = useSelector((state: DesktopUpgradeQuickActionsRootState) =>
+        selectHasRunningDiscovery(state),
+    );
     const displayDeviceUpdateStatusBar = !discoveryInProgress;
 
-    const { device } = useDevice();
-    const dispatch = useDispatch();
+    const device = useSelector((state: DesktopUpgradeQuickActionsRootState) =>
+        selectSelectedDevice(state),
+    );
+    const dispatch = useDispatch<Dispatch>();
 
     const updateSubIcon = mapUpdateStatusToIcon[updateStatus];
 

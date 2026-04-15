@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 
+import { UpdateNotificationBanner, useUpdateStatus } from '@suite/desktop-upgrade';
 import { suiteSettingsActions } from '@suite/settings';
 import { selectDevicesCount, selectSelectedDevice } from '@suite-common/device';
 import { Box, ElevationUp, Icon, ResizableBox, useElevation } from '@trezor/components';
@@ -24,8 +25,6 @@ import { useResponsiveContext } from 'src/support/suite/ResponsiveContext';
 
 import { Navigation } from './Navigation';
 import { QuickActions } from './QuickActions/QuickActions';
-import { UpdateNotificationBanner } from './QuickActions/Update/UpdateNotificationBanner';
-import { useUpdateStatus } from './QuickActions/Update/useUpdateStatus';
 import {
     SIDEBAR_AUTO_COLLAPSE_BREAKPOINT,
     SIDEBAR_COLLAPSED_WIDTH,

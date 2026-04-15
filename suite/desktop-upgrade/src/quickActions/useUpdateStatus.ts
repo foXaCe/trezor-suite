@@ -1,9 +1,11 @@
-import { type DesktopUpdateState, UpdateState, selectDesktopUpdate } from '@suite/upgrade';
+import { useSelector } from 'react-redux';
+
+import { selectSelectedDevice } from '@suite-common/device';
 import { getSuiteVersion } from '@trezor/env-utils';
 import { versionUtils } from '@trezor/utils';
 
-import { useDevice, useSelector } from 'src/hooks/suite';
-
+import { type DesktopUpdateState, UpdateState, selectDesktopUpdate } from '../desktopUpdateReducer';
+import { type DesktopUpgradeQuickActionsRootState } from './quickActionsRootState';
 import {
     type UpdateStatus,
     type UpdateStatusDevice,
@@ -27,7 +29,6 @@ const getSuiteUpdateStatus = ({ desktopUpdate }: GetSuiteUpdateStatusArgs): Upda
         return 'just-updated';
     }
 
-    // We don't show update-availability in case of auto-updates until the update is downloaded
     if (desktopUpdate.isAutomaticUpdateEnabled && desktopUpdate.state === UpdateState.Ready) {
         return 'update-downloaded-auto-restart-to-update';
     }
@@ -71,14 +72,15 @@ const getDeviceStatus = ({
 };
 
 export const useUpdateStatus = (): UpdateStatusData => {
-    const { device } = useDevice();
-    const desktopUpdate = useSelector(selectDesktopUpdate);
+    const device = useSelector((state: DesktopUpgradeQuickActionsRootState) =>
+        selectSelectedDevice(state),
+    );
+    const desktopUpdate = useSelector((state: DesktopUpgradeQuickActionsRootState) =>
+        selectDesktopUpdate(state),
+    );
 
     const isDeviceDisconnected = device?.connected !== true;
 
-    // If firmware is outdated and suite update download/check is in progress,
-    // we suppress the Firmware notification as it can be there just for a second and then
-    // it will be replaced with Suite update notification
     const isSuiteUpdateInProgress = [UpdateState.Downloading, UpdateState.Checking].includes(
         desktopUpdate.state,
     );
@@ -86,9 +88,6 @@ export const useUpdateStatus = (): UpdateStatusData => {
     const { releaseConditions: { environment, shouldBeOffered } = {} } =
         device?.firmwareReleaseConfigInfo || {};
 
-    // when device is not connected environment?.min_suite_version is undefined and when you start the process of flashing
-    // firmware since it reboots from Firmware mode to Bootloader mode there is a moment when device is "disconnected"
-    // and therefore that fails, so we evaluate isNewerOrEqual only if device is not disconnected.
     const isValidSuiteVersion =
         !isDeviceDisconnected &&
         !!environment?.min_suite_version &&

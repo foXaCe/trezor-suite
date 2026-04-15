@@ -1,12 +1,9 @@
+import { type Dispatch } from '@reduxjs/toolkit';
+
 import { goto } from '@suite/router';
 import { type IconName, type UIIntent } from '@trezor/components';
 
-import {
-    installUpdate,
-    justUpdated,
-    setIsUpdateModalVisible,
-} from 'src/actions/suite/desktopUpdateActions';
-import { type Dispatch } from 'src/types/suite';
+import { installUpdate, justUpdated, setIsUpdateModalVisible } from '../desktopUpdateActions';
 
 export type UpdateStatusDevice = 'up-to-date' | 'update-available' | 'disconnected';
 
@@ -20,7 +17,7 @@ export type UpdateStatusSuite =
 export type UpdateStatus = UpdateStatusDevice | UpdateStatusSuite;
 
 export const mapUpdateStatusToIcon: Record<UpdateStatus, IconName> = {
-    disconnected: 'plugs', // Todo: better icon
+    disconnected: 'plugs',
     'update-downloaded-manual': 'arrowDown',
     'update-downloaded-auto-restart-to-update': 'arrowsClockwiseFilled',
     'up-to-date': 'check',
@@ -37,15 +34,15 @@ export const mapUpdateStatusToIntent: Record<UpdateStatus, UIIntent> = {
     'just-updated': 'accentViolet',
 };
 
-type OnClickCallbackCallback = ((params: { dispatch: Dispatch }) => void) | null;
+type OnClickCallback = ((params: { dispatch: Dispatch }) => void) | null;
 
-export const mapDeviceUpdateToClick: Record<UpdateStatusDevice, OnClickCallbackCallback> = {
+export const mapDeviceUpdateToClick: Record<UpdateStatusDevice, OnClickCallback> = {
     disconnected: null,
     'up-to-date': null,
     'update-available': ({ dispatch }) => dispatch(goto({ routeName: 'firmware-index' })),
 };
 
-export const mapSuiteUpdateToClick: Record<UpdateStatusSuite, OnClickCallbackCallback> = {
+export const mapSuiteUpdateToClick: Record<UpdateStatusSuite, OnClickCallback> = {
     'up-to-date': null,
     'update-downloaded-auto-restart-to-update': ({ dispatch }) =>
         dispatch(installUpdate({ installNow: true })),

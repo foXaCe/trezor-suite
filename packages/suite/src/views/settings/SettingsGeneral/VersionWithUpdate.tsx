@@ -1,17 +1,18 @@
+import {
+    type DesktopUpdateState,
+    UpdateState,
+    installUpdate,
+    setIsUpdateModalVisible,
+    setIsVersionInfoModalVisible,
+} from '@suite/desktop-upgrade';
 import { Translation } from '@suite/intl';
 import { SettingsAnchor } from '@suite/router';
-import { type DesktopUpdateState, UpdateState } from '@suite/upgrade';
 import { isDevEnv } from '@suite-common/suite-utils';
 import { Button, type ButtonProps } from '@trezor/components';
 import { isDesktop } from '@trezor/env-utils';
 import { ActionButton, ActionColumn, TextColumn } from '@trezor/product-components';
 import { desktopApi } from '@trezor/suite-desktop-api';
 
-import {
-    installUpdate,
-    setIsUpdateModalVisible,
-    setIsVersionInfoModalVisible,
-} from 'src/actions/suite/desktopUpdateActions';
 import { SettingsSectionItem } from 'src/components/settings/SettingsSectionItem';
 import { useDispatch, useExternalLink, useSelector } from 'src/hooks/suite';
 import { getReleaseUrl } from 'src/services/github';
