@@ -23,15 +23,15 @@ import {
 // @ts-expect-error: indexing with noUncheckedIndexedAccess
 const OP_INT_BASE: number = OPS.OP_RESERVED; // OP_1 - 1
 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-const { OP_0 } = OPS;
+const OP_0: number = OPS.OP_0;
 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-const { OP_1 } = OPS;
+const OP_1: number = OPS.OP_1;
 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-const { OP_16 } = OPS;
+const OP_16: number = OPS.OP_16;
 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-const { OP_1NEGATE } = OPS;
+const OP_1NEGATE: number = OPS.OP_1NEGATE;
 // @ts-expect-error: indexing with noUncheckedIndexedAccess
-const { OP_PUSHDATA4 } = OPS;
+const OP_PUSHDATA4: number = OPS.OP_PUSHDATA4;
 
 function isOPInt(value: number) {
     return (
