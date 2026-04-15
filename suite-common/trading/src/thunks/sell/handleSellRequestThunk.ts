@@ -178,7 +178,7 @@ export const handleSellRequestThunk = createThunk<
             composeRequestCallback();
         }
 
-        dispatch(tradingActions.setRefetchQuotesTimestamp());
+        dispatch(tradingActions.setRefetchQuotesTimestamp(Date.now()));
 
         return fulfillWithValue(successQuotes);
     },

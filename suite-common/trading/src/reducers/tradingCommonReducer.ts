@@ -52,7 +52,7 @@ export interface TradingPrefilledFromAccount {
     key: AccountKey | undefined;
 }
 
-// Maximum number of refetch attempts before the interval automatically stops */
+// Maximum number of refetch attempts before the interval automatically stops
 export const REFETCH_QUOTES_MAX_COUNT = 40;
 
 export interface RefetchQuotesState {
@@ -191,14 +191,17 @@ const tradingCommonSlice = createSlice({
             state.refetchQuotes.remainingRefetches = REFETCH_QUOTES_MAX_COUNT;
             state.refetchQuotes.lastFetchTimestamp = undefined;
         },
-        setRefetchQuotesTimestamp: state => {
+        setRefetchQuotesTimestamp: (
+            state,
+            { payload }: PayloadAction<RefetchQuotesState['lastFetchTimestamp']>,
+        ) => {
             if (state.refetchQuotes.status === 'stopped') {
                 return;
             }
             state.refetchQuotes.remainingRefetches -= 1;
             state.refetchQuotes.status =
                 state.refetchQuotes.remainingRefetches <= 0 ? 'stopped' : 'running';
-            state.refetchQuotes.lastFetchTimestamp = Date.now();
+            state.refetchQuotes.lastFetchTimestamp = payload;
         },
     },
 });

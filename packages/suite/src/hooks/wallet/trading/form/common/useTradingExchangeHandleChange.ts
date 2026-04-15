@@ -18,7 +18,6 @@ type TradingExchangeUseHandleChangeProps = {
     shouldSendInSats: boolean | undefined;
 
     composeRequestCallback: () => void;
-    setApprovalInitiated?: (value: boolean) => void;
     setIsScheduledQuotesRefresh?: (value: boolean) => void;
 };
 
@@ -35,7 +34,6 @@ export const useTradingExchangeHandleChange = ({
     network,
     shouldSendInSats,
     composeRequestCallback,
-    setApprovalInitiated,
     setIsScheduledQuotesRefresh,
 }: TradingExchangeUseHandleChangeProps) => {
     const dispatch = useDispatch();
@@ -46,8 +44,6 @@ export const useTradingExchangeHandleChange = ({
         if (previousPromise.current) {
             previousPromise.current.abort('Request was replaced by another one.');
         }
-
-        setApprovalInitiated?.(false);
 
         const promise = dispatch(
             exchangeThunks.handleRequestThunk({
@@ -76,7 +72,6 @@ export const useTradingExchangeHandleChange = ({
 
         setIsScheduledQuotesRefresh?.(false);
     }, [
-        setApprovalInitiated,
         dispatch,
         formValues,
         network,
@@ -90,7 +85,7 @@ export const useTradingExchangeHandleChange = ({
         setIsScheduledQuotesRefresh?.(true);
     }, [setIsScheduledQuotesRefresh]);
 
-    useTradingRefetchScheduler(handleChange, onBeforeRefetch);
+    useTradingRefetchScheduler({ onRefetch: handleChange, onBeforeRefetch });
 
     // cleanup signal
     useEffect(

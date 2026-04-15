@@ -116,7 +116,6 @@ export const useTradingExchangeForm = ({
     });
 
     const [isApproval, setIsApproval] = useState<boolean>(false);
-    const [_approvalInitiated, setApprovalInitiated] = useState<boolean>(false);
     const [isLoadingQuote, setIsLoadingQuote] = useState<boolean>(false);
 
     const [receiveAccount, setReceiveAccount] = useState<Account | undefined>();
@@ -262,7 +261,6 @@ export const useTradingExchangeForm = ({
         composeRequestCallback: () => {
             composeRequest(TRADING_FORM_OUTPUT_AMOUNT);
         },
-        setApprovalInitiated,
         setIsScheduledQuotesRefresh,
     });
 
@@ -575,8 +573,6 @@ export const useTradingExchangeForm = ({
     const approveTransaction = async (trade: ExchangeTrade) => {
         if (!receiveAddress) return false;
 
-        setApprovalInitiated(true);
-
         const newTrade = await confirmApproval({
             trade: { ...trade, status: 'CONFIRM' },
             receiveAddress,
@@ -587,8 +583,6 @@ export const useTradingExchangeForm = ({
 
     const revokeApproval = async (trade: ExchangeTrade) => {
         if (!receiveAddress) return false;
-
-        setApprovalInitiated(true);
 
         const approvalType: DexApprovalType = 'ZERO';
         const updatedTrade: ExchangeTrade = {

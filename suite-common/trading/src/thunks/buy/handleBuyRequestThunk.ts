@@ -161,7 +161,7 @@ export const handleBuyRequestThunk = createThunk<
         dispatch(tradingBuyActions.saveQuotes(quotesSuccess));
         dispatch(tradingBuyActions.saveQuoteRequest(requestData));
         dispatch(tradingActions.savePaymentMethods(paymentMethodsFromQuotes));
-        dispatch(tradingActions.setRefetchQuotesTimestamp());
+        dispatch(tradingActions.setRefetchQuotesTimestamp(Date.now()));
 
         return fulfillWithValue(quotesSuccess);
     },

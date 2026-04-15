@@ -94,11 +94,11 @@ export const useTradingBuyHandleChange = ({
                 }
             }
         } catch (error) {
-            console.warn('Request was aborted:', error.message);
+            console.warn('Request was aborted:', error instanceof Error ? error.message : error);
         }
     }, [dispatch, formValues, network, shouldSendInSats, analytics, setValue]);
 
-    useTradingRefetchScheduler(handleChange);
+    useTradingRefetchScheduler({ onRefetch: handleChange });
 
     // cleanup signal
     useEffect(

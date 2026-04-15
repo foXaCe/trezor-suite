@@ -109,7 +109,7 @@ export const useTradingSellHandleChange = ({
         setValue,
     ]);
 
-    useTradingRefetchScheduler(handleChange);
+    useTradingRefetchScheduler({ onRefetch: handleChange });
 
     // cleanup signal
     useEffect(
