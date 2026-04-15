@@ -29,7 +29,7 @@ export class WebPopup extends Popup {
         // const url = 'https://dev.suite.sldev.cz/suite-web/feat/connect-web-iframe-2/web/connect-popup';
         const query = `connect-popup-req=${this.channelId}`;
         const iframeUrl = `${url}/iframe.html?${query}`;
-        const popupUrl = `${url}/?${query}`;
+        const popupUrl = `${url}/iframe.html?${query}&redirect=true`;
 
         const windowResult = window.open(popupUrl, 'modal');
         // const windowResult = window.open('about:blank', 'connect-popup-' + this.channelId);
