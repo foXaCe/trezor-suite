@@ -41,7 +41,7 @@ export const useConnectPopupWeb = () => {
             channelRef.current.postMessage(message);
         } else {
             // TODO: show warning to user
-            console.error('BroadcastChannel not available', initialUrl.current);
+            console.error('BroadcastChannel not available yet', initialUrl.current);
         }
     }, []);
 
@@ -65,6 +65,7 @@ export const useConnectPopupWeb = () => {
     useEffect(() => {
         const urlParams = new URLSearchParams(initialUrl.current);
         const id = urlParams.get('connect-popup-req');
+        console.warn('Connect-popup initialized with id:', id);
         if (!id) {
             // no id in URL, unable to establish communication channel
             return;
@@ -86,6 +87,7 @@ export const useConnectPopupWeb = () => {
             channelRef.current?.removeEventListener('message', onMessage);
             channelRef.current = null;
             // TODO: show warning to user
+            console.warn('Connect-popup handshakeTimeout');
         }, 3000);
 
         const onMessage = (event: MessageEvent) => {
